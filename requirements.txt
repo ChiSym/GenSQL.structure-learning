@@ -1,0 +1,7 @@
+future
+matplotlib
+pandas
+pytest
+seaborn
+sklearn
+statsmodels
