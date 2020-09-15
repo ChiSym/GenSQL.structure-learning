@@ -28,8 +28,23 @@ venv:
 	@mkdir ${VENV_LOCATION}
 	${PYTHON} -m venv ${VENV_LOCATION}
 
-install: venv
+spn-repo:
+ifneq ($(wildcard sum-product-dsl/.*),)
+	@echo "Found sum-product-dsl repo. Will not download."
+else
+	@echo "Did not find sum-product-dsl repo. Will clone."
+	git clone git@github.com:probcomp/sum-product-dsl.git
+endif
+
+spn: spn-repo
+	${VENV_PIP} install ./sum-product-dsl
+
+deps: spn
+	@echo "Installed dependencies."
+
+install: venv deps
 	@mkdir -p ${ANALYSES_LOCATION}
 
 clean:
 	rm -rf ${VENV_LOCATION}
+	rm -rf sum-product-dsl
