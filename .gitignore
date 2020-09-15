@@ -1,3 +1,6 @@
+sum-product-dsl/
+venv/
+
 pom.xml
 pom.xml.asc
 *.jar
