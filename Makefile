@@ -49,8 +49,10 @@ deps: spn cgpm
 	${VENV_PIP} install -r requirements.txt
 	@echo "Installed dependencies."
 
-install: venv deps
+home-dir:
 	@mkdir -p ${ANALYSES_LOCATION}
+
+install: venv deps home-dir
 
 ###########################################################################
 # Clean the house. CAVEAT: this removes the local copy of the sum-product-dsl.
@@ -70,3 +72,12 @@ cgpm-test:
 	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m pytest --pyargs cgpm -k "not __ci_"
 
 test: spn-test cgpm-test
+
+docker-image: spn-repo
+	docker build . -t inferenceql.automodeling
+
+docker-container: home-dir
+	docker run -v ${ANALYSES_LOCATION}:/analyses -p 8000:8000 -t inferenceql.automodeling
+
+notebook:
+	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m jupyter notebook --ip 0.0.0.0 --port=8000 --no-browser --allow-root

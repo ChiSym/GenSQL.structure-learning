@@ -5,3 +5,4 @@ pytest
 seaborn
 sklearn
 statsmodels
+jupyter
