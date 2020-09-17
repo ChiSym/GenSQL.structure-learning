@@ -77,7 +77,11 @@ docker-image: spn-repo
 	docker build . -t inferenceql.automodeling
 
 docker-container: home-dir
-	docker run -v ${ANALYSES_LOCATION}:/analyses -p 8000:8000 -t inferenceql.automodeling
+	docker run  --name iql_auto -v ${ANALYSES_LOCATION}:/analyses -p 8000:8000 -t inferenceql.automodeling
+
+docker-shell:
+	docker exec -it iql_auto bin/bash
+
 
 notebook:
 	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m jupyter notebook --ip 0.0.0.0 --port=8000 --no-browser --allow-root
