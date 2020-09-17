@@ -63,7 +63,7 @@ clean:
 
 
 ###########################################################################
-# Virtual Environment Setup
+# Testing
 
 spn-test:
 	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m pytest --pyargs spn
@@ -72,6 +72,9 @@ cgpm-test:
 	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m pytest --pyargs cgpm -k "not __ci_"
 
 test: spn-test cgpm-test
+
+###########################################################################
+# Docker setup
 
 docker-image: spn-repo
 	docker build . -t inferenceql.automodeling
@@ -82,6 +85,8 @@ docker-container: home-dir
 docker-shell:
 	docker exec -it iql_auto bin/bash
 
+###########################################################################
+# Start a Jupyter notebook
 
 notebook:
 	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m jupyter notebook --ip 0.0.0.0 --port=8000 --no-browser --allow-root
