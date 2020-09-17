@@ -35,11 +35,12 @@ $ make docker-image
 ### Jupyter access
 Run the docker container and start a Jupyter notebook server at port 8000.
 ```
-$ make docker-container.
+$ make docker-container
 ```
 
 ### Shell access
-Once the container is running
+Once the container is running we can open a shell inside the container, too.
+This will help in case we don't want/need Jupyter access.
 ```
 $ make docker-shell
 [docker-container]$ source venv/bin/activate
