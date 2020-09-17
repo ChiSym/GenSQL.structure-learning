@@ -85,6 +85,10 @@ docker-container: home-dir
 docker-shell:
 	docker exec -it iql_auto bin/bash
 
+docker-push:
+	docker tag inferenceql.automodeling probcomp/inferenceql.automodeling:pre-alpha.v$(VERSION)
+	docker push probcomp/inferenceql.automodeling:pre-alpha.v$(VERSION)
+
 ###########################################################################
 # Start a Jupyter notebook
 
