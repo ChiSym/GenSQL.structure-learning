@@ -19,6 +19,13 @@ and then activate the virtual environement.
  source .venv/bin/activate
 ```
 
+### CAVEAT: Python version 3.6
+
+If Python3.6 is not found users may have to edit line 6 in the Makefile or set a global alias for Python using
+```
+alias PYTHON=python3
+```
+
 ### Jupyter access
 ```
 $ make notebook
