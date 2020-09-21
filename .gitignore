@@ -1,5 +1,5 @@
 sum-product-dsl/
-venv/
+.venv/
 
 pom.xml
 pom.xml.asc

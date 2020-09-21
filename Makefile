@@ -16,7 +16,7 @@ ANALYSES_LOCATION = analyses
 #
 # Should not really be changed
 #
-VENV_LOCATION := venv
+VENV_LOCATION := .venv
 VENV_PYTHON := ${VENV_LOCATION}/bin/python
 VENV_PIP := ${VENV_LOCATION}/bin/pip
 
@@ -46,7 +46,7 @@ deps:
 home-dir:
 	@mkdir -p ${ANALYSES_LOCATION}
 
-install: venv deps home-dir
+install: venv spn-repo deps home-dir
 
 ###########################################################################
 # Clean the house. CAVEAT: this removes the local copy of the sum-product-dsl.

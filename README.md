@@ -16,7 +16,7 @@ $ make install
 ````
 and then activate the virtual environement.
 ```
- source venv/bin/activate
+ source .venv/bin/activate
 ```
 
 ### Jupyter access
@@ -43,7 +43,7 @@ Once the container is running we can open a shell inside the container, too.
 This will help in case we don't want/need Jupyter access.
 ```
 $ make docker-shell
-[docker-container]$ source venv/bin/activate
+[docker-container]$ source .venv/bin/activate
 ```
 
 ### Testing
