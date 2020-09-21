@@ -39,13 +39,7 @@ else
 	git clone git@github.com:probcomp/sum-product-dsl.git
 endif
 
-spn: spn-repo
-	${VENV_PIP} install ./sum-product-dsl
-
-cgpm:
-	${VENV_PIP} install git+https://github.com/probcomp/cgpm@20200908-schaechtle-experimenting-porting-to-python3
-
-deps: spn cgpm
+deps:
 	${VENV_PIP} install -r requirements.txt
 	@echo "Installed dependencies."
 

@@ -6,3 +6,6 @@ seaborn
 sklearn
 statsmodels
 jupyter
+./sum-product-dsl
+git+https://github.com/probcomp/cgpm@20200908-schaechtle-experimenting-porting-to-python3
+
