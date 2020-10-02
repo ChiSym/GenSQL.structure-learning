@@ -66,8 +66,10 @@ spn-test:
 cgpm-test:
 	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m pytest --pyargs cgpm -k "not __ci_"
 
-test: spn-test cgpm-test
+auto-test:
 	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m pytest tests/ -vvv
+
+test: spn-test cgpm-test auto-test
 
 ###########################################################################
 # Docker setup
