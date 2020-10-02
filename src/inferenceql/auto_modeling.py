@@ -26,7 +26,7 @@ def replace_strings(df_in, schema):
             df[c] = df_in[c].replace(to_replace=schema[c]['values'])
     return df
 
-def create_cgpm(df, schema, randseed=42):
+def create_cgpms(df, schema,  n_models=1):
     """
     Take data and schema and return a CGPM state.
 
@@ -67,11 +67,12 @@ def create_cgpm(df, schema, randseed=42):
     for distarg in cgpm_distargs:
         assert (distarg is None) or ('k' in distarg)
 
-    state = State(
-        df_not_ignored.values,
-        outputs=range(df_not_ignored.shape[1]),
-        cctypes=cgpm_cc_types,
-        distargs=cgpm_distargs,
-        rng=gu.gen_rng(randseed)
-    )
-    return state, col_name_id_mapping
+    def make_state(i):
+        return State(
+            df_not_ignored.values,
+            outputs=range(df_not_ignored.shape[1]),
+            cctypes=cgpm_cc_types,
+            distargs=cgpm_distargs,
+        )
+    states = list(map(make_state, range(n_models)))
+    return states, col_name_id_mapping

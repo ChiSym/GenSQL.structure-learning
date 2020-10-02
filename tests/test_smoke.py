@@ -13,13 +13,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from inferenceql.auto_modeling import create_cgpm
+from inferenceql.auto_modeling import create_cgpms
 
 import json
 import pandas as pd
 
 
-def test_smoke_create_cgpm():
+def test_smoke_create_cgpms():
     schema = {
         'key': {
             'type' : 'ignored'
@@ -41,9 +41,19 @@ def test_smoke_create_cgpm():
         'b'   : [2.2, 1.3, 11.1, 1.],
         'c'   : ['True', 'False', 'True', 'False'],
     })
-    state, col_name_id_mapping = create_cgpm(df, schema)
+    n_models = 3
 
-    assert list(col_name_id_mapping.keys()) == ['a', 'b', 'c']
+    states, col_name_id_mapping = create_cgpms(df, schema, n_models=n_models)
 
-    lpdf = state.logpdf(None, {2:1}, {0:-1})
-    assert isinstance(lpdf, float)
+    assert len(states) == 3
+
+    assert set(col_name_id_mapping.keys()) == set(['a', 'b', 'c'])
+
+    lpdf1 = states[n_models-1].logpdf(None, {2:1}, {0:-1})
+    lpdf2 = states[0].logpdf(None, {2:1}, {0:-1})
+    assert isinstance(lpdf1, float)
+    assert isinstance(lpdf2, float)
+
+    assert lpdf1 != lpdf2, 'Something is wrong with random initialization'
+    # Once again. Just to be sure.
+    assert states[0].alpha() != states[1].alpha(), 'Something is wrong with random initialization'
