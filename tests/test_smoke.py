@@ -17,9 +17,10 @@ from inferenceql.auto_modeling import create_cgpms
 
 import json
 import pandas as pd
+import pytest
 
-
-def test_smoke_create_cgpms():
+@pytest.mark.parametrize('parallel', [True, False])
+def test_smoke_create_cgpms(parallel):
     schema = {
         'key': {
             'type' : 'ignored'
@@ -43,7 +44,12 @@ def test_smoke_create_cgpms():
     })
     n_models = 3
 
-    states, col_name_id_mapping = create_cgpms(df, schema, n_models=n_models)
+    states, col_name_id_mapping = create_cgpms(
+        df,
+        schema,
+        n_models=n_models,
+        parallel=parallel
+    )
 
     assert len(states) == 3
 

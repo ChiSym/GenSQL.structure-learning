@@ -16,6 +16,7 @@
 
 from cgpm.crosscat.state import State
 from cgpm.utils import general as gu
+from cgpm.utils.parallel_map import parallel_map
 
 def replace_strings(df_in, schema):
     """Replace categorical values in a dataframe with integers as specified in
@@ -26,7 +27,7 @@ def replace_strings(df_in, schema):
             df[c] = df_in[c].replace(to_replace=schema[c]['values'])
     return df
 
-def create_cgpms(df, schema,  n_models=1):
+def create_cgpms(df, schema,  n_models=1, parallel=True):
     """
     Take data and schema and return a CGPM state.
 
@@ -73,6 +74,8 @@ def create_cgpms(df, schema,  n_models=1):
             outputs=range(df_not_ignored.shape[1]),
             cctypes=cgpm_cc_types,
             distargs=cgpm_distargs,
+            rng=gu.gen_rng(i + 1)
         )
-    states = list(map(make_state, range(n_models)))
+    mapper =  parallel_map if parallel else map
+    states = list(mapper(make_state, range(n_models)))
     return states, col_name_id_mapping
