@@ -47,6 +47,7 @@ home-dir:
 	@mkdir -p ${ANALYSES_LOCATION}
 
 install: venv spn-repo deps home-dir
+	pip install .
 
 ###########################################################################
 # Clean the house. CAVEAT: this removes the local copy of the sum-product-dsl.
@@ -66,6 +67,7 @@ cgpm-test:
 	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m pytest --pyargs cgpm -k "not __ci_"
 
 test: spn-test cgpm-test
+	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m pytest tests/ -vvv
 
 ###########################################################################
 # Docker setup
