@@ -17,7 +17,7 @@
 from cgpm.crosscat.state import State
 from cgpm.utils import general as gu
 from cgpm.utils.parallel_map import parallel_map
-
+from copy import deepcopy
 from inferenceql.convert_cgpm import convert_states
 
 def replace_strings(df_in, schema):
@@ -106,3 +106,53 @@ def cgpm_to_spn(states, col_name_id_mapping, schema):
     # Inverting order of the three vars here to make the output more intuitive.
     # We should probably also fix this in convert_states.
     return spn, variables, latents
+
+
+def inf_names_to_cgpm_kernels(inf_names):
+    kernels=[]
+    for name in inf_names:
+        if name == 'GIBBS_COLUMN_ALPHA':
+            kernels.append('alpha')
+        elif name == 'GIBBS_ROW_ALPHAS':
+            kernels.append('view_alphas')
+        elif name == 'GIBBS_COLUMN_HYPERS':
+            kernels.append('column_hypers')
+        elif name == 'GIBBS_ROW_ASSIGNMENTS':
+            kernels.append('rows')
+        elif name == 'GIBBS_COLUMN_ASSIGNMENTS':
+            kernels.append('columns')
+        else:
+            raise ValueError(name)
+    return kernels
+
+def get_inf_routine(states, iters, body):
+
+    if body == 'default':
+        def inf(state):
+            state.transition(iters)
+            return state
+    elif isinstance(body, dict):
+        if set(body.values()) == set(['default']):
+            kernels = inf_names_to_cgpm_kernels(body.keys())
+            def inf(state):
+                state.transition(iters, kernels=kernels)
+                return state
+        else:
+            raise NotImplementedError
+    else:
+        raise ValueError(body)
+    return inf
+
+
+def cgpm_inference(states_in, col_name_id_mapping, inf_prog, parallel=True):
+    """Perform inference given a specified inference program"""
+    mapper =  parallel_map if parallel else map
+    states = deepcopy(states_in)
+    for instruction in inf_prog:
+        inf = get_inf_routine(
+            states,
+            instruction['REPEAT'],
+            instruction['BODY'],
+        )
+        states = list(mapper(inf, states))
+    return states
