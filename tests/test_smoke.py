@@ -14,7 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from inferenceql.auto_modeling import create_cgpms
-
+from inferenceql.auto_modeling import cgpm_to_spn
+from spn.spn import SumSPN
 import json
 import pandas as pd
 import pytest
@@ -65,3 +66,26 @@ def test_smoke_create_cgpms(parallel):
     assert lpdf1 != lpdf2, 'Something is wrong with random initialization'
     # Once again. Just to be sure.
     assert states[0].alpha() != states[1].alpha(), 'Something is wrong with random initialization'
+
+def test_smoke_create_spn():
+    n_models = 3
+
+    states, col_name_id_mapping = create_cgpms(
+        DF,
+        SCHEMA,
+        n_models=n_models,
+    )
+
+    spn, variables, latents = cgpm_to_spn(states, col_name_id_mapping, SCHEMA)
+    assert spn.prob(spn.child << {'2'}) == pytest.approx(1./n_models)
+    assert spn.prob(spn.child << {'3'}) == 0.
+
+    assert isinstance(spn, SumSPN)
+    assert isinstance(spn.condition(variables['c'] << {'True'}), SumSPN)
+
+    n_samples = 3
+    samples = spn.sample_subset([variables['a'], variables['c']], N=n_samples)
+    assert len(samples) == n_samples
+    assert len(samples[0]) == 2
+    for s in samples:
+        assert s[variables['c']] in ['True', 'False']

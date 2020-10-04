@@ -18,6 +18,8 @@ from cgpm.crosscat.state import State
 from cgpm.utils import general as gu
 from cgpm.utils.parallel_map import parallel_map
 
+from inferenceql.convert_cgpm import convert_states
+
 def replace_strings(df_in, schema):
     """Replace categorical values in a dataframe with integers as specified in
     the schema."""
@@ -79,3 +81,28 @@ def create_cgpms(df, schema,  n_models=1, parallel=True):
     mapper =  parallel_map if parallel else map
     states = list(mapper(make_state, range(n_models)))
     return states, col_name_id_mapping
+
+
+def cgpm_to_spn(states, col_name_id_mapping, schema):
+    """Functoin to convert from the CGPM model represenation to SPN
+    representatoin."""
+    metadata_list = [state.to_metadata() for state in states]
+    # Here, we follow @fsaad's conventions
+    variable_mapping = {int(v):k for k,v in col_name_id_mapping.items()}
+    # This needs to be a tuple as convert_states below makes this assumption.
+    # We should probably keep it from making this assumption.
+    categorical_mapping = [
+            (v,[(i,cat) for cat,i in schema[k].get('values', {}).items()])
+        for k,v in col_name_id_mapping.items()
+    ]
+    # `variables` is a dictionary mapping variable names to queryable variables.
+    # `latests` is a dictionary mapping variable names to queryable latent cluster
+    # variable.
+    variables, latents, spn = convert_states(
+        metadata_list,
+        variable_mapping,
+        categorical_mapping
+    )
+    # Inverting order of the three vars here to make the output more intuitive.
+    # We should probably also fix this in convert_states.
+    return spn, variables, latents
