@@ -19,34 +19,36 @@ import json
 import pandas as pd
 import pytest
 
+
+SCHEMA = {
+    'key': {
+        'type' : 'ignored'
+        },
+    'a': {
+        'type' : 'numerical'
+        },
+    'b': {
+        'type' : 'numerical'
+        },
+    'c': {
+        'type' : 'nominal',
+        'values': {'False': 0, 'True': 1}
+    }
+}
+DF = pd.DataFrame({
+    'key' : [0, 1, 2, 3],
+    'a'   : [1.2, 9.3, 10.1, 12.],
+    'b'   : [2.2, 1.3, 11.1, 1.],
+    'c'   : ['True', 'False', 'True', 'False'],
+})
+
 @pytest.mark.parametrize('parallel', [True, False])
 def test_smoke_create_cgpms(parallel):
-    schema = {
-        'key': {
-            'type' : 'ignored'
-            },
-        'a': {
-            'type' : 'numerical'
-            },
-        'b': {
-            'type' : 'numerical'
-            },
-        'c': {
-            'type' : 'nominal',
-            'values': {'False': 0, 'True': 1}
-        }
-    }
-    df = pd.DataFrame({
-        'key' : [0, 1, 2, 3],
-        'a'   : [1.2, 9.3, 10.1, 12.],
-        'b'   : [2.2, 1.3, 11.1, 1.],
-        'c'   : ['True', 'False', 'True', 'False'],
-    })
     n_models = 3
 
     states, col_name_id_mapping = create_cgpms(
-        df,
-        schema,
+        DF,
+        SCHEMA,
         n_models=n_models,
         parallel=parallel
     )
