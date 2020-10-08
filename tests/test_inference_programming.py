@@ -56,82 +56,53 @@ PARALLEL = [True, False]
 
 @pytest.mark.parametrize('parallel', PARALLEL)
 def test_smoke_full_sweep(parallel):
-    inf_prog = [{'REPEAT': 3, 'BODY':'default'}]
     states = cgpm_inference(
             STATES_INIT,
             COL_NAME_ID_MAPPING,
-            inf_prog,
-            parallel
+            iters=3,
+            parallel=parallel
     )
     assert states[0].logpdf_score() != STATES_INIT[0].logpdf_score()
 
 def test_consistency_parallel():
-    inf_prog = [{'REPEAT': 3, 'BODY':'default'}]
     states_serial = cgpm_inference(
             STATES_INIT,
             COL_NAME_ID_MAPPING,
-            inf_prog,
+            iters=3,
             parallel=False
     )
     states_parallel = cgpm_inference(
             STATES_INIT,
             COL_NAME_ID_MAPPING,
-            inf_prog,
+            iters=3,
             parallel=True
     )
     assert states_serial[0].logpdf_score() == states_parallel[0].logpdf_score()
+    assert states_serial[1].logpdf_score() == states_parallel[1].logpdf_score()
 
 @pytest.mark.parametrize('parallel', PARALLEL)
-def test_smoke_column_hypers(parallel):
-    inf_prog = [{'REPEAT': 2, 'BODY': {'GIBBS_COLUMN_HYPERS': 'default'}}]
-
+def test_smoke_column_hypers_all_columns(parallel):
     states = cgpm_inference(
             STATES_INIT,
             COL_NAME_ID_MAPPING,
-            inf_prog,
-            parallel
+            iters=3,
+            parallel=parallel,
+            kernels=['column_hypers']
     )
-    assert states[0].views[0].dims[0].hypers != STATES_INIT[0].views[0].dims[0].hypers
-    assert states[0].alpha() ==STATES_INIT[0].alpha()
+    assert states[0].dim_for(0).hypers != STATES_INIT[0].dim_for(0).hypers
+    assert states[1].dim_for(0).hypers != STATES_INIT[1].dim_for(0).hypers
+    assert states[0].alpha() == STATES_INIT[0].alpha()
 
-#def test_smoke_gibbs_inference():
-#
-#    inf_prog_1 = [
-#            {'REPEAT': 3, 'BODY':'default'}
-#    ]
-#    inf_prog_2 = [
-#            {'REPEAT': 3, 'BODY': 'default'},
-#            {'REPEAT': 2, 'BODY': [{'GIBBS_COLUMN_HYPERS': 'default'}]}
-#    ]
-#    inf_prog_3 = [
-#            {'REPEAT': 2, 'BODY': [
-#                {'GIBBS_COLUMN_ALPHA': 'default'}
-#            ]},
-#            {'REPEAT': 2, 'BODY': [
-#                {'GIBBS_COLUMN_HYPERS': {'COLUMNS': ['a', 'c']}}
-#            ]}
-#    ]
-#    inf_prog_4 = [
-#            {'REPEAT': 2, 'BODY': [
-#                {'GIBBS_ROW_ASSIGNMETS': {'ROWS': [0]}}
-#            ]}
-#    ]
-#
-#    states_init, col_name_id_mapping = create_cgpms(
-#        DF,
-#        SCHEMA,
-#        n_models=2,
-#        parallel=parallel
-#    )
-#    states_1 = cgpm_gibbs_inference(states_init, col_name_id_mapping, inf_prog_1)
-#
-#    states_2 = cgpm_gibbs_inference(states_init, col_name_id_mapping, inf_prog_2)
-#
-#    states_3 = cgpm_gibbs_inference(states_init, col_name_id_mapping, inf_prog_3)
-#    # Those have to get better.
-#    assert states_1[0].view_alphas != states_init[0].view_alphas
-#    assert states_2[0].view_alphas != states_init[0].view_alphas
-#    assert states_3[0].view_alphas == states_init[0].view_alphas
-
-# TODO: simple SMC.
-
+@pytest.mark.parametrize('parallel', PARALLEL)
+def test_smoke_column_hypers_specificy_columns(parallel):
+    states = cgpm_inference(
+            STATES_INIT,
+            COL_NAME_ID_MAPPING,
+            iters=3,
+            parallel=parallel,
+            kernels=['column_hypers'],
+            columns=['a']
+    )
+    # Column 'a' corresponds to col index 0 -- thus dim_for[0]
+    assert states[0].dim_for(0).hypers != STATES_INIT[0].dim_for(0).hypers
+    assert states[0].dim_for(1).hypers == STATES_INIT[0].dim_for(1).hypers
