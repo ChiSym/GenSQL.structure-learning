@@ -39,6 +39,7 @@ home-dir:
 	@mkdir -p ${ANALYSES_LOCATION}
 
 install: venv deps home-dir
+	pip install .
 
 ###########################################################################
 # Clean the house. CAVEAT: this removes the local copy of the sum-product-dsl.
@@ -57,7 +58,10 @@ sppl-test:
 cgpm-test:
 	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m pytest --pyargs cgpm -k "not __ci_"
 
-test: sppl-test cgpm-test
+auto-test:
+	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m pytest tests/ -vvv
+
+test: sppl-test cgpm-test auto-test
 
 ###########################################################################
 # Docker setup
