@@ -31,14 +31,6 @@ venv:
 ###########################################################################
 # Install automated modeling.
 
-spn-repo:
-ifneq ($(wildcard sum-product-dsl/.*),)
-	@echo "Found sum-product-dsl repo. Will not download."
-else
-	@echo "Did not find sum-product-dsl repo. Will clone."
-	git clone git@github.com:probcomp/sum-product-dsl.git
-endif
-
 deps:
 	${VENV_PIP} install -r requirements.txt
 	@echo "Installed dependencies."
@@ -46,7 +38,7 @@ deps:
 home-dir:
 	@mkdir -p ${ANALYSES_LOCATION}
 
-install: venv spn-repo deps home-dir
+install: venv deps home-dir
 	pip install .
 
 ###########################################################################
@@ -60,8 +52,8 @@ clean:
 ###########################################################################
 # Testing
 
-spn-test:
-	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m pytest --pyargs spn
+sppl-test:
+	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m pytest --pyargs sppl
 
 cgpm-test:
 	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m pytest --pyargs cgpm -k "not __ci_"
@@ -69,12 +61,12 @@ cgpm-test:
 auto-test:
 	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m pytest tests/ -vvv
 
-test: spn-test cgpm-test auto-test
+test: sppl-test cgpm-test auto-test
 
 ###########################################################################
 # Docker setup
 
-docker-image: spn-repo
+docker-image:
 	docker build . -t inferenceql.automodeling
 
 docker-container: home-dir
