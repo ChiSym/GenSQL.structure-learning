@@ -29,6 +29,11 @@ def replace_strings(df_in, schema):
             df[c] = df_in[c].replace(to_replace=schema[c]['values'])
     return df
 
+
+def replace(dict_in, values):
+    return [dict_in[v.lower()] for v in values]
+
+
 def create_cgpms(df, schema,  n_models=1, parallel=True):
     """
     Take data and schema and return a CGPM state.
@@ -58,12 +63,12 @@ def create_cgpms(df, schema,  n_models=1, parallel=True):
 
     col_name_id_mapping = {c : i for i,c in enumerate(df_not_ignored.columns)}
 
-    cgpm_cc_types = [
-            'normal' if schema[c]['type'] == 'numerical' else 'categorical'
-            for c in df_not_ignored.columns
-    ]
+    cgpm_cc_types = replace(
+            {'numerical': 'normal', 'nominal': 'categorical'},
+            [schema[c]['type'] for c in df_not_ignored.columns]
+    )
     cgpm_distargs = [
-            None if schema[c]['type'] == 'numerical'
+            None if schema[c]['type'].lower() == 'numerical'
             else {'k' : len(schema[c]['values'])}
             for c in df_not_ignored.columns
     ]
