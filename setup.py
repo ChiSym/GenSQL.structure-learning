@@ -15,17 +15,13 @@ setuptools.setup(
         'inferenceql': 'src/inferenceql',
         'inferenceql.auto_modeling': 'src/inferenceql/auto_modeling',
     },
-    #author="Example Author",
-    #author_email="author@example.com",
-    #description="A small example package",
-    #long_description=long_description,
-    #long_description_content_type="text/markdown",
-    #url="https://github.com/pypa/sampleproject",
-    #packages=setuptools.find_packages(),
-    #classifiers=[
-    #    "Programming Language :: Python :: 3",
-    #    "License :: OSI Approved :: MIT License",
-    #    "Operating System :: OS Independent",
-    #],
-    #python_requires='>=3.6',
+    author="Ulrich Schaechtle", # Maintainer
+    author_email="ulli@mit.edu",
+    description="Automated data modeling for inferenceQL",
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: Apache License Version 2.0, January 2004",
+        "Operating System :: macOS, Ubuntu",
+    ],
+    python_requires='>=3.6',
 )
