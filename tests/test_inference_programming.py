@@ -15,7 +15,6 @@
 # limitations under the License.
 from inferenceql.auto_modeling import create_cgpms
 from inferenceql.auto_modeling import cgpm_inference
-from spn.spn import SumSPN
 import json
 import pandas as pd
 import pytest

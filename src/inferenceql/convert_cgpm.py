@@ -12,13 +12,13 @@ from collections import OrderedDict
 from math import log
 from math import sqrt
 
-import spn.distributions
+import sppl.distributions
 
-from spn.math_util import lognorm
-from spn.spn import ProductSPN
-from spn.spn import SumSPN
-from spn.spn import ExposedSumSPN
-from spn.transforms import Identity
+from sppl.math_util import lognorm
+from sppl.spn import ProductSPN
+from sppl.spn import SumSPN
+from sppl.spn import ExposedSumSPN
+from sppl.transforms import Identity
 
 # =====================================================================
 # Converting primitive distributions.
@@ -33,7 +33,7 @@ def convert_primitive(Xs, output, cctype, hypers, suffstats, distargs,
         x_sum = suffstats['x_sum']
         # Compute the distribution.
         p = (x_sum + alpha) / (N + alpha + beta)
-        dist = spn.distributions.bernoulli(p=p)
+        dist = sppl.distributions.bernoulli(p=p)
 
     elif cctype == 'beta':
         strength = hypers['strength']
@@ -41,7 +41,7 @@ def convert_primitive(Xs, output, cctype, hypers, suffstats, distargs,
         # Compute the distribution.
         alpha = strength * balance
         beta = strength * (1. - balance)
-        dist = spn.distributions.beta(a=alpha, b=beta)
+        dist = sppl.distributions.beta(a=alpha, b=beta)
 
     elif cctype == 'categorical':
         k = distargs['k']
@@ -76,7 +76,7 @@ def convert_primitive(Xs, output, cctype, hypers, suffstats, distargs,
         # Compute the distribution.
         an = a + N
         bn = b + sum_x
-        dist = spn.distributions.lomax(c=an, scale=bn)
+        dist = sppl.distributions.lomax(c=an, scale=bn)
 
     elif cctype == 'geometric':
         a = hypers['a']
@@ -91,7 +91,7 @@ def convert_primitive(Xs, output, cctype, hypers, suffstats, distargs,
         an = a + N
         bn = b + sum_x
         pn = an / (an + bn)
-        dist = spn.distributions.geom(p=pn)
+        dist = sppl.distributions.geom(p=pn)
 
     elif cctype == 'normal':
         m = hypers['m']
@@ -110,7 +110,7 @@ def convert_primitive(Xs, output, cctype, hypers, suffstats, distargs,
         sn = s + sum_x_sq + r*m*m - rn*mn*mn
         (an, bn, kn, mun) = (nun/2, sn/2, rn, mn)
         scalesq = bn*(kn+1)/(an*kn)
-        dist = spn.distributions.t(df=2*an, loc=mun, scale=sqrt(scalesq))
+        dist = sppl.distributions.t(df=2*an, loc=mun, scale=sqrt(scalesq))
 
     elif cctype == 'poisson':
         a = hypers['a']
@@ -123,7 +123,7 @@ def convert_primitive(Xs, output, cctype, hypers, suffstats, distargs,
         an = a + sum_x
         bn = b + N
         pn = bn / (1. + bn)
-        dist = spn.distributions.nbinom(n=an, p=pn)
+        dist = sppl.distributions.nbinom(n=an, p=pn)
 
     else:
         assert False, 'Cannot convert primitive: %s ' % (cctype,)
