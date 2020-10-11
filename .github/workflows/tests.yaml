@@ -24,10 +24,10 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Run Clojure tests
         run: bin/kaocha --reporter documentation --plugin kaocha.plugin/profiling
-      - name: Setup Python
-        uses: actions/setup-python@v2
-      - name: Setup Virtual env
-        run: apt-get install python3-venv
+      - name: setup pyenv
+        uses: "gabrielfalcao/pyenv-action@v5"
+        with:
+          default: 3.6.4
       - name: Install automodeling
         run: make install
       - name: Run CGPM tests
