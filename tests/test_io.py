@@ -139,8 +139,8 @@ def test_write_analysis():
     )
     analysis = read_analysis(TEST_DIR)
     assert_analysis_format(analysis)
-    assert analysis['metadata']['Inference'][0]['foo_infernce_iterations'] == 3
-    assert analysis['metadata']['Inference'][0]['bar_infernce_iterations'] == 4
+    assert analysis['metadata']['inference'][0]['foo_infernce_iterations'] == 3
+    assert analysis['metadata']['inference'][0]['bar_infernce_iterations'] == 4
 
     _clean_test_dir()
 
