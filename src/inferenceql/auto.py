@@ -65,7 +65,7 @@ def run_automodeling(kwargs):
         analysis['states'],
         analysis['col_name_id_mapping'],
         iters=kwargs['iterations'],
-        columns=None,
+        columns=kwargs['columns'],
         kernels=kwargs['kernels'],
         parallel=kwargs['parallel']
     )
@@ -116,6 +116,13 @@ if __name__ == "__main__":
         type=int,
         default=1,
         help='Number of models in the ensemble'
+    )
+    parser.add_argument(
+        '-c', '--columns',
+        nargs='+',
+        type=str,
+        default=None,
+        help='Consider only the specified subset of columns'
     )
     parser.add_argument(
         '-n', '--name',
