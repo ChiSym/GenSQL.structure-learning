@@ -95,6 +95,7 @@ def assert_analysis_format(analysis):
     assert isinstance(analysis['col_name_id_mapping'], dict)
     assert isinstance(analysis['metadata'], dict)
 
+
 def test_read_analysis(tmp_analysis_dir, get_test_states):
     _,  _, test_dir = tmp_analysis_dir
     states_in, col_name_id_mapping_in = get_test_states
