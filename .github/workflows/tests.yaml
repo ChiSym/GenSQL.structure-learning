@@ -24,7 +24,7 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Run Clojure tests
         run: bin/kaocha --reporter documentation --plugin kaocha.plugin/profiling
-      - name: setup pyenv
+      - name: Setup pyenv
         uses: "gabrielfalcao/pyenv-action@v5"
         with:
           default: 3.6.4
