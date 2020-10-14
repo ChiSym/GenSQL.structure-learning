@@ -10,6 +10,8 @@ jobs:
           default: 3.6.4
       - name: Setup Graphviz
         uses: ts-graphviz/setup-graphviz@v1
+      - name: Checkout repository
+        uses: actions/checkout@v2
       - name: Install automodeling
         run: make install
       - name: Run CGPM tests
