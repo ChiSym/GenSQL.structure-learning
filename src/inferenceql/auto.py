@@ -131,8 +131,5 @@ if __name__ == "__main__":
         help='Name under which to safe/look for the CGPM model'
     )
     args = parser.parse_args()
-    if (len(args.kernels) < 5) and ('rows' in args.kernels):
-        raise ValueError(
-            'Suppling a subset of kernels including the "rows" kernel is currently buggy. Other subset of kernels should work.')
     print(vars(args))
     run_automodeling(vars(args))
