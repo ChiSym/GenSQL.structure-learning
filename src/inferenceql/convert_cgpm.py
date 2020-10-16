@@ -137,7 +137,7 @@ def convert_cluster(Xs, Zs, metadata, categorical_mapping, tables):
     distargs = metadata['distargs']
     suffstats = metadata['suffstats']
     args = lambda output, z : (Xs, output, cctypes[output], hypers[output],
-        suffstats[output][z], distargs[output], categorical_mapping)
+        suffstats[output][str(z)], distargs[output], categorical_mapping)
     children_list_x = [
         [convert_primitive(*args(output, z)) for output in outputs]
         for z in tables

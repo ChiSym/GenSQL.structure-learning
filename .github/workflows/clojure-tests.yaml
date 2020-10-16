@@ -1,4 +1,4 @@
-name: Tests
+name: Clojure Tests
 on: push
 jobs:
   run-tests:
@@ -22,5 +22,5 @@ jobs:
         uses: webfactory/ssh-agent@v0.2.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: Run tests
+      - name: Run Clojure tests
         run: bin/kaocha --reporter documentation --plugin kaocha.plugin/profiling
