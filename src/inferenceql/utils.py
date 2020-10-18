@@ -66,7 +66,7 @@ def get_metadata(directory_path):
         with open(metadata_path, 'r') as f:
                 metadata = json.load(f)
     else:
-        metadata = {'Inference':[]}
+        metadata = {'inference':[]}
     return metadata
 
 def read_analysis(directory_path, cgpm_name='cgpm'):
@@ -88,8 +88,8 @@ def read_analysis(directory_path, cgpm_name='cgpm'):
 
 def write_analysis(states, col_name_id_mapping, directory_path, inf_meta_data):
     metadata = get_metadata(directory_path)
-    metadata['Number of models in ensemble'] = len(states)
-    metadata['Inference'].append(inf_meta_data)
+    metadata['models'] = len(states)
+    metadata['inference'].append(inf_meta_data)
     write_cgpms(states, col_name_id_mapping, directory_path, cgpm_name='cgpm')
     with open(os.path.join(directory_path, 'metadata.json'), 'w') as f:
         json.dump(metadata, f)
