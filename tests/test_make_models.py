@@ -16,32 +16,33 @@
 from inferenceql.auto_modeling import create_cgpms
 from inferenceql.auto_modeling import cgpm_to_spn
 from sppl.spn import SumSPN
-import json
+
 import pandas as pd
 import pytest
 
 
 SCHEMA = {
     'key': {
-        'type' : 'ignored'
+        'type': 'ignored'
         },
     'a': {
-        'type' : 'numerical'
+        'type': 'numerical'
         },
     'b': {
-        'type' : 'numerical'
+        'type': 'numerical'
         },
     'c': {
-        'type' : 'nominal',
+        'type': 'nominal',
         'values': {'False': 0, 'True': 1}
     }
 }
 DF = pd.DataFrame({
-    'key' : [0, 1, 2, 3],
-    'a'   : [1.2, 9.3, 10.1, 12.],
-    'b'   : [2.2, 1.3, 11.1, 1.],
-    'c'   : ['True', 'False', 'True', 'False'],
+    'key': [0, 1, 2, 3],
+    'a':   [1.2, 9.3, 10.1, 12.],
+    'b':   [2.2, 1.3, 11.1, 1.],
+    'c':   ['True', 'False', 'True', 'False'],
 })
+
 
 @pytest.mark.parametrize('parallel', [True, False])
 def test_smoke_create_cgpms(parallel):
@@ -58,14 +59,16 @@ def test_smoke_create_cgpms(parallel):
 
     assert set(col_name_id_mapping.keys()) == set(['a', 'b', 'c'])
 
-    lpdf1 = states[n_models-1].logpdf(None, {2:1}, {0:-1})
-    lpdf2 = states[0].logpdf(None, {2:1}, {0:-1})
+    lpdf1 = states[n_models-1].logpdf(None, {2: 1}, {0: -1})
+    lpdf2 = states[0].logpdf(None, {2: 1}, {0: -1})
     assert isinstance(lpdf1, float)
     assert isinstance(lpdf2, float)
 
     assert lpdf1 != lpdf2, 'Something is wrong with random initialization'
     # Once again. Just to be sure.
-    assert states[0].alpha() != states[1].alpha(), 'Something is wrong with random initialization'
+    assert states[0].alpha() != states[1].alpha(), 'Something is wrong with \
+                                                    random initialization'
+
 
 def test_smoke_create_spn():
     n_models = 3

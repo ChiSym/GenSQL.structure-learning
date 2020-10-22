@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="inferenceql", # Replace with your own username
+    name="inferenceql",  # Replace with your own username
     version="0.0.1",
     license='Apache License, Version 2.0',
     packages=[
@@ -15,7 +15,7 @@ setuptools.setup(
         'inferenceql': 'src/inferenceql',
         'inferenceql.auto_modeling': 'src/inferenceql/auto_modeling',
     },
-    author="Ulrich Schaechtle", # Maintainer
+    author="Ulrich Schaechtle",  # Maintainer
     author_email="ulli@mit.edu",
     description="Automated data modeling for inferenceQL",
     classifiers=[

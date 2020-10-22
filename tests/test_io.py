@@ -1,5 +1,10 @@
 # Copyright 2020 MIT Probabilistic Computing Project.
 # See LICENSE.txt
+import json
+import os
+import pandas as pd
+import pytest
+
 from cgpm.crosscat.state import State
 from inferenceql.auto_modeling import create_cgpms
 from inferenceql.utils import read_analysis
@@ -9,33 +14,29 @@ from inferenceql.utils import read_spn
 from inferenceql.utils import write_cgpms
 from inferenceql.utils import write_analysis
 
-import json
-import os
-import pandas as pd
-import pytest
 
 def _get_test_df():
     return pd.DataFrame({
-            'key' : [0, 1, 2, 3],
-            'a'   : [1.2, 9.3, 10.1, 12.],
-            'b'   : [2.2, 1.3, 11.1, 1.],
-            'c'   : ['True', 'False', 'True', 'False'],
+            'key': [0, 1, 2, 3],
+            'a':   [1.2, 9.3, 10.1, 12.],
+            'b':   [2.2, 1.3, 11.1, 1.],
+            'c':   ['True', 'False', 'True', 'False'],
         })
 
 
 def _get_test_schema():
     return {
             'key': {
-                'type' : 'ignored'
+                'type': 'ignored'
                 },
             'a': {
-                'type' : 'numerical'
+                'type': 'numerical'
                 },
             'b': {
-                'type' : 'numerical'
+                'type': 'numerical'
                 },
             'c': {
-                'type' : 'nominal',
+                'type': 'nominal',
                 'values': {'False': 0, 'True': 1}
             }
         }
@@ -59,7 +60,7 @@ def tmp_analysis_dir(tmpdir):
     # Write the files to disk.
     df.to_csv(os.path.join(tmpdir, 'data.csv'), index=False)
     with open(os.path.join(tmpdir, 'schema.json'), 'w') as schema_f:
-            json.dump(schema, schema_f)
+        json.dump(schema, schema_f)
     return df, schema, tmpdir
 
 
@@ -67,7 +68,7 @@ def test_read_data(tmp_analysis_dir):
     df_written, schema_written, test_dir = tmp_analysis_dir
     df_read, schema_read = read_data(test_dir)
     assert df_read.equals(df_written)
-    assert  schema_read == schema_written
+    assert schema_read == schema_written
 
 
 def test_write_cgpm(tmpdir, get_test_states):
@@ -84,7 +85,8 @@ def test_read_cgpm(tmpdir, get_test_states):
     assert col_name_id_mapping_out, col_name_id_mapping_in
     for i in range(len(states_in)):
         assert states_out[i].to_metadata() == states_in[i].to_metadata()
-        assert states_out[i].logpdf(None, {2:1}, {0:-1}) == states_in[i].logpdf(None, {2:1}, {0:-1})
+        assert states_out[i].logpdf(None, {2: 1}, {0: -1}) \
+            == states_in[i].logpdf(None, {2: 1}, {0: -1})
 
 
 def assert_analysis_format(analysis):

@@ -23,41 +23,44 @@ from inferenceql.utils import write_analysis
 import argparse
 import os
 
+
 def retrieve_analysis(kwargs):
-   assert os.path.exists(os.path.join(kwargs['analysis'], 'data.csv')), \
+    assert os.path.exists(os.path.join(kwargs['analysis'], 'data.csv')), \
            'Analysis path does not contain a file data.csv'
-   assert os.path.exists(os.path.join(kwargs['analysis'], 'schema.json')), \
+    assert os.path.exists(os.path.join(kwargs['analysis'], 'schema.json')), \
            'Analysis path does not contain a file schema.json'
 
-   cgpm_path = os.path.join(
-           kwargs['analysis'],
-           '{}.json'.format(kwargs['name'])
-   )
+    cgpm_path = os.path.join(
+       kwargs['analysis'],
+       '{}.json'.format(kwargs['name'])
+    )
 
-   if os.path.exists(cgpm_path):
-       print('Loading models from disk. This can take while...')
-       print('... done')
-       analysis = read_analysis(kwargs['analysis'])
-       assert len(analysis['states']) == kwargs['models'], \
-               'The intended number of models specified via CLI differed from what was on disk'
-   else:
-       print('Initializing models. This can take while...')
-       df, schema = read_data(kwargs['analysis'])
-       states, col_name_id_mapping = create_cgpms(
-               df,
-               schema,
-               n_models=kwargs['models'],
-               parallel=kwargs['parallel']
-       )
-       print('... done')
-       analysis = {
-           'data':df,
+    if os.path.exists(cgpm_path):
+        print('Loading models from disk. This can take while...')
+        print('... done')
+        analysis = read_analysis(kwargs['analysis'])
+        assert len(analysis['states']) == kwargs['models'], \
+               'The intended number of models specified via CLI differed from \
+                what was on disk'
+    else:
+        print('Initializing models. This can take while...')
+        df, schema = read_data(kwargs['analysis'])
+        states, col_name_id_mapping = create_cgpms(
+           df,
+           schema,
+           n_models=kwargs['models'],
+           parallel=kwargs['parallel']
+        )
+        print('... done')
+        analysis = {
+           'data': df,
            'schema': schema,
            'states': states,
            'col_name_id_mapping': col_name_id_mapping,
-           'metadata': {'inference':[]}
-       }
-   return analysis
+           'metadata': {'inference': []}
+        }
+    return analysis
+
 
 def run_automodeling(kwargs):
     analysis = retrieve_analysis(kwargs)
@@ -70,8 +73,8 @@ def run_automodeling(kwargs):
         parallel=kwargs['parallel']
     )
     inf_metadata = {
-        'iters':kwargs['iterations'],
-        'kernels':kwargs['kernels'],
+        'iters': kwargs['iterations'],
+        'kernels': kwargs['kernels'],
     }
     write_analysis(
         states,
@@ -96,7 +99,8 @@ if __name__ == "__main__":
         '-i', '--iterations',
         type=int,
         default=0,
-        help='Number of Iterations to be run with the kernels, specified below.'
+        help='Number of Iterations to be run with the kernels, specified \
+              below.'
     )
     parser.add_argument(
         '-p', '--parallel',

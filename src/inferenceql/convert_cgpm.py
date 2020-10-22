@@ -23,9 +23,9 @@ from sppl.transforms import Identity
 # =====================================================================
 # Converting primitive distributions.
 
-def convert_primitive(Xs, output, cctype, hypers, suffstats, distargs,
-        categorical_mapping):
 
+def convert_primitive(Xs, output, cctype, hypers, suffstats, distargs,
+                      categorical_mapping):
     if cctype == 'bernoulli':
         alpha = hypers['alpha']
         beta = hypers['beta']
@@ -54,7 +54,7 @@ def convert_primitive(Xs, output, cctype, hypers, suffstats, distargs,
         keys = map(str, range(k)) \
             if (categorical_mapping is None) else \
             [categorical_mapping[output][j] for j in range(k)]
-        dist = {key : weight / norm for key, weight in zip(keys, weights)}
+        dist = {key: weight / norm for key, weight in zip(keys, weights)}
 
     elif cctype == 'crp':
         alpha = hypers['alpha']
@@ -66,7 +66,7 @@ def convert_primitive(Xs, output, cctype, hypers, suffstats, distargs,
         weights = [counts[t] for t in tables] + [alpha]
         norm = sum(weights)
         keys = map(str, range(len(weights)))
-        dist = {key : weight / norm for key, weight in zip(keys, weights)}
+        dist = {key: weight / norm for key, weight in zip(keys, weights)}
 
     elif cctype == 'exponential':
         a = hypers['a']
@@ -130,14 +130,23 @@ def convert_primitive(Xs, output, cctype, hypers, suffstats, distargs,
 
     return Xs[output] >> dist
 
+
 def convert_cluster(Xs, Zs, metadata, categorical_mapping, tables):
     outputs = metadata['outputs']
     cctypes = metadata['cctypes']
     hypers = metadata['hypers']
     distargs = metadata['distargs']
     suffstats = metadata['suffstats']
-    args = lambda output, z : (Xs, output, cctypes[output], hypers[output],
-        suffstats[output][str(z)], distargs[output], categorical_mapping)
+
+    def args(output, z):
+        return (
+            Xs,
+            output, cctypes[output],
+            hypers[output],
+            suffstats[output][str(z)],
+            distargs[output],
+            categorical_mapping,
+        )
     children_list_x = [
         [convert_primitive(*args(output, z)) for output in outputs]
         for z in tables
@@ -146,8 +155,11 @@ def convert_cluster(Xs, Zs, metadata, categorical_mapping, tables):
         [Zs[output] >> {str(z): 1} for output in outputs]
         for z in tables
     ]
-    children_list = [cx + cz for cx, cz in zip(children_list_x, children_list_z)]
+    children_list = [cx + cz
+                     for cx, cz
+                     in zip(children_list_x, children_list_z)]
     return [ProductSPN(children) for children in children_list]
+
 
 def convert_view(Xs, Zs, metadata, categorical_mapping):
     # Compute the CRP cluster weights using Zr and alpha.
@@ -167,21 +179,24 @@ def convert_view(Xs, Zs, metadata, categorical_mapping):
     # Return a Sum of Products (or a single Product).
     return SumSPN(products, log_weights) if len(products) > 1 else products[0]
 
+
 def convert_state(metadata, variable_mapping, categorical_mapping):
     # Obtain the outputs.
     outputs = metadata['outputs']
 
     # Construct the symbolic variables.
     if variable_mapping is None:
-        Xs = {o : Identity('X[%d]' % (o,)) for o in outputs}
-        Zs = {o : Identity('Z[%d]' % (o,)) for o in outputs}
+        Xs = {o: Identity('X[%d]' % (o,)) for o in outputs}
+        Zs = {o: Identity('Z[%d]' % (o,)) for o in outputs}
     else:
         variable_mapping = dict(variable_mapping)
-        Xs = {o : Identity(variable_mapping[o]) for o in outputs}
-        Zs = {o : Identity('%s_cluster' % (variable_mapping[o],)) for o in outputs}
+        Xs = {o: Identity(variable_mapping[o])
+              for o in outputs}
+        Zs = {o: Identity('%s_cluster' % (variable_mapping[o],))
+              for o in outputs}
 
     if categorical_mapping is not None:
-        categorical_mapping = {o : dict(m) for o, m in categorical_mapping}
+        categorical_mapping = {o: dict(m) for o, m in categorical_mapping}
 
     # Extract column data.
     cctypes = {o: cc for o, cc in zip(outputs, metadata['cctypes'])}
@@ -199,22 +214,22 @@ def convert_state(metadata, variable_mapping, categorical_mapping):
     view_partition = assignments_to_partition(Zv)
     for v, (view_idx, view_outputs) in enumerate(view_partition.items()):
         metadata_view = {
-            'idx'       : v,
-            'outputs'   : view_outputs,
-            'cctypes'   : cctypes,
-            'hypers'    : hypers,
-            'distargs'  : distargs,
-            'suffstats' : suffstats,
-            'Zr'        : Zrv[view_idx],
-            'alpha'     : view_alphas[view_idx],
+            'idx':       v,
+            'outputs':   view_outputs,
+            'cctypes':   cctypes,
+            'hypers':    hypers,
+            'distargs':  distargs,
+            'suffstats': suffstats,
+            'Zr':        Zrv[view_idx],
+            'alpha':     view_alphas[view_idx],
         }
         view = convert_view(Xs, Zs, metadata_view, categorical_mapping)
         views.append(view)
 
     # Update the symbolic variable lookup dictionary to have string keys.
     if variable_mapping is not None:
-        Xs = {variable_mapping[o] : s for o, s in Xs.items()}
-        Zs = {variable_mapping[o] : s for o, s in Zs.items()}
+        Xs = {variable_mapping[o]: s for o, s in Xs.items()}
+        Zs = {variable_mapping[o]: s for o, s in Zs.items()}
 
     # Construct a Product of Sums (or a single Sum).
     spn = ProductSPN(views) if len(views) > 1 else views[0]
@@ -222,7 +237,10 @@ def convert_state(metadata, variable_mapping, categorical_mapping):
     # Return the SPN and variables.
     return Xs, Zs, spn
 
-def convert_states(metadata_list, variable_mapping=None, categorical_mapping=None):
+
+def convert_states(metadata_list,
+                   variable_mapping=None,
+                   categorical_mapping=None):
     # Arguments
     #
     # metadata_list : A list of return values from state.to_metadata().
@@ -247,8 +265,8 @@ def convert_states(metadata_list, variable_mapping=None, categorical_mapping=Non
         for metadata in metadata_list
     ]
     Xs_list, Zs_list, children = [x for x in zip(*results)]
-    assert all(Xs_list[0]==Xs for Xs in Xs_list)
-    assert all(Zs_list[0]==Zs for Zs in Zs_list)
+    assert all(Xs_list[0] == Xs for Xs in Xs_list)
+    assert all(Zs_list[0] == Zs for Zs in Zs_list)
 
     # Create an equal-weighted ExposedSum.
     id_children = Identity('child')
@@ -265,6 +283,7 @@ def convert_states(metadata_list, variable_mapping=None, categorical_mapping=Non
 
     # Return the resulting SPN.
     return Xs_list[0], Zs_list[0], spn
+
 
 def assignments_to_partition(d):
     partition = OrderedDict([])

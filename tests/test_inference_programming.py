@@ -15,31 +15,31 @@
 # limitations under the License.
 from inferenceql.auto_modeling import create_cgpms
 from inferenceql.auto_modeling import cgpm_inference
-import json
+
 import pandas as pd
 import pytest
 
-
 SCHEMA = {
     'key': {
-        'type' : 'ignored'
+        'type': 'ignored'
         },
     'a': {
-        'type' : 'numerical'
+        'type': 'numerical'
         },
     'b': {
-        'type' : 'numerical'
+        'type': 'numerical'
         },
     'c': {
-        'type' : 'nominal',
+        'type': 'nominal',
         'values': {'False': 0, 'True': 1}
     }
 }
+
 DF = pd.DataFrame({
-    'key' : [0, 1, 2, 3],
-    'a'   : [1.2, 9.3, 10.1, 12.],
-    'b'   : [2.2, 1.3, 11.1, 1.],
-    'c'   : ['True', 'False', 'True', 'False'],
+    'key': [0, 1, 2, 3],
+    'a':   [1.2, 9.3, 10.1, 12.],
+    'b':   [2.2, 1.3, 11.1, 1.],
+    'c':   ['True', 'False', 'True', 'False'],
 })
 
 STATES_INIT, COL_NAME_ID_MAPPING = create_cgpms(
@@ -48,7 +48,6 @@ STATES_INIT, COL_NAME_ID_MAPPING = create_cgpms(
     n_models=2,
     parallel=True
 )
-
 
 PARALLEL = [True, False]
 
@@ -62,6 +61,7 @@ def test_smoke_full_sweep(parallel):
             parallel=parallel
     )
     assert states[0].logpdf_score() != STATES_INIT[0].logpdf_score()
+
 
 def test_consistency_parallel():
     states_serial = cgpm_inference(
@@ -79,6 +79,7 @@ def test_consistency_parallel():
     assert states_serial[0].logpdf_score() == states_parallel[0].logpdf_score()
     assert states_serial[1].logpdf_score() == states_parallel[1].logpdf_score()
 
+
 @pytest.mark.parametrize('parallel', PARALLEL)
 def test_smoke_column_hypers_all_columns(parallel):
     states = cgpm_inference(
@@ -91,6 +92,7 @@ def test_smoke_column_hypers_all_columns(parallel):
     assert states[0].dim_for(0).hypers != STATES_INIT[0].dim_for(0).hypers
     assert states[1].dim_for(0).hypers != STATES_INIT[1].dim_for(0).hypers
     assert states[0].alpha() == STATES_INIT[0].alpha()
+
 
 @pytest.mark.parametrize('parallel', PARALLEL)
 def test_smoke_column_hypers_specificy_columns(parallel):
