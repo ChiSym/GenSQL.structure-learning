@@ -23,5 +23,5 @@ setuptools.setup(
         "License :: Apache License Version 2.0, January 2004",
         "Operating System :: macOS, Ubuntu",
     ],
-    python_requires='>=3.6,<3.7',
+    python_requires='>=3.6',
 )

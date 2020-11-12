@@ -19,6 +19,7 @@ from sppl.spn import ProductSPN
 from sppl.spn import SumSPN
 from sppl.spn import ExposedSumSPN
 from sppl.transforms import Identity
+from sppl.distributions import choice
 
 # =====================================================================
 # Converting primitive distributions.
@@ -54,7 +55,9 @@ def convert_primitive(Xs, output, cctype, hypers, suffstats, distargs,
         keys = map(str, range(k)) \
             if (categorical_mapping is None) else \
             [categorical_mapping[output][j] for j in range(k)]
-        dist = {key: weight / norm for key, weight in zip(keys, weights)}
+        dist = choice(
+            {key: weight / norm for key, weight in zip(keys, weights)}
+        )
 
     elif cctype == 'crp':
         alpha = hypers['alpha']
@@ -152,7 +155,7 @@ def convert_cluster(Xs, Zs, metadata, categorical_mapping, tables):
         for z in tables
     ]
     children_list_z = [
-        [Zs[output] >> {str(z): 1} for output in outputs]
+        [Zs[output] >> choice({str(z): 1}) for output in outputs]
         for z in tables
     ]
     children_list = [cx + cz
@@ -273,7 +276,7 @@ def convert_states(metadata_list,
     n_children = len(metadata_list)
     children_keys = [str(i) for i in range(n_children)]
     children_probs = {i: Fraction(1, n_children) for i in children_keys}
-    children_dist = id_children >> children_probs
+    children_dist = id_children >> choice(children_probs)
     children_dict = dict(zip(children_keys, children))
     spn_sum = ExposedSumSPN(children_dict, children_dist)
 

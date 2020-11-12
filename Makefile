@@ -70,14 +70,18 @@ docker-image:
 	docker build . -t inferenceql.automodeling
 
 docker-container: home-dir
-	docker run  --name iql_auto -v ${ANALYSES_LOCATION}:/analyses -p 8000:8000 -t inferenceql.automodeling
+	docker run  --name iql_auto -v $(shell pwd)/${ANALYSES_LOCATION}:/home/jovyan/work -p 8888:8888 -t inferenceql.automodeling
 
 docker-shell:
-	docker exec -it iql_auto bin/bash
+	docker exec -it iql_auto /bin/bash
 
 docker-push:
 	docker tag inferenceql.automodeling probcomp/inferenceql.automodeling:pre-alpha.v$(VERSION)
 	docker push probcomp/inferenceql.automodeling:pre-alpha.v$(VERSION)
+
+docker-clean:
+	docker rm -f iql_auto
+	docker rmi -f inferenceql.automodeling
 
 ###########################################################################
 # Start a Jupyter notebook
