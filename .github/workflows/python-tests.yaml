@@ -6,10 +6,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Setup pyenv
-        uses: "gabrielfalcao/pyenv-action@v5"
+      - name: Setup Python
+        uses: actions/setup-python@v2
         with:
-          default: 3.6.4
+          python-version: 3.6.12
       - name: Setup Graphviz
         uses: ts-graphviz/setup-graphviz@v1
       - name: Install automodeling
