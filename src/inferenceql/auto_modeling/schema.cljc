@@ -20,11 +20,11 @@
         (cond
           (<  num-disitinct-vals 2) "ignore"
           (some string? col-data) (if (< num-disitinct-vals max-categories) "nominal" "ignore")
-          (and (every? float? col-data) (> num-disitinct-vals (* 0.5 n))) "numerical"
           (=  num-disitinct-vals (count data))
             (if (every? integer? col-data)
                   (if (consequitive-integers? col-data) "ignore" "numerical")
                   "numerical")
+          (and (every? float? col-data) (> num-disitinct-vals (* 0.5 n))) "numerical"
           :else (throw (AssertionError. "Could not resolve stattype")))))
 
 (defn guess-schema
