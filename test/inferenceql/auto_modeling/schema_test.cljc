@@ -29,5 +29,5 @@
            (schema/guess-schema nullified-data)))
     (is (= {:a "numerical", :b "nominal", :c "ignore", :d "ignore" :e "ignore"}
            (schema/guess-schema nullified-data ignore)))
-    (is (= {:a "numerical", :b "nominal", :c "nomial", :d "ignore" :e "ignore"}
+    (is (= {:a "numerical", :b "nominal", :c "nominal", :d "ignore" :e "ignore"}
            (schema/guess-schema nullified-data ignore nominal)))))
