@@ -47,8 +47,9 @@
                              :else (guess-stattype data %)))
                col-names)))))
 
-(defn nullify [data null-values]
+(defn nullify
   "Remove null values."
+  [data null-values]
   (map (fn [row](into {}
                       (remove (comp null-values val))
                       row))
