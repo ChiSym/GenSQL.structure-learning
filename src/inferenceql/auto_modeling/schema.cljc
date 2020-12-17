@@ -19,7 +19,7 @@
   (let [col-data (map #(get % col) data)
         distinct-vals (distinct col-data)
         n (count data)
-        max-categories 50 ;; XXX: choose better heuristic.
+        max-categories 50 ; XXX: choose better heuristic.
         num-disitinct-vals (count distinct-vals)]
         (cond
           (<  num-disitinct-vals 2) "ignore"
