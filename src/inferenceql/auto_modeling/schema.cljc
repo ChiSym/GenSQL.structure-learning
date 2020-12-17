@@ -1,7 +1,8 @@
 (ns inferenceql.auto-modeling.schema)
 
-(defn consequitive-integers? [col-vals]
+(defn consequitive-integers?
   "This function helps identify key columns."
+  [col-vals]
   (let [sorted-vals (sort col-vals)]
     (= (last sorted-vals) (+ (first sorted-vals) (count sorted-vals) -1))))
 
