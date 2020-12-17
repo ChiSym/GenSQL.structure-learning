@@ -1,7 +1,7 @@
 (ns inferenceql.auto-modeling.schema)
 
-(defn consequitive-integers?
-  "This function helps identify key columns."
+(defn consequitive?
+  "Do all numbers correpsond to consequitive integers?"
   [col-vals]
   (let [sorted-vals (sort col-vals)]
     (= (last sorted-vals)
@@ -26,7 +26,7 @@
           (some string? col-data) (if (< num-disitinct-vals max-categories) "nominal" "ignore")
           (=  num-disitinct-vals (count data))
             (if (every? integer? col-data)
-                  (if (consequitive-integers? col-data) "ignore" "numerical")
+                  (if (consequitive? col-data) "ignore" "numerical")
                   "numerical")
           (and (every? float? col-data) (> num-disitinct-vals (* 0.5 n))) "numerical"
           :else (throw (AssertionError. "Could not resolve stattype")))))
