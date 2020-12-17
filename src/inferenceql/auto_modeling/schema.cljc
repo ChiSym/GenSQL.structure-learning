@@ -34,21 +34,21 @@
 (defn guess-schema
   "Guess and overwrite a population schema."
   ([data]
-    (guess-schema data #{} #{} #{}))
+   (guess-schema data #{} #{} #{}))
   ([data ignore-cols]
-    (guess-schema data ignore-cols #{} #{}))
+   (guess-schema data ignore-cols #{} #{}))
   ([data ignore-cols nominal-cols]
-    (guess-schema data ignore-cols nominal-cols #{}))
+   (guess-schema data ignore-cols nominal-cols #{}))
   ([data ignore-cols nominal-cols numerical-cols]
-  (let [col-names (into #{} (mapcat keys) data)]
-    (into {}
-          (map #(assoc {}
-                       %
-                       (cond (contains? ignore-cols %)    "ignore"
-                             (contains? nominal-cols %)   "nominal"
-                             (contains? numerical-cols %) "numerical"
-                             :else (guess-stattype data %)))
-               col-names)))))
+   (let [col-names (into #{} (mapcat keys) data)]
+     (into {}
+           (map #(assoc {}
+                        %
+                        (cond (contains? ignore-cols %)    "ignore"
+                              (contains? nominal-cols %)   "nominal"
+                              (contains? numerical-cols %) "numerical"
+                              :else (guess-stattype data %)))
+                col-names)))))
 
 (defn nullify
   "Remove null values."
