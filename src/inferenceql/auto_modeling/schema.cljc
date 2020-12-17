@@ -4,7 +4,10 @@
   "This function helps identify key columns."
   [col-vals]
   (let [sorted-vals (sort col-vals)]
-    (= (last sorted-vals) (+ (first sorted-vals) (count sorted-vals) -1))))
+    (= (last sorted-vals) 
+       (dec
+        (+ (first sorted-vals) 
+           (count sorted-vals))))))
 
 (defn guess-stattype
   "Guess the stattype for a given columnn."
