@@ -19,8 +19,12 @@ RUN python -m pip install .
 # Ensure the latest version of configurable-http-proxy. Addresses a
 # vulnerability from upstream images.
 RUN npm install -g configurable-http-proxy@latest --save
+# Collaborator orgs require ssh to interact with git.
+RUN apt-get update
+RUN apt-get install -y openssh-client
 
 USER $NB_USER
+
 ADD tests/ ./tests
 RUN python -m pytest tests/ -vvv
 CMD ["start-notebook.sh", "--NotebookApp.custom_display_url=http://localhost:8888"]
