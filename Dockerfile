@@ -20,8 +20,7 @@ RUN python -m pip install .
 # vulnerability from upstream images.
 RUN npm install -g configurable-http-proxy@latest --save
 # Collaborator orgs require ssh to interact with git.
-RUN apt-get update
-RUN apt-get install -y openssh-client
+RUN apt-get update && apt-get install -y openssh-client
 
 USER $NB_USER
 
