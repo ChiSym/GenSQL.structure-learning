@@ -17,3 +17,4 @@ pom.xml.asc
 .cpcache/
 /out/
 /.clj-kondo/.cache/
+/loom

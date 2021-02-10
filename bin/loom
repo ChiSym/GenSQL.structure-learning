@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+WORKDIR=/home/docker/wd
+
+exec docker run \
+  --rm \
+  --user $(id -u):$(id -g) \
+  --volume "$PWD":"$WORKDIR" \
+  --workdir $WORKDIR \
+  --env LOOM_STORE=$WORKDIR \
+  inferenceql.loom "$@"

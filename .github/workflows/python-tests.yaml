@@ -18,5 +18,3 @@ jobs:
         run: make cgpm-test
       - name: Run SPPL tests
         run: make sppl-test
-      - name: Run automodeling tests
-        run: make auto-test

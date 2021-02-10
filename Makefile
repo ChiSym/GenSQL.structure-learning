@@ -27,6 +27,7 @@ venv:
 	@echo ${VENV_LOCATION}
 	@mkdir ${VENV_LOCATION}
 	${PYTHON} -m venv ${VENV_LOCATION}
+	${VENV_PIP} install --upgrade pip
 
 ###########################################################################
 # Install automated modeling.
@@ -58,16 +59,13 @@ sppl-test:
 cgpm-test:
 	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m pytest --pyargs cgpm -k "not __ci_"
 
-auto-test:
-	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m pytest tests/ -vvv
-
 test: sppl-test cgpm-test auto-test
 
 ###########################################################################
 # Docker setup
 
 docker-image:
-	docker build . -t inferenceql.automodeling
+	docker build -f docker/Dockerfile.notebook . -t inferenceql.automodeling
 
 docker-container: home-dir
 	docker run  --name iql_auto -v $(shell pwd)/${ANALYSES_LOCATION}:/home/jovyan/work -p 8888:8888 -t inferenceql.automodeling

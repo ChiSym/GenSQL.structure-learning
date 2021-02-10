@@ -1,0 +1,149 @@
+stages:
+  nullify:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.main/nullify
+      < data/data.csv
+      > data/nullified.csv
+    deps:
+      - data/data.csv
+    params:
+      - nullify
+    outs:
+      - data/nullified.csv
+
+  guess-schema:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.main/guess-schema
+      < data/nullified.csv
+      > data/schema.edn
+    deps:
+      - data/nullified.csv
+    params:
+      - schema
+    outs:
+      - data/schema.edn
+
+  loom-schema:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.main/loom-schema
+      < data/schema.edn
+      > data/loom-schema.json
+    deps:
+      - data/schema.edn
+    outs:
+      - data/loom-schema.json
+
+  cgpm-schema:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.main/cgpm-schema
+      < data/schema.edn
+      > data/cgpm-schema.edn
+    deps:
+      - data/schema.edn
+    outs:
+      - data/cgpm-schema.edn
+
+  numericalize:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.main/numericalize
+      < data/nullified.csv
+      :schema data/schema.edn
+      :table data/mapping-table.edn
+      > data/numericalized.csv
+    deps:
+      - data/nullified.csv
+      - data/schema.edn
+    outs:
+      - data/numericalized.csv
+      - data/mapping-table.edn
+
+  ingest:
+    cmd: ./bin/loom_task ingest loom data/loom-schema.json data/numericalized.csv
+    deps:
+      - data/loom-schema.json
+      - data/numericalized.csv
+    outs:
+      - loom/ingest
+      - loom/query
+
+  infer-config:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.main/infer-config
+      < params.yaml
+      > data/infer-config.json
+    params:
+      - loom.extra_passes
+      - seed
+    outs:
+      - data/infer-config.json
+
+  infer:
+    cmd: ./bin/loom_task infer loom $(bin/param loom.sample_count) data/infer-config.json
+    deps:
+      - loom/ingest
+      - loom/query
+      - data/infer-config.json
+    params:
+      - loom.sample_count
+    outs:
+      - loom/samples
+
+  dump-cgpm-metadata:
+    cmd: >
+      mkdir -p data/cgpm/raw &&
+      find loom/samples -mindepth 1 -maxdepth 1 -type d |
+      parallel $(bin/param parallel.flags)
+      ./bin/loom python scripts/loom_dump.py {}
+      --output data/cgpm/raw/{/}.json
+    params:
+      - parallel.flags
+    deps:
+      - loom/samples
+      - scripts/loom_dump.py
+    outs:
+      - data/cgpm/raw
+
+  hydrate-cgpm-metadata:
+    cmd: >
+      mkdir -p data/cgpm/hydrated &&
+      find data/cgpm/raw -type f |
+      parallel $(bin/param parallel.flags)
+      python scripts/cgpm_hydrate.py {}
+      --output data/cgpm/hydrated/{/}
+      --data data/numericalized.csv
+      --schema data/cgpm-schema.edn
+      --mapping-table data/mapping-table.edn
+      --seed $(bin/param seed)
+    params:
+      - parallel.flags
+      - seed
+    deps:
+      - data/cgpm-schema.edn
+      - data/cgpm/raw
+      - data/mapping-table.edn
+      - data/numericalized.csv
+      - scripts/cgpm_hydrate.py
+    outs:
+      - data/cgpm/hydrated
+
+  infer-hyperparameters:
+    cmd: >
+      mkdir -p data/cgpm/complete &&
+      find data/cgpm/hydrated -type f |
+      parallel $(bin/param parallel.flags)
+      python scripts/cgpm_infer.py {}
+      --kernel alpha
+      --kernel view_alphas
+      --kernel column_hypers
+      --output data/cgpm/complete/{/}
+      --iterations $(bin/param cgpm.hyper_iters)
+      --seed $(bin/param seed)
+    params:
+      - cgpm.hyper_iters
+      - parallel.flags
+      - seed
+    deps:
+      - data/cgpm/hydrated
+      - scripts/cgpm_infer.py
+    outs:
+      - data/cgpm/complete

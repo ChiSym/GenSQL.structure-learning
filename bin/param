@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+clojure -X inferenceql.auto-modeling.main/param :key "$@"
