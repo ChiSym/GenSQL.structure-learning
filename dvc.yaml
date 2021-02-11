@@ -23,16 +23,6 @@ stages:
     outs:
       - data/schema.edn
 
-  loom-schema:
-    cmd: >
-      clojure -X inferenceql.auto-modeling.main/loom-schema
-      < data/schema.edn
-      > data/loom-schema.json
-    deps:
-      - data/schema.edn
-    outs:
-      - data/loom-schema.json
-
   cgpm-schema:
     cmd: >
       clojure -X inferenceql.auto-modeling.main/cgpm-schema
@@ -57,7 +47,17 @@ stages:
       - data/numericalized.csv
       - data/mapping-table.edn
 
-  ingest:
+  loom-schema:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.main/loom-schema
+      < data/schema.edn
+      > data/loom-schema.json
+    deps:
+      - data/schema.edn
+    outs:
+      - data/loom-schema.json
+
+  loom-ingest:
     cmd: ./bin/loom_task ingest loom data/loom-schema.json data/numericalized.csv
     deps:
       - data/loom-schema.json
@@ -66,7 +66,7 @@ stages:
       - loom/ingest
       - loom/query
 
-  infer-config:
+  loom-infer-config:
     cmd: >
       clojure -X inferenceql.auto-modeling.main/infer-config
       < params.yaml
@@ -77,18 +77,18 @@ stages:
     outs:
       - data/infer-config.json
 
-  infer:
-    cmd: ./bin/loom_task infer loom $(bin/param loom.sample_count) data/infer-config.json
+  loom-infer:
+    cmd: ./bin/loom_task infer loom $(bin/param sample_count) data/infer-config.json
     deps:
       - loom/ingest
       - loom/query
       - data/infer-config.json
     params:
-      - loom.sample_count
+      - sample_count
     outs:
       - loom/samples
 
-  dump-cgpm-metadata:
+  loom-dump-metadata:
     cmd: >
       mkdir -p data/cgpm/raw &&
       find loom/samples -mindepth 1 -maxdepth 1 -type d |
@@ -103,7 +103,17 @@ stages:
     outs:
       - data/cgpm/raw
 
-  hydrate-cgpm-metadata:
+  # cgpm-initialize-empty-metadata:
+  #   cmd: >
+  #     mkdir -p data/cgpm/raw &&
+  #     seq 0 $(($(bin/param sample_count) - 1)) |
+  #     parallel -I ,, 'echo "{}" > data/cgpm/raw/sample.,,.json'
+  #   params:
+  #     - sample_count
+  #   outs:
+  #     - data/cgpm/raw
+
+  cgpm-hydrate-metadata:
     cmd: >
       mkdir -p data/cgpm/hydrated &&
       find data/cgpm/raw -type f |
@@ -126,7 +136,7 @@ stages:
     outs:
       - data/cgpm/hydrated
 
-  infer-hyperparameters:
+  cgpm-infer-hyperparameters:
     cmd: >
       mkdir -p data/cgpm/complete &&
       find data/cgpm/hydrated -type f |

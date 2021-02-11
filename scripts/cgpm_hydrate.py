@@ -14,7 +14,8 @@ def read_metadata(f):
     metadata = json.load(f)
 
     for z in ['Zv', 'Zrv']:
-        metadata[z] = {int(k): metadata[z][k] for k in metadata[z]}
+        if z in metadata:
+            metadata[z] = {int(k): metadata[z][k] for k in metadata[z]}
 
     return metadata
 

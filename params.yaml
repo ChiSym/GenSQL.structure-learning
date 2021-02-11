@@ -1,9 +1,9 @@
 seed: 0
+sample_count: 10
 parallel:
   # To limit the number of jobs GNU Parallel spawns use add the flag `--jobs n`.
   flags: >
     --verbose
-    --ungroup
 nullify:
   # Entries added here will be treated as null. For example, to treat "NaN" and
   # "missing" as null uncomment the following two lines:
@@ -15,7 +15,6 @@ schema:
   # numerical uncomment the following line:
   # age: numerical
 loom:
-  sample_count: 10
   extra_passes: 1
 cgpm:
   hyper_iters: 1000
