@@ -19,12 +19,14 @@
 
 (defn guess-schema
   [_]
-  (let [guessed-schema (->> (csv/read-csv (slurp *in*))
+  (let [params-schema (:schema (dvc/yaml))
+        guessed-schema (->> (csv/read-csv (slurp *in*))
                             (iql.csv/as-maps)
                             (iql.csv/nullify #{""})
                             (iql.csv/heuristic-coerce-all)
+                            (map #(apply dissoc % (keys params-schema)))
                             (schema/guess))
-        schema (merge guessed-schema (:schema (dvc/yaml)))]
+        schema (merge guessed-schema params-schema)]
     (prn schema)))
 
 (defn loom-schema
