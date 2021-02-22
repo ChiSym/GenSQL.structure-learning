@@ -109,6 +109,7 @@ stages:
       parallel jsonschema --instance {} schemas/cgpm.json &&
       mkdir -p data/cgpm/hydrated &&
       find data/cgpm/raw -type f |
+      sort |
       parallel $(bin/param parallel.flags)
       'python scripts/cgpm_hydrate.py
       --metadata {}
@@ -116,7 +117,7 @@ stages:
       --data data/numericalized.csv
       --schema data/cgpm-schema.edn
       --mapping-table data/mapping-table.edn
-      --seed $(bin/param seed)'
+      --seed $(($(bin/param seed) + {#} - 1))'
     params:
       - parallel.flags
       - seed
@@ -160,14 +161,15 @@ stages:
       parallel jsonschema --instance {} schemas/cgpm.json &&
       mkdir -p data/cgpm/complete &&
       find data/cgpm/hydrated -type f |
+      sort |
       parallel $(bin/param parallel.flags)
-      python scripts/cgpm_infer.py {}
+      'python scripts/cgpm_infer.py {}
       --kernel alpha
       --kernel view_alphas
       --kernel column_hypers
       --output data/cgpm/complete/{/}
       --iterations $(bin/param cgpm.hyper_iters)
-      --seed $(bin/param seed)
+      --seed $(($(bin/param seed) + {#} - 1))'
     params:
       - cgpm.hyper_iters
       - parallel.flags
