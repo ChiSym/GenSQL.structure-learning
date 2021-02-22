@@ -17,7 +17,7 @@ def loom_metadata(path):
 
     with stream.open_compressed(model_in, 'rb') as f:
         cross_cat.ParseFromString(f.read())
-        zv = dict(
+        zv = list(
             itertools.chain.from_iterable([
                 [(loom_rank, k) for loom_rank in kind.featureids]
                 for k, kind in enumerate(cross_cat.kinds)
@@ -29,14 +29,15 @@ def loom_metadata(path):
             for a in cFormat.assignment_stream_load(assign_in)
         }
         rowids = sorted(assignments)
-        zrv = {
-            k: [assignments[rowid][k] for rowid in rowids]
+        zrv = [
+            [k, [assignments[rowid][k] for rowid in rowids]]
             for k in range(num_kinds)
-        }
+        ]
 
         return {
             'Zv': zv,
-            'Zrv': zrv
+            'Zrv': zrv,
+            'hooked_cgpms': {}
         }
 
 

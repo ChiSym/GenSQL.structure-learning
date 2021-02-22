@@ -103,27 +103,20 @@ stages:
     outs:
       - data/cgpm/raw
 
-  # cgpm-initialize-empty-metadata:
-  #   cmd: >
-  #     mkdir -p data/cgpm/raw &&
-  #     seq 0 $(($(bin/param sample_count) - 1)) |
-  #     parallel -I ,, 'echo "{}" > data/cgpm/raw/sample.,,.json'
-  #   params:
-  #     - sample_count
-  #   outs:
-  #     - data/cgpm/raw
-
   cgpm-hydrate-metadata:
     cmd: >
+      find data/cgpm/raw -type f |
+      parallel jsonschema --instance {} schemas/cgpm.json &&
       mkdir -p data/cgpm/hydrated &&
       find data/cgpm/raw -type f |
       parallel $(bin/param parallel.flags)
-      python scripts/cgpm_hydrate.py {}
+      'python scripts/cgpm_hydrate.py
+      --metadata {}
       --output data/cgpm/hydrated/{/}
       --data data/numericalized.csv
       --schema data/cgpm-schema.edn
       --mapping-table data/mapping-table.edn
-      --seed $(bin/param seed)
+      --seed $(bin/param seed)'
     params:
       - parallel.flags
       - seed
@@ -132,12 +125,39 @@ stages:
       - data/cgpm/raw
       - data/mapping-table.edn
       - data/numericalized.csv
+      - schemas/cgpm.json
       - scripts/cgpm_hydrate.py
     outs:
       - data/cgpm/hydrated
 
+  # cgpm-generate-metadata:
+  #   cmd: >
+  #     mkdir -p data/cgpm/hydrated &&
+  #     seq 0 $(($(bin/param sample_count) - 1)) |
+  #     parallel $(bin/param parallel.flags)
+  #     'python scripts/cgpm_hydrate.py
+  #     --output data/cgpm/hydrated/sample.{}.json
+  #     --data data/numericalized.csv
+  #     --schema data/cgpm-schema.edn
+  #     --mapping-table data/mapping-table.edn
+  #     --seed $(bin/param seed)'
+  #   params:
+  #     - parallel.flags
+  #     - sample_count
+  #     - seed
+  #   deps:
+  #     - data/cgpm-schema.edn
+  #     - data/mapping-table.edn
+  #     - data/numericalized.csv
+  #     - schemas/cgpm.json
+  #     - scripts/cgpm_hydrate.py
+  #   outs:
+  #     - data/cgpm/hydrated
+
   cgpm-infer-hyperparameters:
     cmd: >
+      find data/cgpm/hydrated -type f |
+      parallel jsonschema --instance {} schemas/cgpm.json &&
       mkdir -p data/cgpm/complete &&
       find data/cgpm/hydrated -type f |
       parallel $(bin/param parallel.flags)
@@ -154,6 +174,7 @@ stages:
       - seed
     deps:
       - data/cgpm/hydrated
+      - schemas/cgpm.json
       - scripts/cgpm_infer.py
     outs:
       - data/cgpm/complete

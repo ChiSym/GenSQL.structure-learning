@@ -10,26 +10,10 @@ import sys
 from cgpm.crosscat.state import State
 
 
-def read_metadata(f):
-    metadata = json.load(f)
-
-    for z in ['Zv', 'Zrv']:
-        if z in metadata:
-            metadata[z] = {int(k): metadata[z][k] for k in metadata[z]}
-
-    return metadata
-
-
 def main():
-    description = 'Infers hyperparameters for CGPM metadata.'
+    description = 'Generate CGPM metadata.'
     parser = argparse.ArgumentParser(description=description)
 
-    parser.add_argument(
-        'metadata',
-        type=argparse.FileType('r'),
-        help='Path to CGPM metadata.',
-        default=sys.stdin
-    )
     parser.add_argument(
         '-o', '--output',
         type=argparse.FileType('w+'),
@@ -53,6 +37,11 @@ def main():
         dest='mapping_table'
     )
     parser.add_argument(
+        '--metadata',
+        type=argparse.FileType('r'),
+        help='Path to input CGPM metadata.'
+    )
+    parser.add_argument(
         '--seed',
         type=int,
         default=1,
@@ -68,7 +57,6 @@ def main():
     df = pandas.read_csv(args.data)
     schema = edn_format.loads(args.schema.read())
     mapping_table = edn_format.loads(args.mapping_table.read())
-    metadata = read_metadata(args.metadata)
 
     def n_categories(column):
         return len(mapping_table[column])
@@ -81,14 +69,24 @@ def main():
     cctypes = [schema[column] for column in df.columns]
     distargs = [distarg(column) for column in df.columns]
 
-    state = State(
-        df.values,
+    if args.metadata is not None:
+        additional_metadata = json.load(args.metadata)
+    else:
+        additional_metadata = {}
+
+    base_metadata = dict(
+        X=df.values,
         cctypes=cctypes,
         distargs=distargs,
-        outputs=range(df.shape[1]),
-        rng=general.gen_rng(args.seed),
-        **metadata
+        outputs=range(df.shape[1])
     )
+    metadata = {**base_metadata, **additional_metadata}
+    rng = general.gen_rng(args.seed)
+
+    if args.metadata is not None:
+        state = State.from_metadata(metadata, rng=rng)
+    else:
+        state = State(**metadata, rng=rng)
 
     json.dump(state.to_metadata(), args.output)
 
