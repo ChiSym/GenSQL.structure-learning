@@ -168,12 +168,14 @@ stages:
       --kernel view_alphas
       --kernel column_hypers
       --output data/cgpm/complete/{/}
-      --iterations $(bin/param cgpm.hyper_iters)
-      --seed $(($(bin/param seed) + {#} - 1))'
+      --seed $(($(bin/param seed) + {#} - 1))
+      --minutes $(bin/param cgpm.minutes)'
+      #--iterations $(bin/param cgpm.iterations)
     params:
-      - cgpm.hyper_iters
       - parallel.flags
       - seed
+      - cgpm.minutes
+      #- cgpm.iterations
     deps:
       - data/cgpm/hydrated
       - schemas/cgpm.json

@@ -1,5 +1,5 @@
 seed: 0
-sample_count: 10
+sample_count: 3
 parallel:
   # To limit the number of jobs GNU Parallel spawns use add the flag `--jobs n`.
   flags: >
@@ -17,4 +17,5 @@ schema:
 loom:
   extra_passes: 1
 cgpm:
-  hyper_iters: 1000
+  #iterations: 1
+  minutes: 1

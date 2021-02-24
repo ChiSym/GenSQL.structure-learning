@@ -36,8 +36,15 @@ def main():
     parser.add_argument(
         '--iterations',
         type=int,
-        help='Number of hyperperameter inference iterations',
-        default=1,
+        help='Number of inference iterations',
+        default=None,
+        metavar='NUM'
+    )
+    parser.add_argument(
+        '--minutes',
+        type=float,
+        help='Minutes inference should run.',
+        default=None,
         metavar='NUM'
     )
     parser.add_argument(
@@ -56,9 +63,10 @@ def main():
     metadata = json.load(args.metadata)
     rng = general.gen_rng(args.seed)
     state = State.from_metadata(metadata, rng=rng)
-    iterations = args.iterations
-
-    state.transition(N=iterations, kernels=args.kernels)
+    if args.iterations is not None:
+        state.transition(N=args.iterations, kernels=args.kernels)
+    if args.minutes is not None:
+        state.transition(S=args.minutes * 60, kernels=args.kernels)
 
     json.dump(state.to_metadata(), args.output)
 
