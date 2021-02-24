@@ -141,7 +141,16 @@
       }
     },
     "suffstats": {
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "object",
+        "patternProperties": {
+          "^[0-9]+": {
+            "type": "object"
+          }
+        },
+        "additionalProperties": false
+      }
     },
     "view_alphas": {
       "type": "array",

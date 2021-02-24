@@ -180,3 +180,35 @@ stages:
       - scripts/cgpm_infer.py
     outs:
       - data/cgpm/complete
+
+  sppl-import:
+    cmd: >
+      find data/cgpm/complete -type f |
+      parallel jsonschema --instance {} schemas/cgpm.json &&
+      mkdir -p data/sppl/unmerged &&
+      find data/cgpm/complete -type f |
+      parallel $(bin/param parallel.flags)
+      'python scripts/sppl_import.py
+      --metadata {}
+      --data data/numericalized.csv
+      --mapping-table data/mapping-table.edn
+      --output data/sppl/unmerged/{/}'
+    params:
+      - parallel.flags
+    deps:
+      - data/cgpm/complete
+      - data/numericalized.csv
+      - scripts/sppl_import.py
+    outs:
+      - data/sppl/unmerged
+
+  sppl-merge:
+    cmd: >
+      find data/sppl/unmerged -type f |
+      sort |
+      xargs python scripts/sppl_merge.py
+      --output data/sppl/merged.json
+    deps:
+      - data/sppl/unmerged
+    outs:
+      - data/sppl/merged.json
