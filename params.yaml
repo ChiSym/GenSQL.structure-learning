@@ -19,3 +19,18 @@ loom:
 cgpm:
   #iterations: 1
   minutes: 1
+qc:
+  # Set this to the number of virtual samples desired in QC plots.
+  # When not set, the plots will display the same number of virual samples as
+  # observed data points.
+  sample_count: null
+  # Set this to specify the columns visualized in QC plots.
+  # When not set, up to 8 columns--taken from the schema--will be visualized.
+  # e.g. columns: ["foo", "bar", "baz"]
+  columns: null
+  # This sets scaling factor of the qc images produced.
+  # The larger the number, the more high quality and zoom-able the image.
+  # Set this to a multiple of 2. (e.g. 1, 2, 4, ....)
+  # NOTE: There may be an issue with the vl2png command utility such that it fails
+  # for wide images producted at high quality. Try the vl2pdf utility instead.
+  image_quality: 1

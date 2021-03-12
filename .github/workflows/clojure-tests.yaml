@@ -21,6 +21,6 @@ jobs:
       - name: Add SSH key
         uses: webfactory/ssh-agent@v0.4.1
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_INFERENCEQL_MACHINE_USER }}
       - name: Run Clojure tests
         run: bin/kaocha --reporter documentation --plugin kaocha.plugin/profiling

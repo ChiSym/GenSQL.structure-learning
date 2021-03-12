@@ -43,6 +43,13 @@
       (schema/cgpm)
       (pr)))
 
+(defn iql-viz-schema
+  [_]
+  (-> (slurp *in*)
+      (edn/read-string)
+      (schema/iql-viz)
+      (pr)))
+
 (defn numericalize
   [{table-path :table schema-path :schema}]
   (let [nominal-columns (into #{}

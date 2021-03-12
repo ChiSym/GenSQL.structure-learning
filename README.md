@@ -59,3 +59,20 @@ In either, the docker container or the local virtual environment, run
 ```
 make test
 ```
+
+### Quality Control (QC) images
+
+The DVC stages `qc-dashboard-image` and `qc-splom-image` produce pngs in the `qc/images/` folder.
+
+These images can be used to verify model quality.
+
+Vega-lite command line utilities (version 5) are needed to run these stages. Install them globally with this.
+```bash
+yarn global add vega-lite@5
+```
+
+### Quality Control (QC) apps
+
+The DVC stages `qc-dashboard-app` and `qc-splom-app` produce standalone html files in the `qc/app/`
+folder. Open them in a browser. These interactive vega-lite visualizations can be used to verify
+model quality.

@@ -214,3 +214,132 @@ stages:
       - data/sppl/unmerged
     outs:
       - data/sppl/merged.json
+
+  sppl-sample:
+    cmd: >
+      python scripts/sppl_sample.py
+      --model data/sppl/merged.json
+      --data data/nullified.csv
+      --sample_count $(bin/param qc.sample_count)
+      > qc/samples/samples-virtual.edn
+    deps:
+      - data/sppl/merged.json
+      - data/nullified.csv
+    outs:
+      - qc/samples/samples-virtual.edn
+
+  iql-viz-schema:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.main/iql-viz-schema
+      < data/schema.edn
+      > qc/schema.edn
+    deps:
+      - data/schema.edn
+      - src/inferenceql/auto_modeling/main.clj
+    outs:
+      - qc/schema.edn
+
+  qc-tag-samples:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.samples/tag
+      :data data/nullified.csv
+      :schema qc/schema.edn
+      :samples-virtual qc/samples/samples-virtual.edn
+      > qc/samples/samples.edn
+    deps:
+      - data/nullified.csv
+      - qc/schema.edn
+      - qc/samples/samples-virtual.edn
+      - src/inferenceql/auto_modeling/samples.clj
+    outs:
+      - qc/samples/samples.edn
+
+  qc-dashboard-spec:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.vega/qc-dashboard-spec
+      :samples qc/samples/samples.edn
+      :schema qc/schema.edn
+      > qc/specs/qc-dashboard.vl.json
+    params:
+      - qc.columns
+    deps:
+      - qc/samples/samples.edn
+      - qc/schema.edn
+      - src/inferenceql/auto_modeling/vega.clj
+    outs:
+      - qc/specs/qc-dashboard.vl.json
+
+  qc-dashboard-image:
+    cmd: >
+      vl2png
+      -s $(bin/param qc.image_quality)
+      -l warn
+      < qc/specs/qc-dashboard.vl.json
+      > qc/images/qc-dashboard.png
+      2> qc/logs/vl2png-qc-image.log
+    params:
+      - qc.image_quality
+    deps:
+      - qc/specs/qc-dashboard.vl.json
+    outs:
+      - qc/images/qc-dashboard.png
+      - qc/logs/vl2png-qc-image.log
+
+  qc-dashboard-app:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.app/create
+      :template qc/templates/index.html
+      :spec qc/specs/qc-dashboard.vl.json
+      :renderer svg
+      :title '"QC dashboard"'
+      > qc/app/qc-dashboard.html
+    deps:
+      - qc/templates/index.html
+      - qc/specs/qc-dashboard.vl.json
+    outs:
+      - qc/app/qc-dashboard.html
+
+  qc-splom-spec:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.vega/qc-splom-spec
+      :samples qc/samples/samples.edn
+      :schema qc/schema.edn
+      > qc/specs/qc-splom.vl.json
+    params:
+      - qc.columns
+    deps:
+      - qc/samples/samples.edn
+      - qc/schema.edn
+      - src/inferenceql/auto_modeling/vega.clj
+    outs:
+      - qc/specs/qc-splom.vl.json
+
+  qc-splom-image:
+    cmd: >
+      vl2png
+      -s $(bin/param qc.image_quality)
+      -l warn
+      < qc/specs/qc-splom.vl.json
+      > qc/images/qc-splom.png
+      2> qc/logs/vl2png-qc-splom-image.log
+    params:
+      - qc.image_quality
+    deps:
+      - qc/specs/qc-splom.vl.json
+    outs:
+      - qc/images/qc-splom.png
+      - qc/logs/vl2png-qc-splom-image.log
+
+  qc-splom-app:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.app/create
+      :template qc/templates/index.html
+      :spec qc/specs/qc-splom.vl.json
+      :renderer canvas
+      :title '"QC scatter plot matrix"'
+      > qc/app/qc-splom.html
+    deps:
+      - qc/templates/index.html
+      - qc/specs/qc-splom.vl.json
+    outs:
+      - qc/app/qc-splom.html

@@ -10,4 +10,5 @@
                         (into {}
                               (map (juxt (comp name key)
                                          (comp keyword val)))
-                              schema)))))
+                              schema)))
+      (update-in [:qc :columns] (fn [columns] (seq (map keyword columns))))))
