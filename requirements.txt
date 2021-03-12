@@ -1,3 +1,4 @@
+black==20.8b1
 dvc==1.11.10
 edn-format==0.7.5
 future==0.18.2

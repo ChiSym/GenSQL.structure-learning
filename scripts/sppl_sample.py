@@ -6,10 +6,10 @@ import csv
 
 # Monkey patching this to work around https://github.com/scipy/scipy/pull/7838
 
-if not hasattr(stats, 'frechet_r'):
+if not hasattr(stats, "frechet_r"):
     stats.frechet_r = stats.weibull_max
 
-if not hasattr(stats, 'frechet_l'):
+if not hasattr(stats, "frechet_l"):
     stats.frechet_l = stats.weibull_min
 
 import argparse
@@ -23,39 +23,40 @@ def save_samples(spn_samples, f):
         {
             edn_format.Keyword(k): v
             for k, v in row.items()
-            if (not str(k).endswith('_cluster')) and (str(k) != 'child')
+            if (not str(k).endswith("_cluster")) and (str(k) != "child")
         }
         for row in spn_samples
     ]
-    f.write(edn_format.dumps(samples).replace('[', '(').replace(']', ')'))
+    f.write(edn_format.dumps(samples).replace("[", "(").replace("]", ")"))
 
 
 def main():
-    description = 'Outputs samples from a SPPL model.'
+    description = "Outputs samples from a SPPL model."
     parser = argparse.ArgumentParser(description=description)
 
     parser.add_argument(
-        '--model',
-        type=argparse.FileType('r'),
-        help='Path to SPN model (json) used to generate samples.'
+        "--model",
+        type=argparse.FileType("r"),
+        help="Path to SPN model (json) used to generate samples.",
     )
     parser.add_argument(
-        '--data',
-        type=argparse.FileType('r'),
-        help='Path to CSV used to generate the SPN model.'
+        "--data",
+        type=argparse.FileType("r"),
+        help="Path to CSV used to generate the SPN model.",
     )
     parser.add_argument(
-        '--sample_count',
+        "--sample_count",
         type=int,
-        nargs='?',
+        nargs="?",
         default=None,
-        help='Number of joint simulations for QC'
+        help="Number of joint simulations for QC",
     )
     parser.add_argument(
-        '-o', '--output',
-        type=argparse.FileType('w+'),
-        help='Path to which samples will be written as EDN.',
-        default=sys.stdout
+        "-o",
+        "--output",
+        type=argparse.FileType("w+"),
+        help="Path to which samples will be written as EDN.",
+        default=sys.stdout,
     )
 
     args = parser.parse_args()

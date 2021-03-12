@@ -9,54 +9,51 @@ from cgpm.crosscat.state import State
 
 
 def main():
-    parser = argparse.ArgumentParser(description='')
+    parser = argparse.ArgumentParser(description="")
 
     parser.add_argument(
-        'metadata',
-        type=argparse.FileType('r'),
-        help='CGPM metadata JSON',
+        "metadata",
+        type=argparse.FileType("r"),
+        help="CGPM metadata JSON",
         default=sys.stdin,
-        metavar='PATH'
+        metavar="PATH",
     )
     parser.add_argument(
-        '-o', '--output',
-        type=argparse.FileType('w+'),
+        "-o",
+        "--output",
+        type=argparse.FileType("w+"),
         default=sys.stdout,
-        metavar='PATH'
+        metavar="PATH",
     )
     parser.add_argument(
-        '-k', '--kernel',
-        action='append',
+        "-k",
+        "--kernel",
+        action="append",
         type=str,
-        help='Inference kernel.',
-        default=['alpha', 'view_alphas', 'column_hypers'],
-        metavar='KERNEL',
-        dest='kernels'
+        help="Inference kernel.",
+        default=["alpha", "view_alphas", "column_hypers"],
+        metavar="KERNEL",
+        dest="kernels",
     )
     parser.add_argument(
-        '--iterations',
+        "--iterations",
         type=int,
-        help='Number of inference iterations',
+        help="Number of inference iterations",
         default=None,
-        metavar='NUM'
+        metavar="NUM",
     )
     parser.add_argument(
-        '--minutes',
+        "--minutes",
         type=float,
-        help='Minutes inference should run.',
+        help="Minutes inference should run.",
         default=None,
-        metavar='NUM'
+        metavar="NUM",
     )
-    parser.add_argument(
-        '--seed',
-        type=int,
-        default=1,
-        help='CGPM seed.'
-    )
+    parser.add_argument("--seed", type=int, default=1, help="CGPM seed.")
 
     args = parser.parse_args()
 
-    if (args.metadata is None):
+    if args.metadata is None:
         parser.print_help(sys.stderr)
         sys.exit(1)
 

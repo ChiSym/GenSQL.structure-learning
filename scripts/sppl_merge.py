@@ -5,10 +5,10 @@ import sys
 
 # Monkey patching this to work around https://github.com/scipy/scipy/pull/7838
 
-if not hasattr(stats, 'frechet_r'):
+if not hasattr(stats, "frechet_r"):
     stats.frechet_r = stats.weibull_max
 
-if not hasattr(stats, 'frechet_l'):
+if not hasattr(stats, "frechet_l"):
     stats.frechet_l = stats.weibull_min
 
 import argparse
@@ -22,22 +22,23 @@ from sppl.transforms import Identity
 
 
 def main():
-    description = 'Merges multiple SPPL models.'
+    description = "Merges multiple SPPL models."
     parser = argparse.ArgumentParser(description=description)
 
     parser.add_argument(
-        nargs='+',
-        type=argparse.FileType('r'),
-        help='SPPL model JSON.',
+        nargs="+",
+        type=argparse.FileType("r"),
+        help="SPPL model JSON.",
         default=[],
-        metavar='MODEL',
-        dest='models'
+        metavar="MODEL",
+        dest="models",
     )
     parser.add_argument(
-        '-o', '--output',
-        type=argparse.FileType('w+'),
-        help='Path to write joined SPPL model JSON.',
-        default=sys.stdout
+        "-o",
+        "--output",
+        type=argparse.FileType("w+"),
+        help="Path to write joined SPPL model JSON.",
+        default=sys.stdout,
     )
 
     args = parser.parse_args()
@@ -50,7 +51,7 @@ def main():
     children = [spn_to_dict.spn_from_dict(d) for d in spn_dicts]
 
     # Create an equal-weighted ExposedSum.
-    id_children = Identity('child')
+    id_children = Identity("child")
     n_children = len(children)
     children_keys = [str(i) for i in range(n_children)]
     children_probs = {i: Fraction(1, n_children) for i in children_keys}
