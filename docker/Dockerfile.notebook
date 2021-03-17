@@ -9,8 +9,6 @@ ADD setup.py .
 ADD Makefile .
 # add python requirements.
 ADD requirements.txt .
-# Add iql-viz
-ADD iql-viz/ ./iql-viz
 
 USER root
 RUN python -m pip install -r requirements.txt

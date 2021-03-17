@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "vega": "^5.19.1",
+    "vega-cli": "^5.19.1",
+    "vega-lite": "^5.0.0"
+  }
+}

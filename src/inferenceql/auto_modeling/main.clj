@@ -7,24 +7,26 @@
             [clojure.string :as string]
             [inferenceql.auto-modeling.csv :as iql.csv]
             [inferenceql.auto-modeling.dvc :as dvc]
-            [inferenceql.auto-modeling.schema :as schema]))
+            [inferenceql.auto-modeling.schema :as schema]
+            [medley.core :as medley]))
 
 (defn nullify
   [_]
-  (->> (csv/read-csv (slurp *in*))
-       (iql.csv/as-maps)
-       (iql.csv/nullify (:nullify (dvc/yaml)))
-       (iql.csv/as-cells)
-       (csv/write-csv *out*)))
+  (let [null-vals (set (:nullify (dvc/yaml)))]
+    (->> (csv/read-csv (slurp *in*))
+         (iql.csv/as-maps)
+         (map #(medley/remove-vals (some-fn nil? null-vals) %))
+         (iql.csv/as-cells)
+         (csv/write-csv *out*))))
 
 (defn guess-schema
   [_]
   (let [params-schema (:schema (dvc/yaml))
         guessed-schema (->> (csv/read-csv (slurp *in*))
                             (iql.csv/as-maps)
-                            (iql.csv/nullify #{""})
+                            (map #(medley/remove-vals (every-pred string? string/blank?) %))
                             (iql.csv/heuristic-coerce-all)
-                            (map #(apply dissoc % (keys params-schema)))
+                            (map #(medley/remove-keys (set (keys params-schema)) %))
                             (schema/guess))
         schema (merge guessed-schema params-schema)]
     (prn schema)))
@@ -58,7 +60,7 @@
                               (edn/read-string (slurp (io/file (str schema-path)))))
         {:keys [rows table]} (->> (csv/read-csv (slurp *in*))
                                   (iql.csv/as-maps)
-                                  (iql.csv/nullify #{""})
+                                  (medley/remove-vals (some-fn nil? (every-pred string? string/blank?)))
                                   (iql.csv/heuristic-coerce-all)
                                   (iql.csv/numericalize nominal-columns))]
 

@@ -1,13 +1,28 @@
 (ns inferenceql.auto-modeling.csv
   (:require [clojure.data.csv :as csv]
+            [clojure.edn :as edn]
             [clojure.pprint :as pprint]))
 
+(defn parse-number
+  "Attempts to parse string s as a number or `nil`. Throws a
+  `java.lang.NumberFormatException` if parsing fails."
+  [s]
+  (let [x (edn/read-string s)]
+    (if (or (number? x)
+            (nil? x))
+      x
+      (throw (NumberFormatException. (str "The value " (pr-str x) " cannot be read as a number or nil."))))))
+
 (defn as-maps
-  [coll]
-  (let [[headers & rows] coll]
-    (into []
-          (map #(zipmap headers %))
-          rows)))
+  ([coll]
+   (as-maps coll {}))
+  ([coll opts]
+   (let [{:keys [key-fn]} opts
+         headers (cond->> (first coll)
+                   key-fn (map key-fn))]
+     (into []
+           (map #(zipmap headers %))
+           (rest coll)))))
 
 (defn as-cells
   [coll]
@@ -21,15 +36,6 @@
                          []
                          headers)))
           coll)))
-
-(defn nullify
-  "Remove null values."
-  [values data]
-  (map (fn [row]
-         (into {}
-               (remove (comp values val))
-               row))
-       data))
 
 (defn lookup-table
   "Constructs a lookup table for a sequence of maps `ms`, which maps each "
@@ -63,23 +69,12 @@
       (spit (str out) table)
       (pprint/pprint rows))))
 
-;; This was a one-off fucntion we used to create test data.
-(defn new-csv
-  [_]
-  (let [[headers & rows] (csv/read-csv (slurp "/Users/zane/Desktop/data.csv"))
-        new-headers (into ["id"] headers)
-        output (into [new-headers]
-                     (map-indexed (fn [index row]
-                                    (into [index] row))
-                                  rows))]
-    (csv/write-csv *out* output)))
-
 (defn heuristic-coerce
   [& coll]
   (try (into []
              (map #(if (nil? %)
                      %
-                     (Integer/parseInt %)))
+                     (Long/parseLong %)))
              coll)
        (catch java.lang.NumberFormatException _
          (try (into []
@@ -89,8 +84,6 @@
                     coll)
               (catch java.lang.NumberFormatException _
                 coll)))))
-
-#_(heuristic-coerce "1" "2" nil "3")
 
 (defn apply-column
   [k f coll]
@@ -113,10 +106,13 @@
             coll
             ks)))
 
-#_(apply-column
-   :x
-   (fn [& ns]
-     (map (fnil inc 0) ns))
-   [{:x 0 :y 1}
-    {:y 2}
-    {:x 2 :y 3}])
+(defn update-by-key
+  "For each key k in coll if (f k) returns a function update the value for k in
+  coll with that function."
+  [coll f]
+  (reduce-kv (fn [coll k v]
+               (if-let [f (f k)]
+                 (assoc coll k (f v))
+                 coll))
+             coll
+             coll))

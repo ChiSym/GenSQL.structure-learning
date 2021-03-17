@@ -66,9 +66,10 @@ The DVC stages `qc-dashboard-image` and `qc-splom-image` produce pngs in the `qc
 
 These images can be used to verify model quality.
 
-Vega-lite command line utilities (version 5) are needed to run these stages. Install them globally with this.
+Vega-lite command line utilities (version 5) are needed to run these stages. Install them with this.
+
 ```bash
-yarn global add vega-lite@5
+yarn install
 ```
 
 ### Quality Control (QC) apps

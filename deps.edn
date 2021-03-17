@@ -11,4 +11,5 @@
                                     :sha "b2e36da07c5218a7c50910a263fd1d7c63f4091b"}}
  :aliases {:test {:extra-paths ["test"]
                   :extra-deps {lambdaisland/kaocha {:mvn/version "1.0-612"}
-                               lambdaisland/kaocha-cljs {:mvn/version "0.0-71"}}}}}
+                               lambdaisland/kaocha-cljs {:mvn/version "0.0-71"}}}
+           :xcat-import {:exec-fn inferenceql.auto-modeling.xcat/import}}}

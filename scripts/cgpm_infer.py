@@ -3,9 +3,17 @@
 import argparse
 import cgpm.utils.general as general
 import json
+import math
 import sys
 
 from cgpm.crosscat.state import State
+
+
+def replace(array, pred, replacement):
+    """Destructively replace all instances in a 2D array that satisfy a
+    predicate with a replacement.
+    """
+    return [[(y if not pred(y) else replacement) for y in x] for x in array]
 
 
 def main():
@@ -65,7 +73,9 @@ def main():
     if args.minutes is not None:
         state.transition(S=args.minutes * 60, kernels=args.kernels)
 
-    json.dump(state.to_metadata(), args.output)
+    state_metadata = state.to_metadata()
+    state_metadata["X"] = replace(state_metadata["X"], math.isnan, None)
+    json.dump(state_metadata, args.output)
 
 
 if __name__ == "__main__":

@@ -232,54 +232,79 @@ stages:
     cmd: >
       clojure -X inferenceql.auto-modeling.main/iql-viz-schema
       < data/schema.edn
-      > qc/schema.edn
+      > data/iql-schema.edn
     deps:
       - data/schema.edn
       - src/inferenceql/auto_modeling/main.clj
     outs:
-      - qc/schema.edn
+      - data/iql-schema.edn
 
   qc-tag-samples:
     cmd: >
       clojure -X inferenceql.auto-modeling.samples/tag
       :data data/nullified.csv
-      :schema qc/schema.edn
+      :schema data/iql-schema.edn
       :samples-virtual qc/samples/samples-virtual.edn
       > qc/samples/samples.edn
     deps:
       - data/nullified.csv
-      - qc/schema.edn
+      - data/iql-schema.edn
       - qc/samples/samples-virtual.edn
       - src/inferenceql/auto_modeling/samples.clj
     outs:
       - qc/samples/samples.edn
 
+  xcat-import:
+    cmd: >
+      mkdir -p data/xcat &&
+      find data/cgpm/complete -type f |
+      parallel $(bin/param parallel.flags)
+      'clojure -X:xcat-import
+      :cgpm-json {}
+      :data-csv data/nullified.csv
+      :mapping-table data/mapping-table.edn
+      :numericalized-csv data/numericalized.csv
+      :schema-edn data/iql-schema.edn
+      > data/xcat/{/.}.edn'
+    params:
+      - parallel.flags
+    deps:
+      - data/cgpm/complete
+      - data/mapping-table.edn
+      - data/nullified.csv
+      - data/numericalized.csv
+      - data/iql-schema.edn
+      - src/inferenceql/auto_modeling/xcat.clj
+    outs:
+      - data/xcat
+
   qc-dashboard-spec:
     cmd: >
       clojure -X inferenceql.auto-modeling.vega/qc-dashboard-spec
       :samples qc/samples/samples.edn
-      :schema qc/schema.edn
+      :schema data/iql-schema.edn
       > qc/specs/qc-dashboard.vl.json
     params:
       - qc.columns
     deps:
       - qc/samples/samples.edn
-      - qc/schema.edn
+      - data/iql-schema.edn
       - src/inferenceql/auto_modeling/vega.clj
     outs:
       - qc/specs/qc-dashboard.vl.json
 
   qc-dashboard-image:
     cmd: >
-      vl2png
+      yarn run vl2png
       -s $(bin/param qc.image_quality)
       -l warn
-      < qc/specs/qc-dashboard.vl.json
-      > qc/images/qc-dashboard.png
+      qc/specs/qc-dashboard.vl.json
+      qc/images/qc-dashboard.png
       2> qc/logs/vl2png-qc-image.log
     params:
       - qc.image_quality
     deps:
+      - node_modules
       - qc/specs/qc-dashboard.vl.json
     outs:
       - qc/images/qc-dashboard.png
@@ -303,28 +328,29 @@ stages:
     cmd: >
       clojure -X inferenceql.auto-modeling.vega/qc-splom-spec
       :samples qc/samples/samples.edn
-      :schema qc/schema.edn
+      :schema data/iql-schema.edn
       > qc/specs/qc-splom.vl.json
     params:
       - qc.columns
     deps:
       - qc/samples/samples.edn
-      - qc/schema.edn
+      - data/iql-schema.edn
       - src/inferenceql/auto_modeling/vega.clj
     outs:
       - qc/specs/qc-splom.vl.json
 
   qc-splom-image:
     cmd: >
-      vl2png
+      yarn run vl2png
       -s $(bin/param qc.image_quality)
       -l warn
-      < qc/specs/qc-splom.vl.json
-      > qc/images/qc-splom.png
+      qc/specs/qc-splom.vl.json
+      qc/images/qc-splom.png
       2> qc/logs/vl2png-qc-splom-image.log
     params:
       - qc.image_quality
     deps:
+      - node_modules
       - qc/specs/qc-splom.vl.json
     outs:
       - qc/images/qc-splom.png
