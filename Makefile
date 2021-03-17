@@ -47,8 +47,6 @@ install: venv deps home-dir
 
 clean:
 	rm -rf ${VENV_LOCATION}
-	rm -rf sum-product-dsl
-
 
 ###########################################################################
 # Testing
