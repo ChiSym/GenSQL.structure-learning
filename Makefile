@@ -40,7 +40,6 @@ home-dir:
 	@mkdir -p ${ANALYSES_LOCATION}
 
 install: venv deps home-dir
-	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m pip install .
 
 ###########################################################################
 # Clean the house. CAVEAT: this removes the local copy of the sum-product-dsl.
