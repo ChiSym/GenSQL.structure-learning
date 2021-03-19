@@ -183,6 +183,18 @@ stages:
     outs:
       - data/cgpm/complete
 
+  save-dependencies:
+    cmd: >
+      find data/cgpm/complete -type f |
+      sort |
+      xargs python scripts/dep_prob.py
+      --data data/numericalized.csv
+      --output data/dep-prob.json
+    deps:
+      - data/cgpm/complete
+    outs:
+      - data/dep-prob.json
+
   sppl-import:
     cmd: >
       find data/cgpm/complete -type f |
