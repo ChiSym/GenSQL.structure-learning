@@ -1,4 +1,4 @@
-(ns inferenceql.auto-modeling.samples
+(ns inferenceql.auto-modeling.qc.samples
   (:require [clojure.edn :as edn]
             [clojure.pprint :refer [pprint]]
             [inferenceql.query.main :refer [slurp-csv]]

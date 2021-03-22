@@ -34,3 +34,7 @@ qc:
   # NOTE: There may be an issue with the vl2png command utility such that it fails
   # for wide images producted at high quality. Try the vl2pdf utility instead.
   image_quality: 1
+  # This limits the number of categories shown for categorical variables in
+  # 2-dimensional QC plots. Set this to null for no limit.
+  category_limit: 10
+

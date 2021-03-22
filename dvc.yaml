@@ -253,7 +253,7 @@ stages:
 
   qc-tag-samples:
     cmd: >
-      clojure -X inferenceql.auto-modeling.samples/tag
+      clojure -X inferenceql.auto-modeling.qc.samples/tag
       :data data/nullified.csv
       :schema data/iql-schema.edn
       :samples-virtual qc/samples/samples-virtual.edn
@@ -262,7 +262,7 @@ stages:
       - data/nullified.csv
       - data/iql-schema.edn
       - qc/samples/samples-virtual.edn
-      - src/inferenceql/auto_modeling/samples.clj
+      - src/inferenceql/auto_modeling/qc/samples.clj
     outs:
       - qc/samples/samples.edn
 
@@ -292,7 +292,7 @@ stages:
 
   qc-dashboard-spec:
     cmd: >
-      clojure -X inferenceql.auto-modeling.vega/qc-dashboard-spec
+      clojure -X inferenceql.auto-modeling.qc.dashboard/spec
       :samples qc/samples/samples.edn
       :schema data/iql-schema.edn
       > qc/specs/qc-dashboard.vl.json
@@ -301,7 +301,8 @@ stages:
     deps:
       - qc/samples/samples.edn
       - data/iql-schema.edn
-      - src/inferenceql/auto_modeling/vega.clj
+      - src/inferenceql/auto_modeling/qc/dashboard.clj
+      - src/inferenceql/auto_modeling/qc/util.clj
     outs:
       - qc/specs/qc-dashboard.vl.json
 
@@ -324,21 +325,22 @@ stages:
 
   qc-dashboard-app:
     cmd: >
-      clojure -X inferenceql.auto-modeling.app/create
+      clojure -X inferenceql.auto-modeling.qc.app/create
       :template qc/templates/index.html
       :spec qc/specs/qc-dashboard.vl.json
-      :renderer svg
+      :renderer canvas
       :title '"QC dashboard"'
       > qc/app/qc-dashboard.html
     deps:
       - qc/templates/index.html
       - qc/specs/qc-dashboard.vl.json
+      - src/inferenceql/auto_modeling/qc/app.clj
     outs:
       - qc/app/qc-dashboard.html
 
   qc-splom-spec:
     cmd: >
-      clojure -X inferenceql.auto-modeling.vega/qc-splom-spec
+      clojure -X inferenceql.auto-modeling.qc.splom/spec
       :samples qc/samples/samples.edn
       :schema data/iql-schema.edn
       > qc/specs/qc-splom.vl.json
@@ -347,7 +349,8 @@ stages:
     deps:
       - qc/samples/samples.edn
       - data/iql-schema.edn
-      - src/inferenceql/auto_modeling/vega.clj
+      - src/inferenceql/auto_modeling/qc/splom.clj
+      - src/inferenceql/auto_modeling/qc/util.clj
     outs:
       - qc/specs/qc-splom.vl.json
 
@@ -370,7 +373,7 @@ stages:
 
   qc-splom-app:
     cmd: >
-      clojure -X inferenceql.auto-modeling.app/create
+      clojure -X inferenceql.auto-modeling.qc.app/create
       :template qc/templates/index.html
       :spec qc/specs/qc-splom.vl.json
       :renderer canvas
@@ -379,5 +382,6 @@ stages:
     deps:
       - qc/templates/index.html
       - qc/specs/qc-splom.vl.json
+      - src/inferenceql/auto_modeling/qc/app.clj
     outs:
       - qc/app/qc-splom.html
