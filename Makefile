@@ -3,8 +3,8 @@
 #
 # These are usually not overridden by users but can be.
 #
-PYTHON ?= python3.6
-PIP ?= pip3
+PYTHON ?= python3.9
+PIP ?= pip
 
 ###########################################################################
 # This is where analyses are saved.
@@ -33,7 +33,9 @@ venv:
 # Install automated modeling.
 
 deps:
-	${VENV_PIP} install -r requirements.txt
+	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m pip --default-timeout=1000 install -r requirements.txt
+	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m pip --default-timeout=1000 install install sppl==1.2.1 --no-deps
+
 	@echo "Installed dependencies."
 
 home-dir:
@@ -56,7 +58,7 @@ sppl-test:
 cgpm-test:
 	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m pytest --pyargs cgpm -k "not __ci_"
 
-test: sppl-test cgpm-test auto-test
+test: sppl-test cgpm-test
 
 ###########################################################################
 # Docker setup
