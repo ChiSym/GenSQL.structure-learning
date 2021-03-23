@@ -35,6 +35,7 @@ venv:
 deps:
 	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m pip --default-timeout=1000 install -r requirements.txt
 	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m pip --default-timeout=1000 install install sppl==1.2.1 --no-deps
+	yarn install
 
 	@echo "Installed dependencies."
 
