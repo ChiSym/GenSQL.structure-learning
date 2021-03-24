@@ -7,6 +7,7 @@
 (def obs-data-color "#4e79a7") ;; Tableau-10 Blue
 (def virtual-data-color "#f28e2b") ;; Tableau-10 Orange
 (def unselected-color "lightgrey")
+(def regression-color "black")
 
 (defn vega-type-fn
   "Given a `schema`, returns a vega-type function.

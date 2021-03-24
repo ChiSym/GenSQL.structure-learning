@@ -195,6 +195,19 @@ stages:
     outs:
       - data/dep-prob.json
 
+  save-correlations:
+    cmd: >
+      python scripts/correlation.py
+      --data data/nullified.csv
+      --schema data/schema.edn
+      --output data/correlation.json
+    deps:
+      - data/nullified.csv
+      - data/schema.edn
+      - scripts/correlation.py
+    outs:
+      - data/correlation.json
+
   sppl-import:
     cmd: >
       find data/cgpm/complete -type f |
@@ -295,12 +308,14 @@ stages:
       clojure -X inferenceql.auto-modeling.qc.dashboard/spec
       :samples qc/samples/samples.edn
       :schema data/iql-schema.edn
+      :correlation data/correlation.json
       > qc/specs/qc-dashboard.vl.json
     params:
       - qc.columns
     deps:
       - qc/samples/samples.edn
       - data/iql-schema.edn
+      - data/correlation.json
       - src/inferenceql/auto_modeling/qc/dashboard.clj
       - src/inferenceql/auto_modeling/qc/util.clj
     outs:
@@ -343,12 +358,14 @@ stages:
       clojure -X inferenceql.auto-modeling.qc.splom/spec
       :samples qc/samples/samples.edn
       :schema data/iql-schema.edn
+      :correlation data/correlation.json
       > qc/specs/qc-splom.vl.json
     params:
       - qc.columns
     deps:
       - qc/samples/samples.edn
       - data/iql-schema.edn
+      - data/correlation.json
       - src/inferenceql/auto_modeling/qc/splom.clj
       - src/inferenceql/auto_modeling/qc/util.clj
     outs:
