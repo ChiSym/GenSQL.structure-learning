@@ -60,8 +60,8 @@
                               (edn/read-string (slurp (io/file (str schema-path)))))
         {:keys [rows table]} (->> (csv/read-csv (slurp *in*))
                                   (iql.csv/as-maps)
-                                  (medley/remove-vals (some-fn nil? (every-pred string? string/blank?)))
-                                  (iql.csv/heuristic-coerce-all)
+                                  (map #(medley/remove-vals (some-fn nil? (every-pred string? string/blank?))
+                                                            %))
                                   (iql.csv/numericalize nominal-columns))]
 
     (spit (io/file (str table-path))
