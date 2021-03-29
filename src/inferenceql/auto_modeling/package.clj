@@ -12,7 +12,8 @@
                  (assoc-in [:deps 'probcomp/inferenceql.inference]
                            {:local/root "inferenceql.inference/"})
                  (assoc-in [:deps 'probcomp/inferenceql.query]
-                           {:local/root "inferenceql.query/"}))]
+                           {:local/root "inferenceql.query/"
+                            :exclusions ['probcomp/inferenceql.inference]}))]
     (binding [*print-namespace-maps* false
               clojure.pprint/*print-right-margin* 80
               clojure.pprint/*print-miser-width* 80]
