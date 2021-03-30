@@ -20,7 +20,9 @@
     :ignore    [0 0 0]
     :ignore    [1 2 3]
     :nominal   [1 "2" 3]
-    :numerical [0.0 1.0 2.0]))
+    :numerical [0.0 1.0 2.0]
+    :ignore    (map #(str "x" %) (range 51))))
+
 
 (deftest guess
   (is (= {:id :ignore

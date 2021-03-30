@@ -21,13 +21,9 @@
 (defn guess-stattype
   "Guess the statistical type of a collection of values."
   [coll]
-  ;; XXX THIS IS FAR FROM COMPLETE!
-  ;; Todo:
-  ;; - look into percentage of values.
-  ;; - double check https://github.com/probcomp/bayeslite/blob/master/src/guess.py#L227-L297
-  (let [max-categories 50 ; XXX: choose better heuristic.
+  (let [max-categories 50
         num-disitinct-vals (count (distinct coll))]
-    (cond (< num-disitinct-vals 2)
+    (cond (= 1 num-disitinct-vals)
           :ignore
 
           (some string? coll)
@@ -46,10 +42,10 @@
                (> num-disitinct-vals
                   (/ (count coll)
                      2)))
-
           :numerical
-          :else (throw (ex-info "Could not resolve stattype"
-                                {:coll coll})))))
+
+          :else
+          :ignore)))
 
 (defn guess
   "Guess a schema for a collection of maps."
