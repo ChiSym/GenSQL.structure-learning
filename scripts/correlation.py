@@ -20,6 +20,27 @@ if not hasattr(stats, "frechet_l"):
     stats.frechet_l = stats.weibull_min
 
 
+def lin_reg(xs, ys):
+    """Compute linear regression if we have data on both xs and ys"""
+    if len(xs) > 0:  # Check whether nan mask return data
+        r = stats.linregress(xs, ys)
+        # Check if stats.linregress ran into numerical problems.
+        if not (np.isnan(r.slope) or np.isnan(r.intercept)):
+            return {
+                "slope": r.slope,
+                "intercept": r.intercept,
+                "r-value": r.rvalue,
+                "p-value": r.pvalue,
+            }
+    # Else: return a placeholder that works with subsequent dvc stages.
+    return {
+        "slope": 0.0,
+        "intercept": 0.0,
+        "r-value": 0.0,
+        "p-value": 1.0,
+    }
+
+
 def main():
     description = "Outputs linear correlation info for all pairs of numerical columns."
     parser = argparse.ArgumentParser(description=description)
@@ -61,23 +82,9 @@ def main():
         nan_mask = ~np.isnan(c1_vals) & ~np.isnan(c2_vals)
 
         # Store c1, c2 regression.
-        r1 = stats.linregress(c1_vals[nan_mask], c2_vals[nan_mask])
-        r_items_1 = {
-            "slope": r1.slope,
-            "intercept": r1.intercept,
-            "r-value": r1.rvalue,
-            "p-value": r1.pvalue,
-        }
+        r_items_1 = lin_reg(c1_vals[nan_mask], c2_vals[nan_mask])
         regressions[c1][c2] = r_items_1
-
-        # Store c2, c1 regression.
-        r2 = stats.linregress(c2_vals[nan_mask], c1_vals[nan_mask])
-        r_items_2 = {
-            "slope": r2.slope,
-            "intercept": r2.intercept,
-            "r-value": r2.rvalue,
-            "p-value": r2.pvalue,
-        }
+        r_items_2 = lin_reg(c2_vals[nan_mask], c1_vals[nan_mask])
         regressions[c2][c1] = r_items_2
 
     json.dump(regressions, args.output)
