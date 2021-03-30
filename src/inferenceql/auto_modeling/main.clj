@@ -33,24 +33,33 @@
 
 (defn loom-schema
   [_]
-  (-> (slurp *in*)
-      (edn/read-string)
+  (-> (edn/read *in*)
       (schema/loom)
       (json/generate-stream *out*)))
 
 (defn cgpm-schema
   [_]
-  (-> (slurp *in*)
-      (edn/read-string)
+  (-> (edn/read *in*)
       (schema/cgpm)
       (pr)))
 
 (defn iql-viz-schema
   [_]
-  (-> (slurp *in*)
-      (edn/read-string)
+  (-> (edn/read *in*)
       (schema/iql-viz)
       (pr)))
+
+(defn ignore
+  [{:keys [schema]}]
+  (let [ignored (into #{}
+                      (comp (filter (comp #{:ignore} val))
+                            (map key))
+                      (edn/read-string (slurp schema)))]
+    (->> (csv/read-csv *in*)
+         (iql.csv/as-maps)
+         (map #(medley/remove-keys ignored %))
+         (iql.csv/as-cells)
+         (csv/write-csv *out*))))
 
 (defn numericalize
   [{table-path :table schema-path :schema}]
@@ -58,7 +67,7 @@
                               (comp (filter (comp #{:nominal} val))
                                     (map key))
                               (edn/read-string (slurp (io/file (str schema-path)))))
-        {:keys [rows table]} (->> (csv/read-csv (slurp *in*))
+        {:keys [rows table]} (->> (csv/read-csv *in*)
                                   (iql.csv/as-maps)
                                   (map #(medley/remove-vals (some-fn nil? (every-pred string? string/blank?))
                                                             %))

@@ -33,15 +33,27 @@ stages:
     outs:
       - data/cgpm-schema.edn
 
+  ignore:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.main/ignore
+      :schema '"data/schema.edn"'
+      < data/data.csv
+      > data/ignored.csv
+    deps:
+      - data/nullified.csv
+      - data/schema.edn
+    outs:
+      - data/ignored.csv
+
   numericalize:
     cmd: >
       clojure -X inferenceql.auto-modeling.main/numericalize
-      < data/nullified.csv
-      :schema data/schema.edn
+      :schema '"data/schema.edn"'
       :table data/mapping-table.edn
+      < data/ignored.csv
       > data/numericalized.csv
     deps:
-      - data/nullified.csv
+      - data/ignored.csv
       - data/schema.edn
     outs:
       - data/numericalized.csv
