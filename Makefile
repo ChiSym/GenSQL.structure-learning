@@ -25,7 +25,7 @@ VENV_PIP := ${VENV_LOCATION}/bin/pip
 
 venv:
 	@echo ${VENV_LOCATION}
-	@mkdir ${VENV_LOCATION}
+	@mkdir -p ${VENV_LOCATION}
 	${PYTHON} -m venv ${VENV_LOCATION}
 	${VENV_PIP} install --upgrade pip
 
@@ -33,7 +33,7 @@ venv:
 # Install automated modeling.
 
 deps:
-	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m pip --default-timeout=1000 install -r requirements.txt
+	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m pip --default-timeout=1000 install -r requirements.txt --upgrade --upgrade-strategy eager
 	. ${VENV_LOCATION}/bin/activate && ${PYTHON} -m pip --default-timeout=1000 install install sppl==1.2.1 --no-deps
 	yarn install
 
