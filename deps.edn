@@ -1,14 +1,14 @@
-{:deps {org.clojure/clojure {:mvn/version "1.10.1"}
-        org.clojure/clojurescript {:mvn/version "1.10.520"}
+{:deps {org.clojure/clojure {:mvn/version "1.10.3"}
+        org.clojure/clojurescript {:mvn/version "1.10.773"}
         org.clojure/data.csv {:mvn/version "1.0.0"}
-        clj-commons/clj-yaml {:mvn/version "0.7.0"}
+        clj-commons/clj-yaml {:mvn/version "0.7.106"}
         cheshire/cheshire {:mvn/version "5.10.0"}
         medley/medley {:mvn/version "1.3.0"}
         selmer/selmer {:mvn/version "1.12.33"}
         probcomp/inferenceql.inference {:git/url "git@github.com:probcomp/inferenceql.inference.git"
-                                        :sha "9b906a91b47245c2d99c3450971cf4acd6b0c7c9"}
+                                        :sha "874616caac2ed7a82e0af87e9e536d00fbcb4ae7"}
         probcomp/inferenceql.query {:git/url "git@github.com:probcomp/inferenceql.query.git"
-                                    :sha "f4e0d8033130864db33671c634e42aa1f1f17d5c"}}
+                                    :sha "706597755fefddba2f2ccb07fbe7a6f5cb1aecf2"}}
  :aliases {:test {:extra-paths ["test"]
                   :extra-deps {lambdaisland/kaocha {:mvn/version "1.0-612"}
                                lambdaisland/kaocha-cljs {:mvn/version "0.0-71"}}}
