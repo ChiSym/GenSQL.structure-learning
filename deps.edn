@@ -1,15 +1,15 @@
 {:deps {org.clojure/clojure {:mvn/version "1.10.3"}
-        org.clojure/clojurescript {:mvn/version "1.10.773"}
+        org.clojure/clojurescript {:mvn/version "1.10.866"}
         org.clojure/data.csv {:mvn/version "1.0.0"}
         clj-commons/clj-yaml {:mvn/version "0.7.106"}
         cheshire/cheshire {:mvn/version "5.10.0"}
         medley/medley {:mvn/version "1.3.0"}
-        selmer/selmer {:mvn/version "1.12.33"}
+        selmer/selmer {:mvn/version "1.12.40"}
         probcomp/inferenceql.inference {:git/url "git@github.com:probcomp/inferenceql.inference.git"
-                                        :sha "874616caac2ed7a82e0af87e9e536d00fbcb4ae7"}
+                                        :sha "dac95f4d2035ab28ad8af980e9ed21eec21d3451"}
         probcomp/inferenceql.query {:git/url "git@github.com:probcomp/inferenceql.query.git"
-                                    :sha "706597755fefddba2f2ccb07fbe7a6f5cb1aecf2"}}
+                                    :sha "9cfd55152534f4a235eddd9252d86404041d92e4"}}
  :aliases {:test {:extra-paths ["test"]
                   :extra-deps {lambdaisland/kaocha {:mvn/version "1.0-612"}
-                               lambdaisland/kaocha-cljs {:mvn/version "0.0-71"}}}
+                               com.lambdaisland/kaocha-cljs {:mvn/version "1.0.93"}}}
            :xcat-import {:exec-fn inferenceql.auto-modeling.xcat/import}}}
