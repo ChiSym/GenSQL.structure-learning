@@ -8,7 +8,7 @@
         probcomp/inferenceql.inference {:git/url "git@github.com:probcomp/inferenceql.inference.git"
                                         :sha "dac95f4d2035ab28ad8af980e9ed21eec21d3451"}
         probcomp/inferenceql.query {:git/url "git@github.com:probcomp/inferenceql.query.git"
-                                    :sha "9cfd55152534f4a235eddd9252d86404041d92e4"}}
+                                    :sha "34420acf3b9204a3a0569b7ffe5196d27cec56e3"}}
  :aliases {:test {:extra-paths ["test"]
                   :extra-deps {com.lambdaisland/kaocha-cljs {:mvn/version "1.0.93"}
                                lambdaisland/kaocha {:mvn/version "1.0-612"}
