@@ -13,29 +13,68 @@
       x
       (throw (NumberFormatException. (str "The value " (pr-str x) " cannot be read as a number or nil."))))))
 
-(defn as-maps
+(defn index-comparator
+  "Returns a comparator that treats values that appear earlier in coll as less
+  than values that appear later in coll."
   ([coll]
-   (as-maps coll {}))
-  ([coll opts]
-   (let [{:keys [key-fn]} opts
-         headers (cond->> (first coll)
-                   key-fn (map key-fn))]
-     (into []
-           (map #(zipmap headers %))
-           (rest coll)))))
+   (index-comparator coll ##Inf))
+  ([coll missing]
+   (fn [x y]
+     (let [val->index (zipmap coll (range))
+           f #(get val->index % missing)]
+       (< (f x) (f y))))))
+
+(defn as-maps
+  "Returns a transducer that converts a sequence of vectors into a sequence of
+  maps. The first element of the sequence is treated as keys to be `zipmap`ped
+  with each subsequent element of the sequence."
+  ([]
+   (as-maps nil))
+  ([empty]
+   (fn [xf]
+     (let [empty (atom empty)
+           headers (atom nil)]
+       (fn
+         ([]
+          (xf))
+         ([result]
+          (xf result))
+         ([result input]
+          (if-not @headers
+            (do (reset! headers (vec input))
+                (when-not @empty
+                  (reset! empty (sorted-map-by (index-comparator @headers))))
+                result)
+            (xf result (into @empty (zipmap @headers input))))))))))
 
 (defn as-cells
-  [coll]
-  (let [headers (into #{}
-                      (mapcat keys)
-                      coll)]
-    (into [(vec headers)]
-          (map (fn [row]
-                 (reduce (fn [acc header]
-                           (conj acc (get row header)))
-                         []
-                         headers)))
-          coll)))
+  "Returns a transducer that converts a sequence of maps into a two-dimensional
+  vector by unzippping the map with the provided keys. If the 1-arity of the
+  function is used the keys from the first map are used for each subsequent
+  element in the sequence."
+  ([]
+   (as-cells nil))
+  ([ks]
+   (fn [xf]
+     (let [ks (atom ks)
+           ks-sent (atom false)]
+       (fn
+         ([]
+          (xf))
+         ([result]
+          (xf result))
+         ([result input]
+          (when-not @ks
+            (reset! ks (keys input)))
+          (let [input (reduce (fn [acc header]
+                                (conj acc (get input header)))
+                              []
+                              @ks)
+                result (if @ks-sent
+                         result
+                         (do (reset! ks-sent true)
+                             (xf result (vec @ks))))]
+            (xf result input))))))))
 
 (defn lookup-table
   "Constructs a lookup table for a sequence of maps `ms`, which maps each "

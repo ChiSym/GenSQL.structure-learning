@@ -14,19 +14,19 @@
   [_]
   (let [null-vals (set (:nullify (dvc/yaml)))]
     (->> (csv/read-csv (slurp *in*))
-         (iql.csv/as-maps)
-         (map #(medley/remove-vals (some-fn nil? null-vals) %))
-         (iql.csv/as-cells)
+         (sequence (comp (iql.csv/as-maps)
+                         (map #(medley/remove-vals (some-fn nil? null-vals) %))
+                         (iql.csv/as-cells)))
          (csv/write-csv *out*))))
 
 (defn guess-schema
   [_]
   (let [params-schema (:schema (dvc/yaml))
         guessed-schema (->> (csv/read-csv (slurp *in*))
-                            (iql.csv/as-maps)
-                            (map #(medley/remove-vals (every-pred string? string/blank?) %))
+                            (sequence (comp (iql.csv/as-maps)
+                                            (map #(medley/remove-vals (every-pred string? string/blank?) %))
+                                            (map #(medley/remove-keys (set (keys params-schema)) %))))
                             (iql.csv/heuristic-coerce-all)
-                            (map #(medley/remove-keys (set (keys params-schema)) %))
                             (schema/guess))
         schema (merge guessed-schema params-schema)]
     (prn schema)))
@@ -56,9 +56,9 @@
                             (map key))
                       (edn/read-string (slurp schema)))]
     (->> (csv/read-csv *in*)
-         (iql.csv/as-maps)
-         (map #(medley/remove-keys ignored %))
-         (iql.csv/as-cells)
+         (sequence (comp (iql.csv/as-maps)
+                         (map #(medley/remove-keys ignored %))
+                         (iql.csv/as-cells)))
          (csv/write-csv *out*))))
 
 (defn numericalize
@@ -68,16 +68,16 @@
                                     (map key))
                               (edn/read-string (slurp (io/file (str schema-path)))))
         {:keys [rows table]} (->> (csv/read-csv *in*)
-                                  (iql.csv/as-maps)
-                                  (map #(medley/remove-vals (some-fn nil? (every-pred string? string/blank?))
-                                                            %))
+                                  (sequence (comp (iql.csv/as-maps)
+                                                  (map #(medley/remove-vals (some-fn nil? (every-pred string? string/blank?))
+                                                                            %))))
                                   (iql.csv/numericalize nominal-columns))]
 
     (spit (io/file (str table-path))
           table)
 
     (->> rows
-         (iql.csv/as-cells)
+         (sequence (iql.csv/as-cells))
          (csv/write-csv *out*))))
 
 (defn sample-count
