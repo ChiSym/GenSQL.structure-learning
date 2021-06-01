@@ -148,14 +148,14 @@ stages:
       parallel $(bin/param parallel.flags)
       'python scripts/sppl_import.py
       --metadata {}
-      --data data/numericalized.csv
+      --data data/ignored.csv
       --mapping-table data/mapping-table.edn
       --output data/sppl/unmerged/{/}'
     params:
       - parallel.flags
     deps:
       - data/cgpm/complete
-      - data/numericalized.csv
+      - data/ignored.csv
       - scripts/sppl_import.py
     outs:
       - data/sppl/unmerged
@@ -220,7 +220,7 @@ stages:
       :data-csv data/nullified.csv
       :mapping-table data/mapping-table.edn
       :numericalized-csv data/numericalized.csv
-      :schema-edn data/schema.edn
+      :schema-edn data/iql-schema.edn
       > data/xcat/{/.}.edn'
     params:
       - parallel.flags
@@ -229,7 +229,7 @@ stages:
       - data/mapping-table.edn
       - data/nullified.csv
       - data/numericalized.csv
-      - data/schema.edn
+      - data/iql-schema.edn
       - src/inferenceql/auto_modeling/xcat.clj
     outs:
       - data/xcat
