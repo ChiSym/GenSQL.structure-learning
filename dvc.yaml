@@ -280,12 +280,12 @@ stages:
     cmd: >
       clojure -X inferenceql.auto-modeling.qc.samples/tag
       :data data/nullified.csv
-      :schema data/iql-schema.edn
+      :schema data/schema.edn
       :samples-virtual qc/samples/samples-virtual.edn
       > qc/samples/samples.edn
     deps:
       - data/nullified.csv
-      - data/iql-schema.edn
+      - data/schema.edn
       - qc/samples/samples-virtual.edn
       - src/inferenceql/auto_modeling/qc/samples.clj
     outs:
@@ -301,7 +301,7 @@ stages:
       :data-csv data/nullified.csv
       :mapping-table data/mapping-table.edn
       :numericalized-csv data/numericalized.csv
-      :schema-edn data/iql-schema.edn
+      :schema-edn data/schema.edn
       > data/xcat/{/.}.edn'
     params:
       - parallel.flags
@@ -310,7 +310,7 @@ stages:
       - data/mapping-table.edn
       - data/nullified.csv
       - data/numericalized.csv
-      - data/iql-schema.edn
+      - data/schema.edn
       - src/inferenceql/auto_modeling/xcat.clj
     outs:
       - data/xcat
@@ -319,14 +319,14 @@ stages:
     cmd: >
       clojure -X inferenceql.auto-modeling.qc.dashboard/spec
       :samples qc/samples/samples.edn
-      :schema data/iql-schema.edn
+      :schema data/schema.edn
       :correlation data/correlation.json
       > qc/specs/qc-dashboard.vl.json
     params:
       - qc.columns
     deps:
       - qc/samples/samples.edn
-      - data/iql-schema.edn
+      - data/schema.edn
       - data/correlation.json
       - src/inferenceql/auto_modeling/qc/dashboard.clj
       - src/inferenceql/auto_modeling/qc/util.clj
@@ -369,14 +369,14 @@ stages:
     cmd: >
       clojure -X inferenceql.auto-modeling.qc.splom/spec
       :samples qc/samples/samples.edn
-      :schema data/iql-schema.edn
+      :schema data/schema.edn
       :correlation data/correlation.json
       > qc/specs/qc-splom.vl.json
     params:
       - qc.columns
     deps:
       - qc/samples/samples.edn
-      - data/iql-schema.edn
+      - data/schema.edn
       - data/correlation.json
       - src/inferenceql/auto_modeling/qc/splom.clj
       - src/inferenceql/auto_modeling/qc/util.clj

@@ -20,9 +20,9 @@
   [schema]
   (fn [col-name]
     ;; Mapping from multi-mix stat-types to vega-lite data-types.
-    (let [mapping {:gaussian "quantitative"
-                   :categorical "nominal"}]
-      (get mapping (get schema col-name)))))
+    (let [mapping {:numerical "quantitative"
+                   :nominal "nominal"}]
+      (get mapping (get schema (name col-name))))))
 
 (defn should-bin?
   "Returns whether data for a certain column should be binned in a vega-lite spec.

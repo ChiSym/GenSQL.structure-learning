@@ -459,16 +459,16 @@
                         (get "virtual")
                         (count))
 
+        vega-type (vega-type-fn schema)
+
         ;; Visualize the columns set in params.yaml.
         ;; If not specified, visualize all the columns.
-        cols (or (get-in (dvc/yaml) [:qc :columns])
-                 (keys schema))
-        ;; Either way we will visualize at most 8 columns.
-        cols (take 8 cols)
+        cols (->> (or (get-in (dvc/yaml) [:qc :columns])
+                      (keys schema))
+                  (map keyword)
+                  (take 8) ; Either way we will visualize at most 8 columns.
+                  (filter vega-type)) ; Only keep the columns that we can determine a vega-type for.
 
-        vega-type (vega-type-fn schema)
-        ;; Only keep the columns that we can determine a vega-type for.
-        cols (filter vega-type cols)
         cols-by-type (group-by vega-type cols)
 
         histograms-quant (histogram-quant-section "1-D marginals" "(numerical columns)"

@@ -33,11 +33,12 @@
         (update :Zrv ->map))))
 
 (defn ^:private data
-  [data-cells iql-schema]
+  [data-cells schema]
   (let [headers (map keyword (first data-cells))
-        column->f (comp {:gaussian am.csv/parse-number
-                         :categorical str}
-                        iql-schema)]
+        column->f (comp {:numerical am.csv/parse-number
+                         :nominal str}
+                        schema
+                        name)]
     (zipmap (range)
             (map #(-> (zipmap headers %)
                       (am.csv/update-by-key column->f))
@@ -57,9 +58,13 @@
 (defn ^:private spec
   [numericalized schema cgpm-model]
   (let [columns (mapv keyword (first numericalized))
-        views (views columns cgpm-model)]
+        views (views columns cgpm-model)
+        types (->> schema
+                   (medley/map-keys keyword)
+                   (medley/map-vals {:nominal :categorical
+                                     :numerical :gaussian}))]
     {:views views
-     :types schema}))
+     :types types}))
 
 (defn ^:private latents
   [{:keys [alpha Zrv] view-alphas :view_alphas}]
@@ -88,14 +93,14 @@
 
 (defn import
   [{:keys [cgpm-json data-csv mapping-table numericalized-csv schema-edn]}]
-  (let [iql-schema    (-> schema-edn        (str) (slurp) (edn/read-string))
+  (let [schema        (-> schema-edn        (str) (slurp) (edn/read-string))
         mapping-table (-> mapping-table     (str) (slurp) (edn/read-string))
         csv-data      (-> data-csv          (str) (slurp) (csv/read-csv))
         numericalized (-> numericalized-csv (str) (slurp) (csv/read-csv))
         cgpm-model    (-> cgpm-json         (str) (slurp) (json/parse-string true) (fix-cgpm-maps))
 
-        data (data csv-data iql-schema)
-        spec (spec numericalized iql-schema cgpm-model)
+        data (data csv-data schema)
+        spec (spec numericalized schema cgpm-model)
         latents (latents cgpm-model)
         options (options mapping-table)
         model (crosscat/construct-xcat-from-latents spec latents data {:options options})]

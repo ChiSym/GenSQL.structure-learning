@@ -137,6 +137,7 @@
 
         vega-type (vega-type-fn schema)
         cols (->> cols
+                  (map keyword)
                   ;; Get just the quantitative columns.
                   (filter (comp #{"quantitative"} vega-type))
                   ;; We will visualize at most 8 columns.
