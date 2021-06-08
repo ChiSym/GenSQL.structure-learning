@@ -186,11 +186,11 @@ stages:
   save-correlations:
     cmd: >
       python scripts/correlation.py
-      --data data/nullified.csv
+      --data data/ignored.csv
       --schema data/schema.edn
       --output data/correlation.json
     deps:
-      - data/nullified.csv
+      - data/ignored.csv
       - data/schema.edn
       - scripts/correlation.py
     outs:
@@ -232,12 +232,12 @@ stages:
     cmd: >
       python scripts/sppl_sample.py
       --model data/sppl/merged.json
-      --data data/nullified.csv
+      --data data/ignored.csv
       --sample_count $(bin/param qc.sample_count)
       > qc/samples/samples-virtual.edn
     deps:
       - data/sppl/merged.json
-      - data/nullified.csv
+      - data/ignored.csv
     outs:
       - qc/samples/samples-virtual.edn
 
@@ -255,12 +255,12 @@ stages:
   qc-tag-samples:
     cmd: >
       clojure -X inferenceql.auto-modeling.qc.samples/tag
-      :data data/nullified.csv
+      :data data/ignored.csv
       :schema data/schema.edn
       :samples-virtual qc/samples/samples-virtual.edn
       > qc/samples/samples.edn
     deps:
-      - data/nullified.csv
+      - data/ignored.csv
       - data/schema.edn
       - qc/samples/samples-virtual.edn
       - src/inferenceql/auto_modeling/qc/samples.clj
