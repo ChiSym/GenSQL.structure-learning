@@ -67,7 +67,8 @@
                               (comp (filter (comp #{:nominal} val))
                                     (map key))
                               (edn/read-string (slurp (io/file (str schema-path)))))
-        {:keys [rows table]} (->> (csv/read-csv *in*)
+        [headers & _ :as csv]  (csv/read-csv *in*)
+        {:keys [rows table]} (->> csv
                                   (sequence (comp (iql.csv/as-maps)
                                                   (map #(medley/remove-vals (some-fn nil? (every-pred string? string/blank?))
                                                                             %))))
@@ -77,7 +78,7 @@
           table)
 
     (->> rows
-         (sequence (iql.csv/as-cells))
+         (sequence (iql.csv/as-cells headers))
          (csv/write-csv *out*))))
 
 (defn sample-count
