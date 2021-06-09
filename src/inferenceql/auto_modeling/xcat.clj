@@ -36,7 +36,7 @@
   [data-cells schema]
   (let [headers (map keyword (first data-cells))
         column->f (comp {:numerical am.csv/parse-number
-                         :nominal str}
+                         :nominal am.csv/parse-str}
                         schema
                         name)]
     (zipmap (range)

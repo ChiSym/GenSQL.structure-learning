@@ -13,6 +13,12 @@
       x
       (throw (NumberFormatException. (str "The value " (pr-str x) " cannot be read as a number or nil."))))))
 
+(defn parse-str
+  "Attempts to parse string s as a string  or
+  `nil` if it sees the empty string."
+  [s]
+  (let [x (str s)] (if-not (= x "") x nil)))
+
 (defn index-comparator
   "Returns a comparator that treats values that appear earlier in coll as less
   than values that appear later in coll."
