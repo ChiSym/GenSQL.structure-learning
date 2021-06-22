@@ -1,0 +1,303 @@
+stages:
+  nullify:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.main/nullify
+      < data/data.csv
+      > data/nullified.csv
+    deps:
+      - data/data.csv
+    params:
+      - nullify
+    outs:
+      - data/nullified.csv
+
+  guess-schema:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.main/guess-schema
+      < data/nullified.csv
+      > data/schema.edn
+    deps:
+      - data/nullified.csv
+    params:
+      - schema
+    outs:
+      - data/schema.edn
+
+  cgpm-schema:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.main/cgpm-schema
+      < data/schema.edn
+      > data/cgpm-schema.edn
+    deps:
+      - data/schema.edn
+    outs:
+      - data/cgpm-schema.edn
+
+  ignore:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.main/ignore
+      :schema '"data/schema.edn"'
+      < data/nullified.csv
+      > data/ignored.csv
+    deps:
+      - data/nullified.csv
+      - data/schema.edn
+    outs:
+      - data/ignored.csv
+
+  numericalize:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.main/numericalize
+      :schema '"data/schema.edn"'
+      :table data/mapping-table.edn
+      < data/ignored.csv
+      > data/numericalized.csv
+    deps:
+      - data/ignored.csv
+      - data/schema.edn
+    outs:
+      - data/numericalized.csv
+      - data/mapping-table.edn
+
+
+  cgpm-infer-stream:
+    cmd: >
+      mkdir -p data/cgpm/complete &&
+      seq 0 $(($(bin/param sample_count) - 1)) | parallel $(bin/param parallel.flags) 'mkdir -p data/cgpm/checkpoints/sample-$(($(bin/param seed) + {#} - 1))/' &&
+      seq 0 $(($(bin/param sample_count) - 1)) |
+      parallel $(bin/param parallel.flags)
+      'python scripts/cgpm_stream.py
+      --output data/cgpm/complete/sample.{}.json
+      --data data/numericalized.csv
+      --schema data/cgpm-schema.edn
+      --mapping-table data/mapping-table.edn
+      --seed $(($(bin/param seed) + {#} - 1))'
+    params:
+      - parallel.flags
+      - sample_count
+      - seed
+    deps:
+      - data/cgpm-schema.edn
+      - data/mapping-table.edn
+      - data/numericalized.csv
+      - schemas/cgpm.json
+      - scripts/cgpm_stream.py
+      - scripts/inf_prog.py
+    outs:
+      - data/cgpm/complete
+      - data/cgpm/checkpoints
+
+  summarize-checkpoints:
+    cmd: >
+      mkdir -p data/cgpm/transitions &&
+      seq 0 $(($(bin/param sample_count) - 1)) |
+      parallel $(bin/param parallel.flags)
+      'jq -s "." $(find data/cgpm/checkpoints/sample-$(($(bin/param seed) + {#} - 1))/ -type f | sort) > data/cgpm/transitions/sample-{}.json'
+    deps:
+      - data/cgpm/checkpoints
+    outs:
+      - data/cgpm/transitions/
+
+  # XXX: the next stage is not yet parallelized. Should be:
+  #diff-checkpoints:
+  #  cmd: >
+  #    mkdir -p data/cgpm/patches/
+  #    seq 0 $(($(bin/param sample_count) - 1)) |
+  #    parallel $(bin/param parallel.flags)
+  #    'bin/patches.js data/cgpm/transitions/sample-{}.json > data/cgpm/patches/transitions.patches-{}.json'
+  #  deps:
+  #    - data/cgpm/transitions
+  #  outs:
+  #    - data/cgpm/patches
+  diff-checkpoints:
+    cmd: >
+      bin/patches.js data/cgpm/transitions/sample-0.json > data/cgpm/transitions.patches.json
+    deps:
+      - data/cgpm/transitions
+    outs:
+      - data/cgpm/transitions.patches.json
+
+  save-dependencies:
+    cmd: >
+      find data/cgpm/complete -type f |
+      sort |
+      xargs python scripts/dep_prob.py
+      --data data/numericalized.csv
+      --output data/dep-prob.json
+    deps:
+      - data/cgpm/complete
+    outs:
+      - data/dep-prob.json
+
+  save-correlations:
+    cmd: >
+      python scripts/correlation.py
+      --data data/ignored.csv
+      --schema data/schema.edn
+      --output data/correlation.json
+    deps:
+      - data/ignored.csv
+      - data/schema.edn
+      - scripts/correlation.py
+    outs:
+      - data/correlation.json
+
+  sppl-import:
+    cmd: >
+      find data/cgpm/complete -type f |
+      parallel jsonschema --instance {} schemas/cgpm.json &&
+      mkdir -p data/sppl/unmerged &&
+      find data/cgpm/complete -type f |
+      parallel $(bin/param parallel.flags)
+      'python scripts/sppl_import.py
+      --metadata {}
+      --data data/numericalized.csv
+      --mapping-table data/mapping-table.edn
+      --output data/sppl/unmerged/{/}'
+    params:
+      - parallel.flags
+    deps:
+      - data/cgpm/complete
+      - data/ignored.csv
+      - scripts/sppl_import.py
+    outs:
+      - data/sppl/unmerged
+
+  sppl-merge:
+    cmd: >
+      find data/sppl/unmerged -type f |
+      sort |
+      xargs python scripts/sppl_merge.py
+      --output data/sppl/merged.json
+    deps:
+      - data/sppl/unmerged
+    outs:
+      - data/sppl/merged.json
+
+  sppl-sample:
+    cmd: >
+      python scripts/sppl_sample.py
+      --model data/sppl/merged.json
+      --data data/ignored.csv
+      --sample_count $(bin/param qc.sample_count)
+      > qc/samples/samples-virtual.edn
+    deps:
+      - data/sppl/merged.json
+      - data/ignored.csv
+    outs:
+      - qc/samples/samples-virtual.edn
+
+  iql-viz-schema:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.main/iql-viz-schema
+      < data/schema.edn
+      > data/iql-schema.edn
+    deps:
+      - data/schema.edn
+      - src/inferenceql/auto_modeling/main.clj
+    outs:
+      - data/iql-schema.edn
+
+  qc-tag-samples:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.qc.samples/tag
+      :data data/ignored.csv
+      :schema data/schema.edn
+      :samples-virtual qc/samples/samples-virtual.edn
+      > qc/samples/samples.edn
+    deps:
+      - data/ignored.csv
+      - data/schema.edn
+      - qc/samples/samples-virtual.edn
+      - src/inferenceql/auto_modeling/qc/samples.clj
+    outs:
+      - qc/samples/samples.edn
+
+  xcat-import:
+    cmd: >
+      mkdir -p data/xcat &&
+      find data/cgpm/complete -type f |
+      parallel $(bin/param parallel.flags)
+      'clojure -X:xcat-import
+      :cgpm-json {}
+      :data-csv data/nullified.csv
+      :mapping-table data/mapping-table.edn
+      :numericalized-csv data/numericalized.csv
+      :schema-edn data/schema.edn
+      > data/xcat/{/.}.edn'
+    params:
+      - parallel.flags
+    deps:
+      - data/cgpm/complete
+      - data/mapping-table.edn
+      - data/nullified.csv
+      - data/numericalized.csv
+      - data/schema.edn
+      - src/inferenceql/auto_modeling/xcat.clj
+    outs:
+      - data/xcat
+  qc-dashboard-spec:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.qc.dashboard/spec
+      :samples qc/samples/samples.edn
+      :schema data/schema.edn
+      :correlation data/correlation.json
+      > qc/specs/qc-dashboard.vl.json
+    params:
+      - qc.columns
+    deps:
+      - qc/samples/samples.edn
+      - data/schema.edn
+      - data/correlation.json
+      - src/inferenceql/auto_modeling/qc/dashboard.clj
+      - src/inferenceql/auto_modeling/qc/util.clj
+    outs:
+      - qc/specs/qc-dashboard.vl.json
+
+  qc-dashboard-app:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.qc.app/create
+      :template qc/templates/index.html
+      :spec qc/specs/qc-dashboard.vl.json
+      :renderer canvas
+      :title '"QC dashboard"'
+      > qc/app/qc-dashboard.html
+    deps:
+      - qc/templates/index.html
+      - qc/specs/qc-dashboard.vl.json
+      - src/inferenceql/auto_modeling/qc/app.clj
+    outs:
+      - qc/app/qc-dashboard.html
+
+  qc-splom-spec:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.qc.splom/spec
+      :samples qc/samples/samples.edn
+      :schema data/schema.edn
+      :correlation data/correlation.json
+      > qc/specs/qc-splom.vl.json
+    params:
+      - qc.columns
+    deps:
+      - qc/samples/samples.edn
+      - data/schema.edn
+      - data/correlation.json
+      - src/inferenceql/auto_modeling/qc/splom.clj
+      - src/inferenceql/auto_modeling/qc/util.clj
+    outs:
+      - qc/specs/qc-splom.vl.json
+
+  qc-splom-app:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.qc.app/create
+      :template qc/templates/index.html
+      :spec qc/specs/qc-splom.vl.json
+      :renderer canvas
+      :title '"QC scatter plot matrix"'
+      > qc/app/qc-splom.html
+    deps:
+      - qc/templates/index.html
+      - qc/specs/qc-splom.vl.json
+      - src/inferenceql/auto_modeling/qc/app.clj
+    outs:
+      - qc/app/qc-splom.html

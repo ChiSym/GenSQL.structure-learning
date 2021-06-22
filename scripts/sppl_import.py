@@ -266,7 +266,12 @@ def main():
         return {v: k for k, v in d.items()}
 
     metadata = read_metadata(args.metadata)
-    variable_mapping = dict(enumerate(pandas.read_csv(args.data)))
+    # Check if we ran streaming inference and cannot guarantee that the indexes
+    # in state.output agree with the column indeces in the traning data:
+    if "incorporated_cols" in metadata:
+        variable_mapping = dict(enumerate(metadata["incorporated_cols"]))
+    else:
+        variable_mapping = dict(enumerate(pandas.read_csv(args.data)))
     inv_variable_mapping = invert(variable_mapping)
     mapping_table = edn_format.loads(args.mapping_table.read())
     category_mapping = {

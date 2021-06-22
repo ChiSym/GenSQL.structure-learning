@@ -55,9 +55,13 @@
                             {:hypers (zipmap columns
                                              (map column->hypers columns))})))))
 
+(defn ^:private col-names
+  [numericalized cgpm-model]
+  (mapv keyword (get cgpm-model :col_names (first numericalized))))
+
 (defn ^:private spec
   [numericalized schema cgpm-model]
-  (let [columns (mapv keyword (first numericalized))
+  (let [columns (col-names numericalized cgpm-model)
         views (views columns cgpm-model)
         types (->> schema
                    (medley/map-keys keyword)

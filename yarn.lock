@@ -84,6 +84,14 @@ chownr@^1.1.1:
   resolved "https://registry.yarnpkg.com/chownr/-/chownr-1.1.4.tgz#6fc9d7b42d32a583596337666e7d08084da2cc6b"
   integrity sha512-jJ0bqzaylmJtVnNgzTeSOs8DPavpbYgEr/b0YL8/2GO3xJEhInFmhKMUnEJQjZumK7KXGFhUy89PrsJWlakBVg==
 
+cli-progress@^3.9.0:
+  version "3.9.0"
+  resolved "https://registry.yarnpkg.com/cli-progress/-/cli-progress-3.9.0.tgz#25db83447deb812e62d05bac1af9aec5387ef3d4"
+  integrity sha512-g7rLWfhAo/7pF+a/STFH/xPyosaL1zgADhI0OM83hl3c7S43iGvJWEAV2QuDOnQ8i6EMBj/u4+NTd0d5L+4JfA==
+  dependencies:
+    colors "^1.1.2"
+    string-width "^4.2.0"
+
 cliui@^7.0.2:
   version "7.0.4"
   resolved "https://registry.yarnpkg.com/cliui/-/cliui-7.0.4.tgz#a0265ee655476fc807aea9df3df8df7783808b4f"
@@ -114,6 +122,11 @@ color-name@~1.1.4:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/color-name/-/color-name-1.1.4.tgz#c2a09a87acbde69543de6f63fa3995c826c536a2"
   integrity sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==
+
+colors@^1.1.2:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/colors/-/colors-1.4.0.tgz#c50491479d4c1bdaed2c9ced32cf7c7dc2360f78"
+  integrity sha512-a+UqTh4kgZg/SlGvfbzDHpgRu7AAQOmmqRHJnxhRZICKFUT91brVhNNt58CMWU9PsBbv3PDCZUHbVxuDiH2mtA==
 
 commander@2:
   version "2.20.3"
@@ -441,6 +454,11 @@ json-stringify-pretty-compact@~3.0.0:
   resolved "https://registry.yarnpkg.com/json-stringify-pretty-compact/-/json-stringify-pretty-compact-3.0.0.tgz#f71ef9d82ef16483a407869556588e91b681d9ab"
   integrity sha512-Rc2suX5meI0S3bfdZuA7JMFBGkJ875ApfVyq2WHELjBiiG22My/l7/8zPpH/CfFVQHuVLd8NLR0nv6vi0BYYKA==
 
+lodash@^4.17.21:
+  version "4.17.21"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
+  integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
+
 mimic-response@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/mimic-response/-/mimic-response-2.1.0.tgz#d13763d35f613d09ec37ebb30bac0469c0ee8f43"
@@ -644,6 +662,11 @@ resolve@^1.1.10:
   dependencies:
     is-core-module "^2.2.0"
     path-parse "^1.0.6"
+
+rfc6902@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/rfc6902/-/rfc6902-4.0.2.tgz#ce99d3562b9e3287d403462e6bcc81eead8fcea0"
+  integrity sha512-MJOC4iDSv3Qn5/QvhPbrNoRongti6moXSShcRmtbNqOk0WPxlviEdMV4bb9PaULhSxLUXzWd4AjAMKQ3j3y54w==
 
 rimraf@^2.6.1:
   version "2.7.1"

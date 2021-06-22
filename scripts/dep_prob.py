@@ -6,9 +6,15 @@ import numpy as np
 import sys
 
 
-def dep_prob(cgpm_dicts, ci, cj):
+def dep_prob(cgpm_dicts, c1, c2, variable_mappings):
     return np.mean(
-        [float(cgpm_dict["Zv"][ci] == cgpm_dict["Zv"][cj]) for cgpm_dict in cgpm_dicts]
+        [
+            float(
+                cgpm_dict["Zv"][variable_mappings[i][c1]]
+                == cgpm_dict["Zv"][variable_mappings[i][c2]]
+            )
+            for i, cgpm_dict in enumerate(cgpm_dicts)
+        ]
     )
 
 
@@ -38,14 +44,21 @@ def main():
     cgpm_dicts = [json.load(model) for model in args.models]
     df = pd.read_csv(args.data)
     pairs = itertools.combinations(df.columns, 2)
-    variable_mapping = {c: i for i, c in enumerate(df.columns)}
+
+    if "incorporated_cols" in cgpm_dicts[0]:
+        variable_mappings = [
+            {c: i for i, c in enumerate(cgpm_dict["col_names"])}
+            for cgpm_dict in cgpm_dicts
+        ]
+    else:
+        variable_mappings = [{c: i for i, c in enumerate(df.columns)}] * len(cgpm_dicts)
     deps = {}
     # Turn Zv into dicts for speed and accessibility:
     for cgpm_dict in cgpm_dicts:
         cgpm_dict["Zv"] = dict(cgpm_dict["Zv"])
 
     for c1, c2 in pairs:
-        p = dep_prob(cgpm_dicts, variable_mapping[c1], variable_mapping[c2])
+        p = dep_prob(cgpm_dicts, c1, c2, variable_mappings)
         if c1 in deps:
             deps[c1][c2] = p
         else:
