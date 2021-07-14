@@ -20,7 +20,9 @@ class Streamcat:
         self.distargs = kwargs.get("distargs_orig_order", None)
         self.cctypes = kwargs.get("cctypes_orig_order", None)
         self.X = X
+        self.T = X.shape[0]
         self.counter = 0
+        # TODO: add switch for  checkpointing.
         # Initialize a CGPM-CrossCat state with a subset of rows and cols.
         init_state_args = kwargs
         init_X = X[:1, [col_names.index(c) for c in incorporated]]
@@ -29,13 +31,13 @@ class Streamcat:
         init_cctypes = [self.cctypes[col_names.index(c)] for c in incorporated]
         # Track the seed to save checkpoints.
         self.seed = seed
-        rng = gu.gen_rng(seed)
+        self.rng = gu.gen_rng(seed)
         self.state = State(
             init_X,
             outputs=init_outputs,
             distargs=init_distargs,
             cctypes=init_cctypes,
-            rng=rng,
+            rng=self.rng,
         )
 
     @classmethod
@@ -118,6 +120,44 @@ class Streamcat:
             self.incorporated_cols.append(col_name)
             # This is a stub. For SMC, we need to return a real weight here.
             return 0.0
+
+    def transition_rows(self, rows=None):
+        self.state.transition_view_rows(rows=rows)
+        self.state.transition_view_alphas()
+        self.state.transition_dim_hypers()
+        self.save_checkpoint()
+
+    def transition_cols(self, cols=None):
+        if cols is None:
+            cols = self.incorporated_cols
+        col_ids = [cid for cid, col_name in enumerate(cols)]
+        self.rng.shuffle(col_ids)
+        for col_id in col_ids:
+            self.state.transition_dims(col_id)
+            self.save_checkpoint()
+        self.state.transition_crp_alpha()  # Do I need this here?
+
+    def transition_hypers(self):
+        self.state.transition_crp_alpha()
+        self.state.transition_view_alphas()
+        self.state.transition_dim_hypers()
+
+    def insert_rows(self, rows):
+        for row in rows:
+            self.safe_incorporate_row(row)
+            self.transition_rows([row])
+
+    def insert_cols(self, cols):
+        for col in cols:
+            weigth = self.safe_incorporate_col(col)
+            if weigth is not None:
+                self.transition_cols([cols])
+
+    def other_cols(self):
+        return [c for c in self.col_names if c not in self.incorporated_cols]
+
+    def random_other_col(self):
+        return self.rng.choice(self.other_cols())
 
     def save_checkpoint(self):
         metadata = self.state.to_metadata()

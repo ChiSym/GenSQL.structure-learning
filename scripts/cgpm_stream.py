@@ -66,7 +66,7 @@ def main():
     )
 
     model = Streamcat.from_metadata(metadata)
-    model = inf_prog(model, args.seed)
+    model = inf_prog(model)
     model_metadata = model.to_metadata()
     # Ensure we save the correct x corresponding to the correct values in
     # output.
