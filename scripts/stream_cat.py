@@ -67,9 +67,7 @@ class Streamcat:
         )
         return state
 
-    def to_metadata(
-        self,
-    ):
+    def to_metadata(self):
         metadata = self.state.to_metadata()
         metadata["col_names"] = self.col_names
         metadata["distargs_orig_order"] = self.distargs
