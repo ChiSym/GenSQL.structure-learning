@@ -25,7 +25,7 @@ class Streamcat:
         # TODO: add switch for  checkpointing.
         # Initialize a CGPM-CrossCat state with a subset of rows and cols.
         init_state_args = kwargs
-        init_X = X[:1, [col_names.index(c) for c in incorporated]]
+        init_X = X[:incorporated_rows, [col_names.index(c) for c in incorporated]]
         init_outputs = list(range(len(incorporated)))
         init_distargs = [self.distargs[col_names.index(c)] for c in incorporated]
         init_cctypes = [self.cctypes[col_names.index(c)] for c in incorporated]
