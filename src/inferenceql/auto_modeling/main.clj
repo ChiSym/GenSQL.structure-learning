@@ -43,12 +43,6 @@
       (schema/cgpm)
       (pr)))
 
-(defn iql-viz-schema
-  [_]
-  (-> (edn/read *in*)
-      (schema/iql-viz)
-      (pr)))
-
 (defn ignore
   [{:keys [schema]}]
   (let [ignored (into #{}

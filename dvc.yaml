@@ -59,7 +59,6 @@ stages:
       - data/numericalized.csv
       - data/mapping-table.edn
 
-
   cgpm-generate-metadata:
     cmd: >
       mkdir -p data/cgpm/hydrated &&
@@ -183,17 +182,6 @@ stages:
       - data/ignored.csv
     outs:
       - qc/samples/samples-virtual.edn
-
-  iql-viz-schema:
-    cmd: >
-      clojure -X inferenceql.auto-modeling.main/iql-viz-schema
-      < data/schema.edn
-      > data/iql-schema.edn
-    deps:
-      - data/schema.edn
-      - src/inferenceql/auto_modeling/main.clj
-    outs:
-      - data/iql-schema.edn
 
   qc-tag-samples:
     cmd: >

@@ -187,17 +187,6 @@ stages:
     outs:
       - qc/samples/samples-virtual.edn
 
-  iql-viz-schema:
-    cmd: >
-      clojure -X inferenceql.auto-modeling.main/iql-viz-schema
-      < data/schema.edn
-      > data/iql-schema.edn
-    deps:
-      - data/schema.edn
-      - src/inferenceql/auto_modeling/main.clj
-    outs:
-      - data/iql-schema.edn
-
   qc-tag-samples:
     cmd: >
       clojure -X inferenceql.auto-modeling.qc.samples/tag
@@ -236,6 +225,7 @@ stages:
       - src/inferenceql/auto_modeling/xcat.clj
     outs:
       - data/xcat
+
   qc-dashboard-spec:
     cmd: >
       clojure -X inferenceql.auto-modeling.qc.dashboard/spec

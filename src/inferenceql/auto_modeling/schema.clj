@@ -74,13 +74,3 @@
           (comp (remove (comp #{:ignore} val))
                 (map (juxt (comp  name key) (comp replacements val))))
           schema)))
-
-(defn iql-viz
-  "Returns the inferenceql.viz schema from an InferenceQL schema"
-  [schema]
-  (let [replacements {:nominal :categorical
-                      :numerical :gaussian}]
-    (into {}
-          (comp (remove (comp #{:ignore} val))
-                (map (juxt (comp keyword key) (comp replacements val))))
-          schema)))
