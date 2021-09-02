@@ -22,27 +22,36 @@
   "Guess the statistical type of a collection of values."
   [coll]
   (let [max-categories 50
-        num-disitinct-vals (count (distinct coll))]
-    (cond (= 1 num-disitinct-vals)
+        dv (distinct coll) ; Distinct vals.
+        num-dv (count dv)
+        ratio-dv (/ num-dv (count coll)) ; Ratio of distinct vals to all vals.
+
+        ;; Number of distinct values below which columns whose values can all be parsed as
+        ;; numbers will be considered nominal anyway.
+        numcat-count 20
+        ;; Ratio of distinct values to total values below which columns whose values can
+        ;; all be parsed as numbers will be considered nominal anyway.
+        numcat-ratio 0.02]
+    (cond (= 1 num-dv)
           :ignore
 
           (some string? coll)
-          (if (< num-disitinct-vals max-categories)
+          (if (< num-dv max-categories)
             :nominal
             :ignore)
 
-          (= num-disitinct-vals (count coll))
+          (= num-dv (count coll))
           (if (every? integer? coll)
             (if (consecutive? coll)
               :ignore
               :numerical)
             :numerical)
 
-          (and (every? float? coll)
-               (> num-disitinct-vals
-                  (/ (count coll)
-                     2)))
-          :numerical
+          (every? number? coll)
+          (if (or (< num-dv numcat-count)
+                  (< ratio-dv numcat-ratio))
+            :nominal
+            :numerical)
 
           :else
           :ignore)))
