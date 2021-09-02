@@ -13,25 +13,36 @@
       body {
         font-family: Roboto, 'Helvetica Neue', Verdana, Helvetica, Arial, sans-serif;
         font-size: 20px;
+        margin: 0px
       }
 
-      button {
-       font-size: 20px;
+      #vis {
+        margin: 20px 0px 100px 40px;
       }
 
       #controls-section {
-        margin: 20px 0px 40px 20px;
+        font-size: 14px;
+        background: #f6f6f6;
+        color: #333;
+        padding: 5px 5px 5px 5px;
+        margin: 0px 0px 25px 0px;
       }
 
       #controls {
-        margin: 10px 0px 20px 0px;
+        margin: 10px 10px 10px 28px;
+        line-height: 20px;
+      }
+
+      #controls-button {
+        padding: 1px 6px;
+        cursor: pointer;
       }
     </style>
   </head>
 
   <body>
     <div id="controls-section">
-      <button type="button" onclick="toggle_controls()">Show/Hide Controls</button>
+      <span id="controls-button" onclick="toggle_controls()">⚙️ Settings</span>
       <div id="controls" style="display: none;"></div>
     </div>
     <div id="vis"></div>
