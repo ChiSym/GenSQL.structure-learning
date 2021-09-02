@@ -309,23 +309,6 @@ stages:
     outs:
       - qc/specs/qc-dashboard.vl.json
 
-  qc-dashboard-image:
-    cmd: >
-      yarn run vl2png
-      -s $(bin/param qc.image_quality)
-      -l warn
-      qc/specs/qc-dashboard.vl.json
-      qc/images/qc-dashboard.png
-      2> qc/logs/vl2png-qc-image.log
-    params:
-      - qc.image_quality
-    deps:
-      - node_modules
-      - qc/specs/qc-dashboard.vl.json
-    outs:
-      - qc/images/qc-dashboard.png
-      - qc/logs/vl2png-qc-image.log
-
   qc-dashboard-app:
     cmd: >
       clojure -X inferenceql.auto-modeling.qc.app/create
@@ -358,23 +341,6 @@ stages:
       - src/inferenceql/auto_modeling/qc/util.clj
     outs:
       - qc/specs/qc-splom.vl.json
-
-  qc-splom-image:
-    cmd: >
-      yarn run vl2png
-      -s $(bin/param qc.image_quality)
-      -l warn
-      qc/specs/qc-splom.vl.json
-      qc/images/qc-splom.png
-      2> qc/logs/vl2png-qc-splom-image.log
-    params:
-      - qc.image_quality
-    deps:
-      - node_modules
-      - qc/specs/qc-splom.vl.json
-    outs:
-      - qc/images/qc-splom.png
-      - qc/logs/vl2png-qc-splom-image.log
 
   qc-splom-app:
     cmd: >

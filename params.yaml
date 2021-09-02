@@ -28,12 +28,6 @@ qc:
   # When not set, up to 8 columns--taken from the schema--will be visualized.
   # e.g. columns: ["foo", "bar", "baz"]
   columns: null
-  # This sets scaling factor of the qc images produced.
-  # The larger the number, the more high quality and zoom-able the image.
-  # Set this to a multiple of 2. (e.g. 1, 2, 4, ....)
-  # NOTE: There may be an issue with the vl2png command utility such that it fails
-  # for wide images producted at high quality. Try the vl2pdf utility instead.
-  image_quality: 1
   # This limits the number of categories shown for categorical variables in
   # 2-dimensional QC plots. Set this to null for no limit.
   category_limit: 10
