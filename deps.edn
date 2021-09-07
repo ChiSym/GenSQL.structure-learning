@@ -10,7 +10,7 @@
         probcomp/inferenceql.query {:git/url "git@github.com:probcomp/inferenceql.query.git"
                                     :sha "34420acf3b9204a3a0569b7ffe5196d27cec56e3"}}
  :aliases {:test {:extra-paths ["test"]
-                  :extra-deps {com.lambdaisland/kaocha-cljs {:mvn/version "1.0.93"}
-                               lambdaisland/kaocha {:mvn/version "1.0-612"}
+                  :extra-deps {com.lambdaisland/kaocha-cljs {:mvn/version "1.0.103"}
+                               lambdaisland/kaocha {:mvn/version "1.0.887"}
                                org.clojure/test.check {:mvn/version "1.1.0"}}}
            :xcat-import {:exec-fn inferenceql.auto-modeling.xcat/import}}}
