@@ -10,8 +10,9 @@ nullify:
   # - NaN
   # - missing
 schema:
-  # Key/value paris can be added here to explicitly override the inferred schema
-  # for each column. For example, to force the "age" column to be treated as a
+  # Key/value pairs can be added here to explicitly override the inferred schema
+  # for each column. The available types are as follows: numerical, nominal, and ignore.
+  # For example, to force the "age" column to be treated as a
   # numerical uncomment the following line:
   # age: numerical
 loom:
@@ -19,6 +20,8 @@ loom:
 cgpm:
   #iterations: 1
   minutes: 1
+clojurecat:
+  iterations: 150
 qc:
   # Set this to the number of virtual samples desired in QC plots.
   # When not set, the plots will display the same number of virual samples as

@@ -8,7 +8,6 @@
             [inferenceql.auto-modeling.qc.util :refer [filtering-summary should-bin? bind-to-element
                                                        obs-data-color virtual-data-color
                                                        unselected-color vega-type-fn
-                                                       regression-color
                                                        vl5-schema]]))
 
 (defn scatter-plot-for-splom [col-1 col-2 vega-type correlation samples]
