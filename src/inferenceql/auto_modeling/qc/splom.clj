@@ -4,6 +4,7 @@
             [clojure.edn :as edn]
             [cheshire.core :as cheshire]
             [inferenceql.auto-modeling.dvc :as dvc]
+            [inferenceql.auto-modeling.qc.vega :as vega]
             [inferenceql.auto-modeling.qc.util :refer [filtering-summary should-bin? bind-to-element
                                                        obs-data-color virtual-data-color
                                                        unselected-color vega-type-fn
@@ -12,86 +13,53 @@
 
 (defn scatter-plot-for-splom [col-1 col-2 vega-type correlation samples]
   (let [f-sum (filtering-summary [col-1 col-2] vega-type nil samples)
-        {:keys [slope intercept r-value p-value]} (get-in correlation [col-1 col-2])
-        r-info-string (str (format "R²: %.2f" (* r-value r-value))
-                           "   "
-                           (format "p-value: %.2f" p-value))
-        ;; Function y(x) for regression line.
-        y (fn [x] (+ (* slope x) intercept))
-        x-vals (->> samples
-                    (filter (comp #{"observed"} :collection))
-                    (map col-1)
-                    (filter some?))
-        [min-x max-x] [(apply min x-vals) (apply max x-vals)]]
-    {:layer [{:mark {:type "point"
-                     :tooltip {:content "data"}
-                     :filled true
-                     :size {:expr "splomPointSize"}}
-              :params [{:name "zoom-control-splom"
-                        :bind "scales"
-                        :select {:type "interval"
-                                 :resolve "global"
-                                 :on "[mousedown[event.shiftKey], window:mouseup] > window:mousemove!",
-                                 :translate "[mousedown[event.shiftKey], window:mouseup] > window:mousemove!",
-                                 :clear "dblclick[event.shiftKey]"
-                                 :zoom "wheel![event.shiftKey]"}}
-                       {:name "brush-all"
-                        :select {:type "interval"
-                                 :resolve "global"
-                                 :on "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
-                                 :translate "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove!",
-                                 :clear "dblclick[!event.shiftKey]"
-                                 :zoom "wheel![!event.shiftKey]"}}]
-              :transform [{:window [{:op "row_number", :as "row_number_subplot"}]
-                           :groupby ["collection"]}
-                          {:filter {:or [{:and [{:field "collection" :equal "observed"}
-                                                {:field "row_number_subplot" :lte {:expr "numObservedPoints"}}]}
-                                         {:and [{:field "collection" :equal "virtual"}
-                                                {:field "row_number_subplot" :lte (:num-valid f-sum)}
-                                                {:field "row_number_subplot" :lte {:expr "numVirtualPoints"}}]}]}}]
-              :encoding {:x {:field col-1
-                             :type "quantitative"
-                             :axis {:gridOpacity 0.4
-                                    :title col-1}}
-                         :y {:field col-2
-                             :type "quantitative"
-                             :axis {:gridOpacity 0.4
-                                    :title col-2}}
-                         :opacity {:field "collection"
-                                   :scale {:domain ["observed", "virtual"]
-                                           :range [{:expr "splomAlphaObserved"} {:expr "splomAlphaVirtual"}]}
-                                   :legend nil}
-                         :color {:condition {:param "brush-all"
-                                             :field "collection"
-                                             :scale {:domain ["observed", "virtual"]
-                                                     :range [obs-data-color virtual-data-color]}
-                                             :legend {:orient "top"
-                                                      :title nil
-                                                      :offset 30}}
-                                 :value unselected-color}}}
-             {:data {:values [{:x min-x :y (y min-x)} {:x max-x :y (y max-x)}]}
-              :mark {:type "line"
-                     :strokeDash [4 4]
-                     :color regression-color}
-              :encoding {:x {:field "x"
-                             :type "quantitative"}
-                         :y {:field "y"
-                             :type "quantitative"}
-                         :opacity {:condition {:param "showRegression"
-                                               :value 1}
-                                   :value 0}}}
-             {:data {:values [{:r-info-string r-info-string}]}
-              :mark {:type "text"
-                     :color regression-color
-                     :x "width"
-                     :align "right"
-                     :y -5
-                     :clip false}
-              :encoding {:text {:field "r-info-string" :type "nominal"}
-                         :opacity {:condition {:param "showRegression"
-                                               :value 1}
-                                   :value 0}}}]}))
-
+        base-spec {:layer [{:mark {:type "point"
+                                   :tooltip {:content "data"}
+                                   :filled true
+                                   :size {:expr "splomPointSize"}}
+                            :params [{:name "zoom-control-splom"
+                                      :bind "scales"
+                                      :select {:type "interval"
+                                               :resolve "global"
+                                               :on "[mousedown[event.shiftKey], window:mouseup] > window:mousemove!",
+                                               :translate "[mousedown[event.shiftKey], window:mouseup] > window:mousemove!",
+                                               :clear "dblclick[event.shiftKey]"
+                                               :zoom "wheel![event.shiftKey]"}}
+                                     {:name "brush-all"
+                                      :select {:type "interval"
+                                               :resolve "global"
+                                               :on "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove"
+                                               :translate "[mousedown[!event.shiftKey], window:mouseup] > window:mousemove!",
+                                               :clear "dblclick[!event.shiftKey]"
+                                               :zoom "wheel![!event.shiftKey]"}}]
+                            :transform [{:window [{:op "row_number", :as "row_number_subplot"}]
+                                         :groupby ["collection"]}
+                                        {:filter {:or [{:and [{:field "collection" :equal "observed"}
+                                                              {:field "row_number_subplot" :lte {:expr "numObservedPoints"}}]}
+                                                       {:and [{:field "collection" :equal "virtual"}
+                                                              {:field "row_number_subplot" :lte (:num-valid f-sum)}
+                                                              {:field "row_number_subplot" :lte {:expr "numVirtualPoints"}}]}]}}]
+                            :encoding {:x {:field col-1
+                                           :type "quantitative"
+                                           :axis {:gridOpacity 0.4
+                                                  :title col-1}}
+                                       :y {:field col-2
+                                           :type "quantitative"
+                                           :axis {:gridOpacity 0.4
+                                                  :title col-2}}
+                                       :opacity {:field "collection"
+                                                 :scale {:domain ["observed", "virtual"]
+                                                         :range [{:expr "splomAlphaObserved"} {:expr "splomAlphaVirtual"}]}
+                                                 :legend nil}
+                                       :color {:condition {:param "brush-all"
+                                                           :field "collection"
+                                                           :scale {:domain ["observed", "virtual"]
+                                                                   :range [obs-data-color virtual-data-color]}
+                                                           :legend {:orient "top"
+                                                                    :title nil
+                                                                    :offset 30}}
+                                               :value unselected-color}}}]}]
+    (vega/regression-line col-1 col-2 correlation samples base-spec)))
 
 (defn layered-histogram [col vega-type samples]
   (let [col-type (vega-type col)
@@ -125,10 +93,14 @@
                                  :offset 30
                                  :title nil}}}}))
 
-(defn spec [{sample-path :samples schema-path :schema correlation-path :correlation}]
+(defn spec
+  "Produces a vega-lite spec for the QC SPLOM app.
+  Paths to samples and schema are required.
+  Path to correlation data is optional."
+  [{sample-path :samples schema-path :schema correlation-path :correlation}]
   (let [schema (-> schema-path str slurp edn/read-string)
         samples (-> sample-path str slurp edn/read-string)
-        correlation (-> correlation-path str slurp (cheshire/parse-string true))
+        correlation (some-> correlation-path str slurp (cheshire/parse-string true))
 
         ;; Visualize the columns set in params.yaml.
         ;; If not specified, visualize all the columns.
