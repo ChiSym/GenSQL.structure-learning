@@ -352,6 +352,7 @@ The outputs produced are the same as those produced by the CGPM backend. Please 
 * Java 
 * Clojure
 * Yarn
+* Python (only the DVC dependency)
 
 #### Settings
 - `clojurecat > iterations` — This setting controls the amount of inference to perform.
