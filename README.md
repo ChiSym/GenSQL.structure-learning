@@ -11,7 +11,7 @@ This guide will help you use the IQL auto-modeling project to build your own Cro
   - [Loom and CGPM](#loom-and-cgpm)
   - [Clojurecat](#clojurecat)
   - [Streaming Inference](#streaming-inference)
-- [Quality control plots](#quality-control-plots-1)
+- [Quality control plots](#quality-control-plots)
 - [Using CrossCat models](#using-crosscat-models)
   - [Observable notebooks](#observable-notebooks-1)
   - [IQL Viz](#iql-viz-1)
@@ -368,15 +368,6 @@ Unlike the CGPM and LOOM + CGPM backends. Only a single CrossCat model is produc
 #### Key points 
 * Experimental
 * DVC yaml filename: `dvc-stream.yaml`
-
-## Quality control plots
-### Features 
-- Cross highlighting
-- Pan and zoom 
-- Tooltips
-
-### Other options
-There a number of other rendering options available when you click the options button at the top of the page for the QC apps. There is also the option to show regression lines when there are numerical-numerical plots.
 
 ## Using CrossCat models
 
