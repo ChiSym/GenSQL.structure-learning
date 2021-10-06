@@ -59,19 +59,22 @@ stages:
       - data/numericalized.csv
       - data/mapping-table.edn
 
-
   cgpm-infer-stream:
-    cmd: >
-      mkdir -p data/cgpm/complete &&
-      seq 0 $(($(bin/param sample_count) - 1)) | parallel $(bin/param parallel.flags) 'mkdir -p data/cgpm/checkpoints/sample-$(($(bin/param seed) + {#} - 1))/' &&
-      seq 0 $(($(bin/param sample_count) - 1)) |
-      parallel $(bin/param parallel.flags)
-      'python scripts/cgpm_stream.py
-      --output data/cgpm/complete/sample.{}.json
-      --data data/numericalized.csv
-      --schema data/cgpm-schema.edn
-      --mapping-table data/mapping-table.edn
-      --seed $(($(bin/param seed) + {#} - 1))'
+    cmd:
+      - mkdir -p data/cgpm/complete
+      - >-
+        parallel ${parallel.flags}
+        'mkdir -p data/cgpm/checkpoints/sample-{}/'
+        :::: <(seq ${seed} $((${seed} + ${sample_count} - 1 )))
+      - >-
+        parallel ${parallel.flags}
+        'python scripts/cgpm_stream.py
+        --output data/cgpm/complete/sample.{}.json
+        --data data/numericalized.csv
+        --schema data/cgpm-schema.edn
+        --mapping-table data/mapping-table.edn
+        --seed {}'
+        :::: <(seq ${seed} $((${seed} + ${sample_count} - 1 )))
     params:
       - parallel.flags
       - sample_count
@@ -88,46 +91,45 @@ stages:
       - data/cgpm/checkpoints
 
   summarize-checkpoints:
-    cmd: >
-      mkdir -p data/cgpm/transitions &&
-      seq 0 $(($(bin/param sample_count) - 1)) |
-      parallel $(bin/param parallel.flags)
-      'jq -s "." $(find data/cgpm/checkpoints/sample-$(($(bin/param seed) + {#} - 1))/ -type f | sort) > data/cgpm/transitions/sample-{}.json'
+    cmd:
+      - mkdir -p data/cgpm/transitions
+      - >-
+        parallel ${parallel.flags}
+        'jq -s "." {1}/t-*.json > data/cgpm/transitions/{/}.json'
+        :::: <(find data/cgpm/checkpoints/sample-* -type d)
     deps:
       - data/cgpm/checkpoints
     outs:
       - data/cgpm/transitions/
 
-  # XXX: the next stage is not yet parallelized. Should be:
-  #diff-checkpoints:
-  #  cmd: >
-  #    mkdir -p data/cgpm/patches/
-  #    seq 0 $(($(bin/param sample_count) - 1)) |
-  #    parallel $(bin/param parallel.flags)
-  #    'bin/patches.js data/cgpm/transitions/sample-{}.json > data/cgpm/patches/transitions.patches-{}.json'
-  #  deps:
-  #    - data/cgpm/transitions
-  #  outs:
-  #    - data/cgpm/patches
   diff-checkpoints:
-    cmd: >
-      bin/patches.js data/cgpm/transitions/sample-0.json > data/cgpm/transitions.patches.json
+    cmd:
+      - mkdir -p data/cgpm/patches/
+      - >-
+        parallel ${parallel.flags}
+        'bin/patches.js {1} > data/cgpm/patches/transitions.patches-{2}.json'
+        :::: <(find data/cgpm/transitions -type f)
+        ::::+ <(find data/cgpm/transitions -type f | cut -d/ -f4 | grep -o -E '[0-9]+')
     deps:
       - data/cgpm/transitions
     outs:
-      - data/cgpm/transitions.patches.json
+      - data/cgpm/patches
+
+  ## Stages related to dependencies between columns.
 
   save-dependencies:
-    cmd: >
-      find data/cgpm/complete -type f |
-      sort |
-      xargs python scripts/dep_prob.py
-      --data data/numericalized.csv
-      --output data/dep-prob.json
+    cmd:
+      - mkdir -p data/dep-prob/
+      - >-
+        parallel ${parallel.flags}
+        'python scripts/dep_prob.py
+        --data data/numericalized.csv
+        --output data/dep-prob/{/} {}'
+        :::: <(find data/cgpm/complete -type f)
     deps:
       - data/cgpm/complete
     outs:
-      - data/dep-prob.json
+      - data/dep-prob
 
   save-correlations:
     cmd: >
@@ -142,18 +144,24 @@ stages:
     outs:
       - data/correlation.json
 
+  ## Stages related to converting CGPM models to different model formats.
+
   sppl-import:
-    cmd: >
-      find data/cgpm/complete -type f |
-      parallel jsonschema --instance {} schemas/cgpm.json &&
-      mkdir -p data/sppl/unmerged &&
-      find data/cgpm/complete -type f |
-      parallel $(bin/param parallel.flags)
-      'python scripts/sppl_import.py
-      --metadata {}
-      --data data/numericalized.csv
-      --mapping-table data/mapping-table.edn
-      --output data/sppl/unmerged/{/}'
+    desc: "Imports the final CGPM Crosscat samples as sum-product networks."
+    cmd:
+      - >-
+        parallel ${parallel.flags}
+        jsonschema --instance {} schemas/cgpm.json
+        :::: <(find data/cgpm/complete -type f)
+      - mkdir -p data/sppl/unmerged
+      - >-
+        parallel ${parallel.flags}
+        'python scripts/sppl_import.py
+        --metadata {}
+        --data data/numericalized.csv
+        --mapping-table data/mapping-table.edn
+        --output data/sppl/unmerged/{/}'
+        :::: <(find data/cgpm/complete -type f)
     params:
       - parallel.flags
     deps:
@@ -164,6 +172,7 @@ stages:
       - data/sppl/unmerged
 
   sppl-merge:
+    desc: "Merges sum-product networks from final Crosscat samples into a single network."
     cmd: >
       find data/sppl/unmerged -type f |
       sort |
@@ -173,6 +182,34 @@ stages:
       - data/sppl/unmerged
     outs:
       - data/sppl/merged.json
+
+  xcat-complete-import:
+    desc: "Imports the final CGPM Crosscat samples as XCat records."
+    cmd:
+      - mkdir -p data/xcat/complete/
+      - >-
+        parallel ${parallel.flags}
+        'clojure -X:xcat-import
+        :cgpm-json {}
+        :data-csv data/nullified.csv
+        :mapping-table data/mapping-table.edn
+        :numericalized-csv data/numericalized.csv
+        :schema-edn data/schema.edn
+        > data/xcat/complete/{/.}.edn'
+        :::: <(find data/cgpm/complete -type f)
+    params:
+      - parallel.flags
+    deps:
+      - data/cgpm/complete
+      - data/mapping-table.edn
+      - data/nullified.csv
+      - data/numericalized.csv
+      - data/schema.edn
+      - src/inferenceql/auto_modeling/xcat.clj
+    outs:
+      - data/xcat/complete/
+
+  ## QC-related stages.
 
   sppl-sample:
     cmd: >
@@ -201,30 +238,6 @@ stages:
       - src/inferenceql/auto_modeling/qc/samples.clj
     outs:
       - qc/samples/samples.edn
-
-  xcat-import:
-    cmd: >
-      mkdir -p data/xcat &&
-      find data/cgpm/complete -type f |
-      parallel $(bin/param parallel.flags)
-      'clojure -X:xcat-import
-      :cgpm-json {}
-      :data-csv data/nullified.csv
-      :mapping-table data/mapping-table.edn
-      :numericalized-csv data/numericalized.csv
-      :schema-edn data/schema.edn
-      > data/xcat/{/.}.edn'
-    params:
-      - parallel.flags
-    deps:
-      - data/cgpm/complete
-      - data/mapping-table.edn
-      - data/nullified.csv
-      - data/numericalized.csv
-      - data/schema.edn
-      - src/inferenceql/auto_modeling/xcat.clj
-    outs:
-      - data/xcat
 
   qc-dashboard-spec:
     cmd: >
