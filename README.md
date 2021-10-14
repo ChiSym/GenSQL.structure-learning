@@ -94,8 +94,6 @@ First we will get IQL auto-modeling repo and switch to the right branch.
 git clone git@github.com:probcomp/inferenceql.auto-modeling.git
 
 cd inferenceql.auto-modeling 
-
-git checkout starter
 ```
 
 ### Build a Python virtual-env
