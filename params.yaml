@@ -34,4 +34,8 @@ qc:
   # This limits the number of categories shown for categorical variables in
   # 2-dimensional QC plots. Set this to null for no limit.
   category_limit: 10
-
+mi:
+  configs:
+    # Set MI configs here. If not set, the configs are chosen at random.
+    # For example, to set the config for health_status.
+    # health_status: ["c) Average", "b) Below average"]
