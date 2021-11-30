@@ -2,7 +2,7 @@ seed: 42
 sample_count: 3
 parallel:
   # To limit the number of jobs GNU Parallel spawns use add the flag `--jobs n`.
-  flags: >
+  flags: >-
     --verbose
 nullify:
   # Entries added here will be treated as null. For example, to treat "NaN" and
@@ -60,4 +60,6 @@ qc:
   # This limits the number of categories shown for categorical variables in
   # 2-dimensional QC plots. Set this to null for no limit.
   category_limit: 10
+mi:
+  configs:
 
