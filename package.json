@@ -1,7 +1,9 @@
 {
   "dependencies": {
     "cli-progress": "^3.9.0",
+    "inliner": "^1.13.1",
     "lodash": "^4.17.21",
-    "rfc6902": "^4.0.2"
+    "rfc6902": "^4.0.2",
+    "lz-string": "1.4.4"
   }
 }

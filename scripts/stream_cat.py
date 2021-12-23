@@ -165,6 +165,7 @@ class Streamcat:
         metadata["n"] = n
         metadata["d"] = d
         metadata["col_names"] = self.incorporated_cols
+        metadata["X"] = replace(metadata["X"], math.isnan, None)
         json.dump(
             metadata,
             open(

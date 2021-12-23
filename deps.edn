@@ -3,14 +3,15 @@
         org.clojure/data.csv {:mvn/version "1.0.0"}
         clj-commons/clj-yaml {:mvn/version "0.7.106"}
         cheshire/cheshire {:mvn/version "5.10.0"}
+        cljstache/cljstache {:mvn/version "2.0.6"}
         medley/medley {:mvn/version "1.3.0"}
+        com.cognitect/transit-clj {:mvn/version "1.0.324"}
         selmer/selmer {:mvn/version "1.12.40"}
         probcomp/inferenceql.inference {:git/url "git@github.com:probcomp/inferenceql.inference.git"
-                                        :sha "8f5d1247da8fab480a87ce707ee281484b706459"}
+                                        :sha "fd40816ceb283880db2b87b3ce5a52dcce7263ad"}
         probcomp/inferenceql.query {:git/url "git@github.com:probcomp/inferenceql.query.git"
                                     :sha "34420acf3b9204a3a0569b7ffe5196d27cec56e3"}}
  :aliases {:test {:extra-paths ["test"]
                   :extra-deps {com.lambdaisland/kaocha-cljs {:mvn/version "1.0.103"}
                                lambdaisland/kaocha {:mvn/version "1.0.887"}
-                               org.clojure/test.check {:mvn/version "1.1.0"}}}
-           :xcat-import {:exec-fn inferenceql.auto-modeling.xcat/import}}}
+                               org.clojure/test.check {:mvn/version "1.1.0"}}}}}

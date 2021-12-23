@@ -15,6 +15,7 @@
 /node_modules/
 /out/
 /qc/
+/learning-dashboard/
 /target/
 pom.xml
 pom.xml.asc

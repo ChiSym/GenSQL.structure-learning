@@ -73,18 +73,28 @@ def main():
         for k in spn.sample(1)[0].keys()
         if not k.__str__().endswith("_cluster")
     ]
+    cols.sort()
+
+    # Switch to a fixed random seed (12) before selecting category options for categorical columns
+    # that do not have MI config provided.
+    np.random.seed(12)
     for c in cols:
         if c not in configs:
             if c in mapping_table:
                 categories = list(mapping_table[c].keys())
+                categories.sort()
                 config = np.random.choice(
-                    categories, size=int(np.floor(len(categories) / 2))
+                    categories, size=int(np.floor(len(categories) / 2)), replace=False
                 ).tolist()
+                config.sort()
                 configs[c] = config
             else:
                 configs[c] = df[c].median()
     pairs = list(itertools.combinations(cols, 2))
     result = {"mi": {c: {} for c in cols}}
+
+    # Switch back to provided random seed when doing MI calculations.
+    np.random.seed(args.seed)
     for c1, c2 in pairs:
         p1 = get_predicate(c1, configs[c1])
         p2 = get_predicate(c2, configs[c2])

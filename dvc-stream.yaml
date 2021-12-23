@@ -60,6 +60,9 @@ stages:
       - data/mapping-table.edn
 
   cgpm-infer-stream:
+    desc: >
+      This produces both complete cgpm-model exports after inference is complete and
+      cgpm-model checkpoints while inference is progressing.
     cmd:
       - mkdir -p data/cgpm/complete
       - >-
@@ -91,6 +94,9 @@ stages:
       - data/cgpm/checkpoints
 
   summarize-checkpoints:
+    desc: >
+      This takes the cgpm-model checkpoints for each crosscat sample and concatenates them into a
+      single array in a json file.
     cmd:
       - mkdir -p data/cgpm/transitions
       - >-
@@ -100,287 +106,337 @@ stages:
     deps:
       - data/cgpm/checkpoints
     outs:
-      - data/cgpm/transitions/
-
-  diff-checkpoints:
-    cmd:
-      - mkdir -p data/cgpm/patches/
-      - >-
-        parallel ${parallel.flags}
-        'bin/patches.js {1} > data/cgpm/patches/transitions.patches-{2}.json'
-        :::: <(find data/cgpm/transitions -type f)
-        ::::+ <(find data/cgpm/transitions -type f | cut -d/ -f4 | grep -o -E '[0-9]+')
-    deps:
       - data/cgpm/transitions
-    outs:
-      - data/cgpm/patches
 
-  ## Stages related to dependencies between columns.
+  ### Stages related to dependencies between columns (dep-prob).
 
-  save-dependencies:
-    cmd:
-      - mkdir -p data/dep-prob/
-      - >-
-        parallel ${parallel.flags}
-        'python scripts/dep_prob.py
-        --data data/numericalized.csv
-        --output data/dep-prob/{/} {}'
-        :::: <(find data/cgpm/complete -type f)
-    deps:
-      - data/cgpm/complete
-    outs:
-      - data/dep-prob
-
-  save-correlations:
-    cmd: >
-      python scripts/correlation.py
-      --data data/ignored.csv
-      --schema data/schema.edn
-      --output data/correlation.json
-    deps:
-      - data/ignored.csv
-      - data/schema.edn
-      - scripts/correlation.py
-    outs:
-      - data/correlation.json
-
-  ## Stages related to converting CGPM models to different model formats.
-
-  sppl-import:
-    desc: "Imports the final CGPM Crosscat samples as sum-product networks."
+  cgpm-dep-prob-transitions:
+    desc: >
+      This produces the dependency probability between columns for each cgpm-model checkpoint.
     cmd:
       - >-
-        parallel ${parallel.flags}
-        jsonschema --instance {} schemas/cgpm.json
-        :::: <(find data/cgpm/complete -type f)
-      - mkdir -p data/sppl/unmerged
-      - >-
-        parallel ${parallel.flags}
-        'python scripts/sppl_import.py
-        --metadata {}
-        --data data/numericalized.csv
-        --mapping-table data/mapping-table.edn
-        --output data/sppl/unmerged/{/}'
-        :::: <(find data/cgpm/complete -type f)
-    params:
-      - parallel.flags
-    deps:
-      - data/cgpm/complete
-      - data/ignored.csv
-      - scripts/sppl_import.py
-    outs:
-      - data/sppl/unmerged
-
-  sppl-merge:
-    desc: "Merges sum-product networks from final Crosscat samples into a single network."
-    cmd: >
-      find data/sppl/unmerged -type f |
-      sort |
-      xargs python scripts/sppl_merge.py
-      --output data/sppl/merged.json
-    deps:
-      - data/sppl/unmerged
-    outs:
-      - data/sppl/merged.json
-
-  sppl-import-checkpoints:
-    desc: "Imports CGPM Crosscat checkpoints as SPN checkpoints."
-    cmd:
-      - >-
-        parallel jsonschema --instance {} schemas/cgpm.json
-        :::: <(find data/cgpm/checkpoints/sample-* -type f)
-      - >-
-        parallel mkdir -p data/sppl/checkpoints/{}
+        parallel mkdir -p data/cgpm/dep-prob/checkpoints/{}
         :::: <(find data/cgpm/checkpoints/sample-* -type d | cut -d/ -f4)
       - >-
-        parallel $(bin/param parallel.flags)
-        'python3 scripts/sppl_import_check.py
-        --metadata {1}
+        parallel 'python scripts/dep_prob.py
         --data data/numericalized.csv
-        --mapping-table data/mapping-table.edn
-        --output data/sppl/checkpoints/{2}'
-        :::: <(find data/cgpm/checkpoints/sample-* -type f)
-        ::::+ <(find data/cgpm/checkpoints/sample-* -type f | cut -d/ -f4-5)
+        --output data/cgpm/dep-prob/checkpoints/{2} {1}'
+        :::: <(find data/cgpm/checkpoints -type f)
+        ::::+ <(find data/cgpm/checkpoints -type f | cut -d/ -f4-5)
     params:
       - parallel.flags
     deps:
+      - data/numericalized.csv
       - data/cgpm/checkpoints
-      - data/ignored.csv
-      - scripts/sppl_import_check.py
     outs:
-      - data/sppl/checkpoints/
+      - data/cgpm/dep-prob/checkpoints/
 
-  xcat-complete-import:
-    desc: "Imports the final CGPM Crosscat samples as XCat records."
+  cgpm-dep-prob-merge:
+    desc: >
+      This concatenates the dependency probabilities produced from many
+      cgpm-model checkpoints into a json arrays (one for each crosscat sample).
     cmd:
-      - mkdir -p data/xcat/complete/
+      - mkdir -p data/cgpm/dep-prob/transitions/
+      - >-
+        parallel "jq --slurp '.' {1}/t-*.json > data/cgpm/dep-prob/transitions/{2}.json"
+        :::: <(find data/cgpm/dep-prob/checkpoints/sample-* -type d)
+        ::::+ <(find data/cgpm/dep-prob/checkpoints/sample-* -type d | cut -d/ -f5)
+    deps:
+      - data/cgpm/dep-prob/checkpoints/
+    outs:
+      - data/cgpm/dep-prob/transitions/
+
+  cgpm-dep-prob-merge-phase-2:
+    desc: >
+      This concatenates the dependency probabilities produced from each crosscat sample into a
+      json array.
+    cmd: >
+      jq --slurp '.' data/cgpm/dep-prob/transitions/sample-*.json
+      >  data/cgpm/dep-prob/transitions-merged-not-reduced.json
+    deps:
+      - data/cgpm/dep-prob/transitions/
+    outs:
+      - data/cgpm/dep-prob/transitions-merged-not-reduced.json
+
+  cgpm-dep-prob-merge-phase-3:
+    desc: >
+      This reduces the binary dep-prob values in the previous stage into values ranging [0,1] by
+      averaging across all crosscat models at each iteration (cgpm-model checkpoint).
+    cmd: >-
+      clojure -X inferenceql.auto-modeling.stream.dep-prob/reduce
+      :dep-prob data/cgpm/dep-prob/transitions-merged-not-reduced.json
+      > data/cgpm/dep-prob/transitions-merged.json
+    deps:
+      - data/cgpm/dep-prob/transitions-merged-not-reduced.json
+    outs:
+      - data/cgpm/dep-prob/transitions-merged.json
+
+  ### Stages related to converting CGPM models to XCat records.
+
+  xcat-transitions-import:
+    desc: >
+      Converts the sequences of cgpm-model exports found in cgpm transitions files into
+      sequences of xcat-models (exported as transit-encoded strings).
+    cmd:
+      - mkdir -p data/xcat/transitions
       - >-
         parallel ${parallel.flags}
-        'clojure -X:xcat-import
-        :cgpm-json {}
+        'clojure -X inferenceql.auto-modeling.stream.xcat/transitions-import
+        :transitions-path {1}
         :data-csv data/nullified.csv
         :mapping-table data/mapping-table.edn
         :numericalized-csv data/numericalized.csv
         :schema-edn data/schema.edn
-        > data/xcat/complete/{/.}.edn'
-        :::: <(find data/cgpm/complete -type f)
-    params:
-      - parallel.flags
+        > data/xcat/transitions/{2}'
+        :::: <(find data/cgpm/transitions -type f | sort)
+        ::::+ <(find data/cgpm/transitions -type f | sort | cut -d/ -f4)
     deps:
-      - data/cgpm/complete
+      - data/cgpm/transitions
       - data/mapping-table.edn
       - data/nullified.csv
       - data/numericalized.csv
       - data/schema.edn
       - src/inferenceql/auto_modeling/xcat.clj
     outs:
-      - data/xcat/complete/
+      - data/xcat/transitions
 
-  ## Stages related to calculating mutual information between columns (for each SPN
-  ## representing an iteration of a Crosscat model).
+  xcat-transitions-merge:
+    desc: >
+      Produces a sequences of ensembles which consist of a sequence of xcat-models (exported
+      as transit-encoded strings). This is done by merging the models at each iteration in the
+      xcat-transitions files.
 
-  sppl-mi:
-    desc: "Calculates MI from each SPN checkpoint."
+      NOTE: The :transitions-paths argument requires special quoting. First we are passing double
+      quotes to the Clojure via the single-quoted double-quotes [e.g. '"'] on both ends of the
+      argument. This is so the inner contents gets treated as a string by Clojure. Then we are
+      double-quoting the bash command, [e.g. "$(find...)"] so that shell does not try to evaluate
+      the paths that are produced from the command. Instead it will be passed as text to Clojure.
     cmd:
       - >-
-        parallel mkdir -p data/sppl/mi/checkpoints/{}
-        :::: <(find data/sppl/checkpoints/sample-* -type d | cut -d/ -f4)
-      - >-
-        parallel $(bin/param parallel.flags)
-        'python scripts/sppl_mi.py
-        --model {1}
-        --data data/ignored.csv
-        --mapping-table data/mapping-table.edn
-        --seed {2}
-        --output data/sppl/mi/checkpoints/{3}'
-        :::: <(find data/sppl/checkpoints/sample-* -type f)
-        ::::+ <(find data/sppl/checkpoints/sample-* -type f | cut -d/ -f4 | grep -o -E '[0-9]+')
-        ::::+ <(find data/sppl/checkpoints/sample-* -type f | cut -d/ -f4-5)
-    params:
-      - parallel.flags
-      - mi.configs
+        clojure -X inferenceql.auto-modeling.stream.xcat/transitions-merge
+        :transitions-paths '"'"$(find data/xcat/transitions -type f | sort)"'"'
+        > data/xcat/transitions-merged.json
     deps:
-      - data/ignored.csv
-      - data/sppl/checkpoints
-      - data/mapping-table.edn
-      - scripts/sppl_import_check.py
+      - data/xcat/transitions
     outs:
-      - data/sppl/mi/checkpoints/
+      - data/xcat/transitions-merged.json
 
-  sppl-mi-merge:
-    desc: "Merges MI outputs from SPN checkpoints corresponding to a single CrossCat sample."
+  xcat-transitions-sample:
+    desc: >
+      Samples 1000 points from the ensemble of xcat models at each iteration. Each sample is
+      produced using a model chosen randomly from the ensemble. The collection of samples produced
+      is a transit-encoded string of a clojure collection.
+    cmd: >-
+      clojure -X inferenceql.auto-modeling.stream.xcat/transitions-sample
+      :schema-edn data/schema.edn
+      :transitions-merged data/xcat/transitions-merged.json
+      > data/xcat/transitions-samples.json
+    params:
+      - params-stream.yaml:
+          - allow_negative_simulations
+    deps:
+      - data/schema.edn
+      - data/xcat/transitions-merged.json
+    outs:
+      - data/xcat/transitions-samples.json
+
+  xcat-transitions-sample-compress:
+    desc: >
+      Compresses the transit-encoded string of samples using lz-string.
     cmd:
-      - mkdir -p data/sppl/mi/transitions/
       - >-
-        parallel "jq --slurp '.' {1}/t-*.json > data/sppl/mi/transitions/{2}.json"
-        :::: <(find data/sppl/mi/checkpoints/sample-* -type d)
-        ::::+ <(find data/sppl/mi/checkpoints/sample-* -type d | cut -d/ -f5)
+        node lz-compress.js data/xcat/transitions-samples.json
+        > data/xcat/transitions-samples.lzstring.json
     deps:
-      - data/sppl/mi/checkpoints/
+      - data/xcat/transitions-samples.json
     outs:
-      - data/sppl/mi/transitions/
+      - data/xcat/transitions-samples.lzstring.json
 
-  sppl-mi-merge-phase-2:
-    desc: "Merges MI outputs from multiple CrossCat samples."
-    cmd: >
-      jq --slurp '.' data/sppl/mi/transitions/sample-*.json >  data/sppl/mi/transitions-merged.json
+  ### Stages related to converting XCat reconds to Javascript programs.
+
+  mmix-transitions-import:
+    desc: >
+      Converts the sequences of xcat-model checkpoints found in transitions files into sequences
+      mmix specs. Each transitions file will become a transit-encoded string of a clojure collection
+      of mmix-specs.
+    cmd:
+      - mkdir -p data/mmix/transitions
+      - >-
+        parallel ${parallel.flags}
+        'clojure -X inferenceql.auto-modeling.stream.mmix/transitions-import
+        :transitions-path {1}
+        > data/mmix/transitions/{2}'
+        :::: <(find data/xcat/transitions -type f | sort)
+        ::::+ <(find data/xcat/transitions -type f | sort | cut -d/ -f4)
     deps:
-      - data/sppl/mi/transitions/
+      - data/xcat/transitions
     outs:
-      - data/sppl/mi/transitions-merged.json
+      - data/mmix/transitions
 
-  ## QC-related stages.
-
-  sppl-sample:
-    cmd: >
-      python scripts/sppl_sample.py
-      --model data/sppl/merged.json
-      --data data/ignored.csv
-      --sample_count $(bin/param qc.sample_count)
-      > qc/samples/samples-virtual.edn
+  jsprogram-transitions-import:
+    desc: >
+      Produces a sequences of javascript programs (strings) representing the model encoded by
+      multimix specs. A sequence is produced for each crosscat sample.
+    cmd:
+      - mkdir -p data/jsprogram/transitions
+      - >-
+        parallel ${parallel.flags}
+        'clojure -X inferenceql.auto-modeling.stream.jsmodel.import/transitions-import
+        :transitions-path {1}
+        > data/jsprogram/transitions/{2}'
+        :::: <(find data/mmix/transitions -type f | sort)
+        ::::+ <(find data/mmix/transitions -type f | sort | cut -d/ -f4)
     deps:
-      - data/sppl/merged.json
-      - data/ignored.csv
+      - data/mmix/transitions
     outs:
-      - qc/samples/samples-virtual.edn
+      - data/jsprogram/transitions
 
-  qc-tag-samples:
-    cmd: >
-      clojure -X inferenceql.auto-modeling.qc.samples/tag
-      :data data/ignored.csv
-      :schema data/schema.edn
-      :samples-virtual qc/samples/samples-virtual.edn
-      > qc/samples/samples.edn
+  jsprogram-transitions-merge:
+    desc: >
+      This produces ensembles of javascript programs (strings) by merging the programs found at
+      each iteration in the sequences of programs produced for each crosscat sample.
+    cmd:
+      - >-
+        clojure -X inferenceql.auto-modeling.stream.jsmodel.import/transitions-merge
+        :transitions-paths '"'"$(find data/jsprogram/transitions -type f | sort)"'"'
+        > data/jsprogram/transitions-merged.json
     deps:
-      - data/ignored.csv
-      - data/schema.edn
-      - qc/samples/samples-virtual.edn
-      - src/inferenceql/auto_modeling/qc/samples.clj
+      - data/jsprogram/transitions
     outs:
-      - qc/samples/samples.edn
+      - data/jsprogram/transitions-merged.json
 
-  qc-dashboard-spec:
-    cmd: >
-      clojure -X inferenceql.auto-modeling.qc.dashboard/spec
-      :samples qc/samples/samples.edn
-      :schema data/schema.edn
-      :correlation data/correlation.json
-      > qc/specs/qc-dashboard.vl.json
+  ### Stages related to building the iql.viz.stream.
+  
+  iql.viz.stream-source:
+    desc: "Checks out the source tree for the iql.viz.stream app."
+    wdir: learning-dashboard/
+    cmd:
+      - rm -rf source
+      - mkdir source
+      - >-
+        git clone -b main --single-branch --depth 1
+        git@github.com:probcomp/inferenceql.viz.stream.git source/
+    outs:
+      - source/index.html
+      - source/resources/config-template.edn
+
+  iql.viz.stream-transitions-shorten-ensemble:
+    desc: >
+      Shortens the size of the ensembles in the sequence of ensembles. Each ensemble is shortened
+      to only have 3 xcat models (transit-encoded strings). The new sequences of ensembles is copied
+      over as a temp-resource for iql.viz.stream.
+    cmd:
+      - >-
+        clojure -X inferenceql.auto-modeling.stream.xcat/transitions-shorten-ensemble
+        :transitions-merged data/xcat/transitions-merged.json
+        > learning-dashboard/source/temp-resources/transitions.json
+    deps:
+      - learning-dashboard/source/index.html # Ensures learning-dashboard-source tree is available.
+      - data/xcat/transitions-merged.json
+    outs:
+      - learning-dashboard/source/temp-resources/transitions.json
+
+  iql.viz.stream-config:
+    desc: "Creates a config.edn file for the iql.viz.stream app."
+    cmd:
+      - >-
+        clojure -X inferenceql.auto-modeling.stream.config/generate
+        :config learning-dashboard/source/resources/config-template.edn
+        :mapping-table data/mapping-table.edn
+        :transitions-merged data/xcat/transitions-merged.json
+        > learning-dashboard/source/resources/config.edn
     params:
-      - qc.columns
+      - params-stream.yaml:
+          - slider_text
+          - allow_negative_simulations
+          - numerical_ranges
     deps:
-      - qc/samples/samples.edn
+      - learning-dashboard/source/resources/config-template.edn
+      - data/xcat/transitions-merged.json
+    outs:
+      - learning-dashboard/source/resources/config.edn
+
+  iql.viz.stream-resources:
+    desc: "Copies various resources and temp-resources to the iql.viz.stream app."
+    cmd:
+      - cp data/ignored.csv learning-dashboard/source/resources/
+      - cp data/schema.edn learning-dashboard/source/resources/
+      - >-
+        cp data/xcat/transitions-samples.lzstring.json
+        learning-dashboard/source/temp-resources/transitions-samples.json
+      - >-
+        cp data/cgpm/dep-prob/transitions-merged.json
+        learning-dashboard/source/temp-resources/mutual-info.json
+      - >-
+        cp data/jsprogram/transitions-merged.json
+        learning-dashboard/source/temp-resources/js-program-transitions.json
+    deps:
+      - data/ignored.csv
       - data/schema.edn
-      - data/correlation.json
-      - src/inferenceql/auto_modeling/qc/dashboard.clj
-      - src/inferenceql/auto_modeling/qc/util.clj
+      - data/xcat/transitions-merged.json
+      - data/xcat/transitions-samples.lzstring.json
+      - data/jsprogram/transitions-merged.json
+      - data/cgpm/dep-prob/transitions-merged.json
+      - learning-dashboard/source/temp-resources/transitions.json
+      - learning-dashboard/source/index.html
     outs:
-      - qc/specs/qc-dashboard.vl.json
+      - learning-dashboard/source/resources/ignored.csv
+      - learning-dashboard/source/resources/schema.edn
+      - learning-dashboard/source/temp-resources/transitions-samples.json
+      - learning-dashboard/source/temp-resources/js-program-transitions.json
+      - learning-dashboard/source/temp-resources/mutual-info.json
 
-  qc-dashboard-app:
-    cmd: >
-      clojure -X inferenceql.auto-modeling.qc.app/create
-      :template qc/templates/index.html
-      :spec qc/specs/qc-dashboard.vl.json
-      :renderer canvas
-      :title '"QC dashboard"'
-      > qc/app/qc-dashboard.html
+  iql.viz.stream-compile:
+    desc: "Compiles the iql.viz.stream app into a standalone JS app."
+    wdir: learning-dashboard/source/
+    cmd: make js-advanced-min
     deps:
-      - qc/templates/index.html
-      - qc/specs/qc-dashboard.vl.json
-      - src/inferenceql/auto_modeling/qc/app.clj
+      - resources/config.edn
+      - resources/ignored.csv
+      - resources/schema.edn
+      - temp-resources/transitions-samples.json
+      - temp-resources/js-program-transitions.json
+      - temp-resources/mutual-info.json
+      - temp-resources/transitions.json
     outs:
-      - qc/app/qc-dashboard.html
+      - out/
 
-  qc-splom-spec:
-    cmd: >
-      clojure -X inferenceql.auto-modeling.qc.splom/spec
-      :samples qc/samples/samples.edn
-      :schema data/schema.edn
-      :correlation data/correlation.json
-      > qc/specs/qc-splom.vl.json
-    params:
-      - qc.columns
+  iql.viz.stream-package:
+    desc: "Gathers all the files needed run the compiled iql.viz.stream app into a folder."
+    wdir: learning-dashboard/
+    cmd:
+      - rm -rf dist
+      - mkdir dist
+      - cp source/index.html dist
+      - cp -r source/resources dist
+      - cp -r source/out dist
     deps:
-      - qc/samples/samples.edn
-      - data/schema.edn
-      - data/correlation.json
-      - src/inferenceql/auto_modeling/qc/splom.clj
-      - src/inferenceql/auto_modeling/qc/util.clj
+      - source/out/
     outs:
-      - qc/specs/qc-splom.vl.json
+      - dist/index.html
+      - dist/resources
+      - dist/out
 
-  qc-splom-app:
-    cmd: >
-      clojure -X inferenceql.auto-modeling.qc.app/create
-      :template qc/templates/index.html
-      :spec qc/specs/qc-splom.vl.json
-      :renderer canvas
-      :title '"QC scatter plot matrix"'
-      > qc/app/qc-splom.html
+  iql.viz.stream-zip:
+    desc: "Compresses the files needed to run the compiled iql.viz.stream app."
+    wdir: learning-dashboard/
+    cmd:
+      - zip -rq dist.zip dist
     deps:
-      - qc/templates/index.html
-      - qc/specs/qc-splom.vl.json
-      - src/inferenceql/auto_modeling/qc/app.clj
+      - dist/index.html
+      - dist/resources
+      - dist/out
     outs:
-      - qc/app/qc-splom.html
+      - dist.zip
+
+  iql.viz.stream-inline:
+    desc: >
+      Inlines all the iql.viz.stream files into a single html file.
+      NOTE: This stage may fail when the resources for iql.viz.stream are too large.
+    wdir: learning-dashboard/
+    cmd:
+      - inliner -n source/index.html > dist-inlined.html 2> /dev/null
+    deps:
+      - source/out/
+    outs:
+      - dist-inlined.html

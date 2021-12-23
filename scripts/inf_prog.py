@@ -27,7 +27,9 @@ def inf_prog(model):
     for t in range(model.incorporated_rows, model.T):
         if (t % num_rows_col_insert) == 1:
             if len(model.other_cols()) > 0:
-                model.insert_cols([model.random_other_col()])
+                # Next column needs to be selected deterministically
+                # to be consistent across all streams.
+                model.insert_cols([model.other_cols()[0]])
         model.insert_rows([t])
         if t in [5, 10, 15]:
             model.transition_rows()
