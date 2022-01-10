@@ -3,6 +3,10 @@ on:
   schedule:
     - cron: 0 12 * * 1 # Every Monday at 8 AM EST (noon UTC)
   workflow_dispatch:
+env:
+  # DVC will use the shell defined by this variable or /bin/sh. We need DVC to use bash because
+  # dvc-stream.yaml uses a bash feature -- process substitution.
+  SHELL: /bin/bash
 jobs:
   run-smoke-tests:
     runs-on: ubuntu-latest
