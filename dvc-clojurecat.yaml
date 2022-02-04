@@ -47,28 +47,39 @@ stages:
 
   clojurecat:
     cmd: >
-      mkdir -p data/xcat &&
-      clojure -M -m inferenceql.inference.scripts.clojurecat
+      mkdir -p data/xcat/samples &&
+      seq 0 $(($(bin/param sample_count) - 1)) | parallel $(bin/param parallel.flags)
+      'clojure -M -m inferenceql.inference.scripts.clojurecat
       -c data/clojurecat-config.edn
       -d data/ignored.csv
       -s data/schema.edn
-      -o data/xcat/model.edn
+      -o data/xcat/samples/sample{}.edn'
     deps:
       - data/clojurecat-config.edn
       - data/ignored.csv
       - data/schema.edn
     outs:
-      - data/xcat/model.edn
+      - data/xcat/samples
+
+  clojurecat-merge:
+    cmd: >
+      clj -X inferenceql.auto-modeling.clojurecat/merge
+      :models data/xcat/samples
+      :out data/xcat/ensemble.edn
+    deps:
+      - data/xcat/samples
+    outs:
+      - data/xcat/ensemble.edn
 
   clojurecat-sample:
     cmd: >
       clojure -X inferenceql.auto-modeling.qc.samples/sample-xcat
-      :model data/xcat/model.edn
+      :model data/xcat/ensemble.edn
       :data data/ignored.csv
       :sample-count $(bin/param qc.sample_count || echo nil)
       > qc/samples/samples-virtual.edn
     deps:
-      - data/xcat/model.edn
+      - data/xcat/ensemble.edn
       - data/ignored.csv
     params:
       - qc.sample_count

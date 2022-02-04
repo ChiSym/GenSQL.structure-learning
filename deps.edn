@@ -8,7 +8,7 @@
         com.cognitect/transit-clj {:mvn/version "1.0.324"}
         selmer/selmer {:mvn/version "1.12.40"}
         probcomp/inferenceql.inference {:git/url "git@github.com:probcomp/inferenceql.inference.git"
-                                        :sha "fd40816ceb283880db2b87b3ce5a52dcce7263ad"}
+                                        :sha "a8ec8e08c0f2cfa8a1397bcc80beb00819ba3a4e"}
         probcomp/inferenceql.query {:git/url "git@github.com:probcomp/inferenceql.query.git"
                                     :sha "34420acf3b9204a3a0569b7ffe5196d27cec56e3"}}
  :aliases {:test {:extra-paths ["test"]
