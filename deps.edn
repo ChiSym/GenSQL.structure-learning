@@ -12,6 +12,9 @@
         probcomp/inferenceql.query {:git/url "git@github.com:probcomp/inferenceql.query.git"
                                     :sha "34420acf3b9204a3a0569b7ffe5196d27cec56e3"}}
  :aliases {:test {:extra-paths ["test"]
-                  :extra-deps {com.lambdaisland/kaocha-cljs {:mvn/version "1.0.103"}
-                               lambdaisland/kaocha {:mvn/version "1.0.887"}
-                               org.clojure/test.check {:mvn/version "1.1.0"}}}}}
+                  :extra-deps {org.clojure/test.check {:mvn/version "1.1.1"}}}
+           :clj-test {:extra-deps {io.github.cognitect-labs/test-runner {:git/tag "v0.5.0" :git/sha "48c3c67f98362ba1e20526db4eeb6996209c050a"}}
+                      :main-opts ["-m" "cognitect.test-runner"]
+                      :exec-fn cognitect.test-runner.api/test}
+           :cljs-test {:extra-deps {olical/cljs-test-runner {:mvn/version "3.8.0"}}
+                       :main-opts ["-m" "cljs-test-runner.main"]}}}
