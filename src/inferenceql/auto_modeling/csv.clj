@@ -1,7 +1,7 @@
 (ns inferenceql.auto-modeling.csv
-  (:require [clojure.data.csv :as csv]
-            [clojure.edn :as edn]
-            [clojure.pprint :as pprint]))
+  (:refer-clojure :exclude [dissoc])
+  (:require [clojure.edn :as edn]
+            [inferenceql.auto-modeling.vector :as vector]))
 
 (defn parse-number
   "Attempts to parse string s as a number or `nil`. Throws a
@@ -82,37 +82,39 @@
                              (xf result (vec @ks))))]
             (xf result input))))))))
 
-(defn lookup-table
-  "Constructs a lookup table for a sequence of maps `ms`, which maps each "
-  [ks ms]
-  (zipmap (sort (into []
-                      (comp (keep #(get % ks))
-                            (distinct))
-                      ms))
-          (iterate inc 0)))
+(defn numericalizer
+  "Returns a stateful numericalization function. When called with 1 argument the
+  function will return a unique integer for that value. Subsequent calls to the
+  function on the same value will return the same integer. When called with 0
+  arguments the function will return a map from values to their unique integers
+  across all invocations of the function. After the function has been called
+  with 0 arguments subsequent calls to the function will throw an exception."
+  []
+  (let [i (volatile! 0)
+        x->n (transient {})]
+    (fn
+      ([]
+       (persistent! x->n))
+      ([x]
+       (when-not (contains? x->n x)
+         (assoc! x->n x @i)
+         (vswap! i inc))
+       (get x->n x)))))
 
-(defn numericalize
-  [columns rows]
-  (let [table (zipmap columns
-                      (map #(lookup-table % rows)
-                           columns))
-        rows (mapv (fn [row]
-                     (reduce (fn [row column]
-                               (cond-> row
-                                 (contains? row column) (update column (get table column))))
-                             row
-                             columns))
-                   rows)]
-    {:rows rows
-     :table table}))
-
-(defn numericalize-csv
-  [{:keys [columns out]}]
-  (with-open [reader *in*]
-    (let [rows (as-maps (csv/read-csv reader))
-          {:keys [rows table]} (numericalize columns rows)]
-      (spit (str out) table)
-      (pprint/pprint rows))))
+(defn dissoc
+  ([csv] csv)
+  ([csv k]
+   (let [headers (first csv)
+         index (.indexOf headers k)]
+     (if-not (nat-int? index)
+       csv
+       (map #(vector/remove-nth % index)
+            csv))))
+  ([csv k & ks]
+   (let [csv (dissoc csv k)]
+     (if ks
+       (recur csv (first ks) (next ks))
+       csv))))
 
 (defn heuristic-coerce
   [& coll]
