@@ -1,5 +1,5 @@
-{:deps {org.clojure/clojure {:mvn/version "1.10.3"}
-        org.clojure/clojurescript {:mvn/version "1.10.866"}
+{:deps {org.clojure/clojure {:mvn/version "1.11.1"}
+        org.clojure/clojurescript {:mvn/version "1.11.54"}
         org.clojure/data.csv {:mvn/version "1.0.0"}
         clj-commons/clj-yaml {:mvn/version "0.7.106"}
         cheshire/cheshire {:mvn/version "5.10.0"}
