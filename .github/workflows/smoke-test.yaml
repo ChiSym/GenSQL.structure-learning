@@ -25,10 +25,6 @@ jobs:
         uses: actions/checkout@v2
       - name: Install ws
         run: npm install ws
-      - name: Add SSH key
-        uses: webfactory/ssh-agent@v0.4.1
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_INFERENCEQL_MACHINE_USER }}
       - name: Cache m2
         uses: actions/cache@v2
         with:
