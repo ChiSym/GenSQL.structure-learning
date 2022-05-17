@@ -7,10 +7,10 @@
         medley/medley {:mvn/version "1.3.0"}
         com.cognitect/transit-clj {:mvn/version "1.0.324"}
         selmer/selmer {:mvn/version "1.12.40"}
-        probcomp/inferenceql.inference {:git/url "https://github.com/OpenIQL/inferenceql.inference.git"
-                                        :sha "6938e350673f93bc8383975d92e305ff6872cf61"}
-        probcomp/inferenceql.query {:git/url "https://github.com/OpenIQL/inferenceql.query.git"
-                                    :sha "37f8286b1950a6fcdc1fda4b727d08e24a833de4"}}
+        openiql/inferenceql.inference {:git/url "https://github.com/OpenIQL/inferenceql.inference.git"
+                                       :sha "6938e350673f93bc8383975d92e305ff6872cf61"}
+        openiql/inferenceql.query {:git/url "https://github.com/OpenIQL/inferenceql.query.git"
+                                   :sha "37f8286b1950a6fcdc1fda4b727d08e24a833de4"}}
  :aliases {:test {:extra-paths ["test"]
                   :extra-deps {org.clojure/test.check {:mvn/version "1.1.1"}}}
            :clj-test {:extra-deps {io.github.cognitect-labs/test-runner {:git/tag "v0.5.0" :git/sha "48c3c67f98362ba1e20526db4eeb6996209c050a"}}
