@@ -8,8 +8,7 @@
 (defn tag
   "Adds a collection attribute to both observed data and simulated data."
   [{data-path :data samples-virtual-path :samples-virtual}]
-  (let [coercer (fn [row] (reduce-kv (fn [m k v] (assoc m (keyword k) v)) {} row))
-        data (map coercer (io/slurp-csv (str data-path)))
+  (let [data (map #(update-keys % keyword) (io/slurp-csv (str data-path)))
         samples-virtual (-> samples-virtual-path str slurp edn/read-string)
         out (concat (map #(assoc % :collection "virtual") samples-virtual)
                     (map #(assoc % :collection "observed") data))]
