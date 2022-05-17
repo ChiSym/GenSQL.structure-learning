@@ -1,6 +1,7 @@
 {:deps {org.clojure/clojure {:mvn/version "1.11.1"}
         org.clojure/clojurescript {:mvn/version "1.11.54"}
         org.clojure/data.csv {:mvn/version "1.0.0"}
+        org.clojure/data.json {:mvn/version "2.4.0"}
         clj-commons/clj-yaml {:mvn/version "0.7.106"}
         cheshire/cheshire {:mvn/version "5.10.0"}
         cljstache/cljstache {:mvn/version "2.0.6"}
