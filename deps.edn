@@ -10,6 +10,8 @@
         selmer/selmer {:mvn/version "1.12.40"}
         openiql/inferenceql.inference {:git/url "https://github.com/OpenIQL/inferenceql.inference.git"
                                        :sha "6938e350673f93bc8383975d92e305ff6872cf61"}
+        openiql/inferenceql.gpm.spn {:git/url "https://github.com/OpenIQL/inferenceql.gpm.spn.git"
+                                       :sha "f3e740433e9537e34a3ebfa704f90cfca79736e3"}
         openiql/inferenceql.query {:git/url "https://github.com/OpenIQL/inferenceql.query.git"
                                    :sha "37f8286b1950a6fcdc1fda4b727d08e24a833de4"}}
  :aliases {:test {:extra-paths ["test"]
