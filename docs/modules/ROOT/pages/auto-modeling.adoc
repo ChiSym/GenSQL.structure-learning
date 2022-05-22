@@ -95,6 +95,14 @@ The premise of the qc-plots is following: if our model has truly learned the mul
 
 NOTE: The plots support a number of features including panning, zooming, cross-selection, and details on hover. There are also other options in the options menu. You can find more details in the QC section of this guide.
 
+== Querying the model
+There are different ways to query automatically built models from Python,
+Clojure and JavaScript. The easiest way to query modelsType the following and follow instructions:
+[source,bash]
+----
+query
+----
+
 == Configuring the pipeline
 
 === Data specifications/settings
