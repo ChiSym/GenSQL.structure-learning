@@ -1,17 +1,16 @@
 (ns inferenceql.auto-modeling.query-server
   "Start an SPN server to run queries against an automatically built model."
-  (:require [libpython-clj2.python :as python]
-            [inferenceql.gpm.spn :as spn]
+  (:require [inferenceql.gpm.spn :as spn]
             [inferenceql.query.io :as qio]
             [inferenceql.query.db :as db]
             [inferenceql.query.server :as server]
-            [inferenceql.query :as query]
-            [ring.adapter.jetty :as jetty]))
+            [ring.adapter.jetty :as jetty]
+            [clojure.string :as cljstr]))
 
 ; XXX do I still need this?
 (defn rem-empty [row]
   (into {}
-        (remove #(clojure.string/blank? (str (val %))))
+        (remove #(cljstr/blank? (str (val %))))
         row))
 
 (def data (map rem-empty (qio/slurp-csv "data/data.csv")))
