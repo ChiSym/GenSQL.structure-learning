@@ -1,9 +1,7 @@
 #!/bin/bash -x
 
-# This script for produces a zip-archive of the auto-modeling repo with all git url based
-# dependencies cloned into the auto-modeling repo itself and the main deps.edn file changed
-# accordingly.
-
+# This script for produces a zip-archive of the auto-modeling repo including
+# documentation
 script_base_dir=$(basename -- "$PWD")
 # This script should be run from the inferenceql.auto-modeling root directory.
 # Not from inside the bin/ directory or elsewhere.
@@ -12,39 +10,22 @@ if [ "$script_base_dir" != "inferenceql.auto-modeling" ]; then
     exit 1
 fi
 
-package_dir='../iql-auto-modeling-package/'
+package_dir='../InferenceQL/'
 
 rm -rf ${package_dir}
 mkdir -p ${package_dir}
 cp -r . ${package_dir}
-
-clojure -X inferenceql.auto-modeling.package/local-git-deps \
-  < deps.edn \
-  > ${package_dir}/deps.edn
-
-iql_inference_hash=$(clojure -X inferenceql.auto-modeling.package/get-sha \
-  < deps.edn \
-  :dep-name probcomp/inferenceql.inference)
-
-iql_query_hash=$(clojure -X inferenceql.auto-modeling.package/get-sha \
-  < deps.edn \
-  :dep-name probcomp/inferenceql.query)
 
 cd ${package_dir}
 # Remove all untracked and ignored files and folders.
 git clean -d -x -f
 # Make a clean data dir.
 mkdir data
+mkdir documentation
+cp -r ../openiql.github.io/build/site/* documentation/
 
-git clone git@github.com:probcomp/inferenceql.inference.git
-cd inferenceql.inference
-git -c 'advice.detachedHead=false' checkout ${iql_inference_hash}
-
+pwd
 cd ..
-git clone git@github.com:probcomp/inferenceql.query.git
-cd inferenceql.query
-git -c 'advice.detachedHead=false' checkout ${iql_query_hash}
 
-cd ../../inferenceql.auto-modeling
-zip -r iql-auto-modeling-package.zip ${package_dir}
-rm -rf ${package_dir}
+zip -r InferenceQL.v0.02.zip InferenceQL
+rm -rf InferenceQL
