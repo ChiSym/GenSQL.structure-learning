@@ -1,19 +1,18 @@
 (ns inferenceql.auto-modeling.query-server
   "Start an SPN server to run queries against an automatically built model."
   (:require [inferenceql.gpm.spn :as spn]
-            [inferenceql.query.io :as qio]
+            [inferenceql.query.io :as io]
             [inferenceql.query.db :as db]
             [inferenceql.query.server :as server]
             [ring.adapter.jetty :as jetty]
-            [clojure.string :as cljstr]))
+            [clojure.string :as string]))
 
-; XXX do I still need this?
 (defn rem-empty [row]
   (into {}
-        (remove #(cljstr/blank? (str (val %))))
+        (remove #(string/blank? (str (val %))))
         row))
 
-(def data (map rem-empty (qio/slurp-csv "data/data.csv")))
+(def data (map rem-empty (io/slurp-csv "data/data.csv")))
 (def model_spn (spn/slurp "data/sppl/merged.json"))
 
 (def db (as-> (if false

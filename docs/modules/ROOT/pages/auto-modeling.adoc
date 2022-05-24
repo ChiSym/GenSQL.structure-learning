@@ -41,6 +41,7 @@ and install the dependencies by running:
 ----
 nix-shell
 ----
+WARNING: on macOS, this step can take up to an hour. The reason is that certain dependencies get compiled from scratch. It will only be slow once. The second time you run the `nix-shell` command, it will succeed instantaneously.
 
 == Building your first model
 
