@@ -183,7 +183,7 @@ stages:
         parallel ${parallel.flags}
         'clojure -X inferenceql.auto-modeling.stream.xcat/transitions-import
         :transitions-path {1}
-        :data-csv data/nullified.csv
+        :data-csv data/ignored.csv
         :mapping-table data/mapping-table.edn
         :numericalized-csv data/numericalized.csv
         :schema-edn data/schema.edn
@@ -193,7 +193,7 @@ stages:
     deps:
       - data/cgpm/transitions
       - data/mapping-table.edn
-      - data/nullified.csv
+      - data/ignored.csv
       - data/numericalized.csv
       - data/schema.edn
       - src/inferenceql/auto_modeling/xcat.clj
