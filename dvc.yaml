@@ -1,11 +1,18 @@
 stages:
+  validate-column-names:
+    cmd: bin/validate.sh
+    deps:
+      - data/data.csv
+    outs:
+      - data/validated.csv
+
   nullify:
     cmd: >
       clojure -X inferenceql.auto-modeling.main/nullify
-      < data/data.csv
+      < data/validated.csv
       > data/nullified.csv
     deps:
-      - data/data.csv
+      - data/validated.csv
     params:
       - nullify
     outs:
