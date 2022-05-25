@@ -119,6 +119,7 @@ in pkgs.mkShell {
     pkgs.clojure
     pkgs.openjdk11
     pkgs.parallel
+    pkgs.xsv
     pkgs.yarn
     pythonWithPackages
   ];
