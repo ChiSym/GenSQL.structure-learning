@@ -16,7 +16,7 @@
                             {:x 2 :y "c"}]))))
 
 (deftest guess-stattype
-  (are [stattype coll] (= stattype (schema/guess-stattype coll))
+  (are [stattype coll] (= stattype (schema/guess-stattype :ignore coll))
     :ignore    [0 0 0]
     :ignore    [1 2 3]
     :nominal   [1 "2" 3]
@@ -29,6 +29,7 @@
           :x :numerical
           :y :nominal}
          (schema/guess
+           :ignore
           [{:id 0 :x 0.0 :y "a"}
            {:id 1 :x 1.0 :y "b"}
            {:id 2 :x 2.0 :y "c"}]))))

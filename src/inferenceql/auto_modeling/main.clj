@@ -23,13 +23,15 @@
 
 (defn guess-schema
   [_]
-  (let [params-schema (:schema (dvc/yaml))
+  (let [params (dvc/yaml)
+        params-schema (:schema params)
+        default-stattype (get params :default-stat-type  :ignore)
         guessed-schema (->> (csv/read-csv *in*)
                             (sequence (comp (iql.csv/as-maps)
                                             (map #(medley/remove-vals (every-pred string? string/blank?) %))
                                             (map #(medley/remove-keys (set (keys params-schema)) %))))
                             (iql.csv/heuristic-coerce-all)
-                            (schema/guess))
+                            (schema/guess default-stattype))
         schema (merge guessed-schema params-schema)]
     (prn schema)))
 
