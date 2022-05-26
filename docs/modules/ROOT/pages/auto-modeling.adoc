@@ -112,9 +112,12 @@ There are a variety of settings in the `params.yaml` file in the auto-modeling r
 
 ==== schema
 
-Auto-modeling tries to guess the data types in your CSV. You can see which data types are guessed by running `dvc repro -f guess-schema` and then opening `data/schema.edn`.
+Auto-modeling tries to guess the statistical data types in your CSV. You can see
+which statistical types are guessed by running `dvc repro -f guess-schema` and then opening `data/schema.edn`.
 
 If you want to manually set the data types for one or more columns you can do that in `schema` section in `params.yaml`.
+
+TIP: If a statistical type cannot be guessed with confidence, auto-modeling chooses to ignore this column. You can add `default-stat-type: numerical` or `default-stat-type: nominal` if you prefer to define the stattypes of all columns that can't be guessed. This can save you some time when a lot of columns are ignored.
 
 === nullify
 
