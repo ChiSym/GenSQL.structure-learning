@@ -20,7 +20,7 @@
 
 (defn guess-stattype
   "Guess the statistical type of a collection of values."
-  [coll]
+  [default-type coll]
   (let [max-categories 50
         dv (distinct coll) ; Distinct vals.
         num-dv (count dv)
@@ -54,14 +54,14 @@
             :numerical)
 
           :else
-          :ignore)))
+          default-type)))
 
 (defn guess
   "Guess a schema for a collection of maps."
-  [coll]
+  [default-type coll]
   (let [columns (into #{} (mapcat keys) coll)]
     (zipmap columns
-            (map #(guess-stattype (column % coll))
+            (map #(guess-stattype default-type (column % coll))
                  columns))))
 
 (defn loom
