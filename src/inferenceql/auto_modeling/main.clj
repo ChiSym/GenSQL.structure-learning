@@ -69,9 +69,11 @@
         [columns & rows]  (csv/read-csv *in*)
         numericalize-row (fn [row]
                            (map (fn [column val]
-                                  (if-let [numericalize (get numericalizers column)]
-                                    (numericalize val)
-                                    val))
+                                  (if (string/blank? val)
+                                    ""
+                                    (if-let [numericalize (get numericalizers column)]
+                                      (numericalize val)
+                                      val)))
                                 columns
                                 row))
         numericalized-csv (conj (map numericalize-row rows) columns)]
