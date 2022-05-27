@@ -54,7 +54,7 @@
             :numerical)
 
           :else
-          default-type)))
+          (keyword default-type))))
 
 (defn guess
   "Guess a schema for a collection of maps."
