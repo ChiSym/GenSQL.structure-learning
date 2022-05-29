@@ -121,6 +121,9 @@ class Streamcat:
             # This is a stub. For SMC, we need to return a real weight here.
             return 0.0
 
+    def transition(self, N):
+        self.state.transition(N=N, progress=False)
+
     def transition_rows(self, rows=None, save_checkpoint=False):
         self.state.transition_view_rows(rows=rows)
         self.state.transition_view_alphas()
