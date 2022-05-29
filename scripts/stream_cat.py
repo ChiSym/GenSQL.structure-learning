@@ -121,20 +121,22 @@ class Streamcat:
             # This is a stub. For SMC, we need to return a real weight here.
             return 0.0
 
-    def transition_rows(self, rows=None):
+    def transition_rows(self, rows=None, save_checkpoint=False):
         self.state.transition_view_rows(rows=rows)
         self.state.transition_view_alphas()
         self.state.transition_dim_hypers()
-        self.save_checkpoint()
+        if save_checkpoint:
+            self.save_checkpoint()
 
-    def transition_cols(self, cols=None):
+    def transition_cols(self, cols=None, save_checkpoint=False):
         if cols is None:
             cols = self.incorporated_cols
         col_ids = [cid for cid, col_name in enumerate(cols)]
         self.rng.shuffle(col_ids)
         for col_id in col_ids:
             self.state.transition_dims(col_id)
-            self.save_checkpoint()
+            if save_checkpoint:
+                self.save_checkpoint()
         self.state.transition_crp_alpha()  # Do I need this here?
 
     def transition_hypers(self):
@@ -142,16 +144,16 @@ class Streamcat:
         self.state.transition_view_alphas()
         self.state.transition_dim_hypers()
 
-    def insert_rows(self, rows):
+    def insert_rows(self, rows, save_checkpoint=False):
         for row in rows:
             self.safe_incorporate_row(row)
-            self.transition_rows([row])
+            self.transition_rows([row], save_checkpoint=save_checkpoint)
 
-    def insert_cols(self, cols):
+    def insert_cols(self, cols, save_checkpoint=False):
         for col in cols:
             weigth = self.safe_incorporate_col(col)
             if weigth is not None:
-                self.transition_cols([cols])
+                self.transition_cols([cols], save_checkpoint=save_checkpoint)
 
     def other_cols(self):
         return [c for c in self.col_names if c not in self.incorporated_cols]
