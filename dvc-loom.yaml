@@ -12,7 +12,7 @@ stages:
       < data/validated.csv
       > data/nullified.csv
     deps:
-      - data/data.csv
+      - data/validated.csv
     params:
       - nullify
     outs:
