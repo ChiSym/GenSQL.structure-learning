@@ -117,6 +117,8 @@ in pkgs.mkShell {
   buildInputs = [
     dvc
     pkgs.clojure
+    pkgs.gh
+    pkgs.git
     pkgs.openjdk11
     pkgs.parallel
     pkgs.xsv
