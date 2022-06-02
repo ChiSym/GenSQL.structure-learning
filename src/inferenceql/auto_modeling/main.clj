@@ -34,8 +34,8 @@
                             (schema/guess default-stattype))
         schema (merge guessed-schema params-schema)]
     (assert (not (every? #{:ignore} (vals schema)))
-            (str "The statistical types of the columns in data.csv can't be guessed confidently.\nAll columns are ignored. Set statistical types manually in params.yaml to fix this"
-                 (pr-str schema)))))
+            "The statistical types of the columns in data.csv can't be guessed confidently.\nAll columns are ignored. Set statistical types manually in params.yaml to fix this")
+    (prn schema)))
 
 (defn loom-schema
   [_]
