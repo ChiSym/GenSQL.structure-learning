@@ -13,7 +13,7 @@
         openiql/inferenceql.gpm.spn {:git/url "https://github.com/OpenIQL/inferenceql.gpm.spn.git"
                                        :sha "f3e740433e9537e34a3ebfa704f90cfca79736e3"}
         openiql/inferenceql.query {:git/url "https://github.com/OpenIQL/inferenceql.query.git"
-                                   :sha "37f8286b1950a6fcdc1fda4b727d08e24a833de4"}}
+                                   :sha "933d45293c1929b307a40554d783010fda18b461"}}
  :aliases {:test {:extra-paths ["test"]
                   :extra-deps {org.clojure/test.check {:mvn/version "1.1.1"}}}
            :clj-test {:extra-deps {io.github.cognitect-labs/test-runner {:git/tag "v0.5.0" :git/sha "48c3c67f98362ba1e20526db4eeb6996209c050a"}}

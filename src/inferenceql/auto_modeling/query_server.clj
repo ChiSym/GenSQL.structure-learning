@@ -81,9 +81,9 @@
                                       :predictive_relationships deps-table
                                       (keyword model-name) model_spn})))
 
-(defn run [_]
-  (println "starting server...")
-  (let [app (server/app db)]
+(defn run [{:keys [lang] :as m}]
+  (println (str "starting server with language: " lang))
+  (let [app (server/app db :lang lang)]
     (jetty/run-jetty app {:port 3000 :join? false}))
   (println "... server is running!")
   (println "   Please visit https://observablehq.com/@iql/query-data-and-models-v001"))

@@ -126,5 +126,5 @@ in pkgs.mkShell {
     pythonWithPackages
   ];
 
-  shellHook = "alias query='clojure -X inferenceql.auto-modeling.query-server/run'; export PYTHONPATH=${pythonWithPackages}/${pythonWithPackages.sitePackages}";
+  shellHook = "alias query='clojure -X inferenceql.auto-modeling.query-server/run :lang :permissive'; export PYTHONPATH=${pythonWithPackages}/${pythonWithPackages.sitePackages}";
 }
