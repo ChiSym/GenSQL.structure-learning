@@ -101,7 +101,7 @@ There are different ways to query automatically built models from Python,
 Clojure and JavaScript. The easiest way to query modelsType the following and follow instructions:
 [source,bash]
 ----
-query
+iql-query-server
 ----
 
 == Configuring the pipeline
