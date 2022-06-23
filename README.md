@@ -229,7 +229,7 @@ Your own datasets and models and can be swapped into this notebook.
 
 The first step is to add a clean data directory with your own csv.
 
-For the root directory of the auto-modeling repo, perform the following.
+For the root directory of the auto-modeling repository, perform the following.
 
 ```bash
 # Remove the data dir if it exists.
