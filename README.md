@@ -292,11 +292,11 @@ Each backend is encoded as a `yaml` file. When `dvc repro -f` is run, the YAML f
 * Yarn
 
 #### Settings
-The following settings in `params.yaml` allow you to control the inferece process using the default backend, CGPM.
+The following settings in `params.yaml` allow you to control the inference process using the default backend, CGPM.
 
 - `sample_count` — This lets you set the number of CrossCat models to learn, which together will comprise the ensemble.
 - `cgpm > minutes` — The amount of time (minutes) to spend on inference. Use this setting or `cgpm > iterations` but not both.
-- `cgpm > iterations` — The number CGPM interations to spend on inference. Use this setting or `cgpm > minutes` but not both.
+- `cgpm > iterations` — The number CGPM iterations to spend on inference. Use this setting or `cgpm > minutes` but not both.
 
 #### Outputs 
 
@@ -335,7 +335,7 @@ All the settings in `params.yaml` that apply to the CGPM backend also apply to t
 - `loom > extra_passes` — The number of extra inference passes to perform when learning structure.
 
 #### Outputs 
-The outputs produced are the same as those produced by the CGPM backend. Please see the ouputs section for that backend.
+The outputs produced are the same as those produced by the CGPM backend. Please see the outputs section for that backend.
 
 ### ClojureCat 
 
@@ -378,7 +378,7 @@ Unlike the CGPM and LOOM + CGPM backends. Only a single CrossCat model is produc
 #### How to use
 - Follow these steps
   - Open [this notebook](https://observablehq.com/d/a1cf7c842638a28a). TODO: replace this with a simpler starter notebook.
-  - Open the file attachements menu.
+  - Open the file attachments menu.
   - Replace the following files with the respective files from the auto-modeling file tree.
     - `nullified.csv` -- `data/nullified.csv`
     - `model.edn` -- Any one of the CrossCat models in `data/xcat` such as `data/xcat/sample.0.edn` or `data/xcat/sample.1.edn`.
