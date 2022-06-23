@@ -91,15 +91,15 @@
   with 0 arguments subsequent calls to the function will throw an exception."
   []
   (let [i (volatile! 0)
-        x->n (transient {})]
+        x->n (volatile! (transient {}))]
     (fn
       ([]
-       (persistent! x->n))
+       (persistent! @x->n))
       ([x]
-       (when-not (contains? x->n x)
-         (assoc! x->n x @i)
+       (when-not (contains? @x->n x)
+         (vswap! x->n assoc! x @i)
          (vswap! i inc))
-       (get x->n x)))))
+       (get @x->n x)))))
 
 (defn dissoc
   ([csv] csv)
