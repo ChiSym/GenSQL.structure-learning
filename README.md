@@ -409,7 +409,7 @@ Unlike the CGPM and LOOM + CGPM backends. Only a single CrossCat model is produc
 ## Using SPN models
 ### Background on SPPL and SPN 
 ### Starting IQL Query with an SPN
-### Querying on the commandline 
+### Querying on the command line 
 ### Starting a remote query server
 
 ## Misc 
