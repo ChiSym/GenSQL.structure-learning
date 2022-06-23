@@ -9,7 +9,7 @@ This guide will help you use the IQL auto-modeling project to build your own Cro
 - [Model-building backends](#model-building-backends)
   - [CGPM](#cgpm)
   - [Loom and CGPM](#loom-and-cgpm)
-  - [Clojurecat](#clojurecat)
+  - [ClojureCat](#clojurecat)
   - [Streaming Inference](#streaming-inference)
 - [Quality control plots](#quality-control-plots)
 - [Using CrossCat models](#using-crosscat-models)
@@ -337,7 +337,7 @@ All the settings in `params.yaml` that apply to the CGPM backend also apply to t
 #### Outputs 
 The outputs produced are the same as those produced by the CGPM backend. Please see the ouputs section for that backend.
 
-### Clojurecat 
+### ClojureCat 
 
 #### Key points 
 * Written in Clojure
