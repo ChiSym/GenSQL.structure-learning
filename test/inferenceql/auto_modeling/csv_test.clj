@@ -72,3 +72,15 @@
             []
             []]
            (csv/dissoc csv :a :b :c)))))
+
+(defspec numericalizer
+  (prop/for-all [coll (gen/vector gen/string)]
+    (let [numericalize! (csv/numericalizer)]
+      (doseq [n coll]
+        (numericalize! n))
+      (let [mapping (numericalize!)]
+        (is (= (set (distinct coll))
+               (set (keys mapping))))
+        (let [vals (vals mapping)]
+          (is (every? int? vals))
+          (is (distinct? vals)))))))
