@@ -127,7 +127,7 @@ wget [beat-19-url] > data/data.csv
 
 IQL auto-modeling is built around DVC (https://dvc.org/), a project that helps with version control of machine learning pipelines.
 
-The steps for building a model are encoded as dvc pipelines (see `dvc.yaml`) All we have to do is run the pipeline and dvc takes care of the rest. 
+The steps for building a model are encoded as DVC pipelines (see `dvc.yaml`) All we have to do is run the pipeline and DVC takes care of the rest. 
 
 From the root auto-modeling directory, we can run the following command to get a list of the pipeline stages and which files they will produce giving us an overview of the work that will be done to build the model.
 
@@ -227,7 +227,7 @@ Your own datasets and models and can be swapped into this notebook.
 
 ## Building a model with your own dataset
 
-The first step is to add a clean data directory with your own csv.
+The first step is to add a clean data directory with your own CSV.
 
 For the root directory of the auto-modeling repository, perform the following.
 
@@ -275,7 +275,7 @@ IQL Auto-modeling supports a number of model-building backends. The previous sec
 
 ### Switching between backends
 
-Each backend is encoded as a `yaml` file. When `dvc repro -f` is run, the yaml file for backend currently named `dvc.yaml` is run. To switch to a different backend, rename `dvc.yaml` to any temporary name. And rename the yaml file for the backend to you want to use to `dvc.yaml`.
+Each backend is encoded as a `yaml` file. When `dvc repro -f` is run, the YAML file for backend currently named `dvc.yaml` is run. To switch to a different backend, rename `dvc.yaml` to any temporary name. And rename the YAML file for the backend to you want to use to `dvc.yaml`.
 
 ### CGPM
 
@@ -283,7 +283,7 @@ Each backend is encoded as a `yaml` file. When `dvc repro -f` is run, the yaml f
 * Default backend 
 * Written in Python 
 * Robust 
-* DVC yaml filename: `dvc.yaml`
+* DVC YAML filename: `dvc.yaml`
 
 #### Requirements
 * Java 
@@ -344,7 +344,7 @@ The outputs produced are the same as those produced by the CGPM backend. Please 
 * Usable from both the JVM and the browser (JS environments)
 * Fewest requirements 
 * Experimental
-* DVC yaml filename: `dvc-clojurecat.yaml`
+* DVC YAML filename: `dvc-clojurecat.yaml`
 
 #### Requirements
 * Java 
@@ -365,7 +365,7 @@ Unlike the CGPM and LOOM + CGPM backends. Only a single CrossCat model is produc
 
 #### Key points 
 * Experimental
-* DVC yaml filename: `dvc-stream.yaml`
+* DVC YAML filename: `dvc-stream.yaml`
 
 ## Using CrossCat models
 
@@ -414,4 +414,4 @@ Unlike the CGPM and LOOM + CGPM backends. Only a single CrossCat model is produc
 
 ## Misc 
 ### Notes on Python dependencies and M1-macs.
-### Helpful dvc commands
+### Helpful DVC commands
