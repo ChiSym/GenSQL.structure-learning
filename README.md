@@ -21,94 +21,14 @@ This guide will help you use the IQL auto-modeling project to build your own Cro
 
 ## Setup dependencies 
 
-### Configure GitHub SSH keys
+IQL auto-modeling uses [Nix](https://nixos.org/) to manage dependencies. You can read more about Nix [here](https://nixos.org/explore.html). Installing dependencies is a two-step process:
 
-Running inferenceql.auto-modeling involves fetching private repositories from GitHub over SSH. If you have not set up SSH to be able to connect to GitHub follow [these instructions](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh). If you have already configured SSH to connect to GitHub [test your SSH connection to GitHub](https://docs.github.com/en/github/authenticating-to-github/testing-your-ssh-connection).
+1. [Install Nix](https://nixos.org/download.html#download-nix).
+2. Enter the Nix shell with [`nix-shell`](https://nixos.org/manual/nix/stable/command-ref/nix-shell.html).
 
-Due to a bug upstream the InferenceQL build process _must_ use `ssh-agent` to access your SSH keys. To ensure that this is happens you must must remove any configuration settings that direct SSH to use files instead. Print out your SSH settings by running `cat ~/.ssh/config`. You may see an `IdentityFile` declaration, like this:
+The command nix-shell will retrieve build the dependencies of auto-modeling and start an interactive shell in which all those dependencies are available on the `PATH`. You can exit the `nix-shell` by pressing `Control`+`D` at the `nix-shell` prompt.
 
-```
-Host *
-  AddKeysToAgent yes
-  UseKeychain yes
-  IdentityFile ~/.ssh/id_rsa
-```
-
-The line `IdentityFile ~/.ssh/id_rsa` tells SSH to use the key file `~/.ssh/id_rsa` when accessing the referenced host.
-
-For each `IdentityFile` line first verify that the referenced key is already present in `ssh-agent`. For security reasons `ssh-agent` uses unique character sequences called "fingerprints" to uniquely identify keys it is managing. Run `ssh-keygen -l -f` on any files for which there is a `IdentityFile` declaration and make note of the fingerprint. The `*` portion is the fingerprint.
-
-```
-% ssh-keygen -l -f ~/.ssh/id_rsa
-4096 SHA256:****************************************** user@host.com (RSA)
-```
-
-Next list the SSH keys `ssh-agent` is managing by running `ssh-add -l`. Verify that each of the fingerprints printed by `ssh-keygen -l -f` matches one of the fingerprints displayed by `ssh-add -l`. If any are missing [add them to the SSH agent](https://docs.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#adding-your-ssh-key-to-the-ssh-agent).
-
-```
-% ssh-add -l
-4096 SHA256:****************************************** /Users/user/.ssh/id_rsa (RSA)
-```
-
-Next comment out the `IdentityFile` lines in `~/.ssh/config` by prepending them with `#`:
-
-```
-Host *
-  AddKeysToAgent yes
-  UseKeychain yes
-  # IdentityFile ~/.ssh/id_rsa
-```
-
-Finally [test your SSH connection to GitHub](https://docs.github.com/en/github/authenticating-to-github/testing-your-ssh-connection) once more.
-
-### Get dependencies
-
-#### Java
-
-You will need a version of Java, version 8 or above. 
-[See this for more info](https://clojure.org/guides/getting_started#_dependencies).
-
-You should be ok if either `java --version` runs, or the the $JAVA_HOME environment variable is set. Check the latter with `echo $JAVA_HOME`.
-
-#### Python 3
-
-You will need a version of Python 3. 
-
-Try running `python3.9 --version`. If you don't get a Python version number back, you might need to install a version of Python3 or you may need to set a working alias for the Python executuable in the project's Makefile.   
-
-#### Other depedencies 
-
-We will need Clojure and Yarn. See the following pages for instructions.
-
-[Clojure](https://clojure.org/guides/getting_started#_clojure_installer_and_cli_tools)
-
-[Yarn](https://classic.yarnpkg.com/en/docs/install)
-
-That's it. Those are all the dependencies we need.
-
-### Get auto-modeling 
-
-First we will get IQL auto-modeling repo and switch to the right branch.
-
-```bash
-git clone git@github.com:probcomp/inferenceql.auto-modeling.git
-
-cd inferenceql.auto-modeling 
-```
-
-### Build a Python virtual-env
-
-Run our makefile target which will create a new Python virtual environment and install all our Python dependencies in it. There are also some Javascript dependencies the get installed during this step.
-
-Afterwards, we just need to activate our Python virtual environment. 
-
-```bash
-make intall
-
-source .venv/bin/activate
-```
-
-Now we are ready to use the auto-modeling repo!
+All subsequent instructions assume you are in the `nix-shell`.
 
 ## Building your first model 
 
