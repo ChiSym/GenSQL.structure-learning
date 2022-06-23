@@ -68,7 +68,7 @@
                               schema)
         numericalizers (zipmap nominal-columns
                                (repeatedly iql.csv/numericalizer))
-        [columns & rows]  (csv/read-csv *in*)
+        [columns & rows] (csv/read-csv *in*)
         numericalize-row (fn [row]
                            (map (fn [column val]
                                   (if (string/blank? val)
