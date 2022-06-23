@@ -123,7 +123,7 @@ mkdir data
 wget [beat-19-url] > data/data.csv
 ```
 
-### Run the automodeling pipline
+### Run the auto-modeling pipeline
 
 IQL auto-modeling is built around DVC (https://dvc.org/), a project that helps with version control of machine learning pipelines.
 
@@ -314,7 +314,7 @@ In `data/xcat/`, you can find multiple CrossCat models. Each one is a `.edn` fil
 
 #### Key points 
 * Loom used to learn structure
-* CGPM used to learn hyperparameters
+* CGPM used to learn hyper-parameters
 * Loom is written in C with Python bindings
 * Robust 
 * DVC yaml filename: `dvc-loom.yaml`
