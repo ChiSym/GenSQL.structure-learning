@@ -105,7 +105,7 @@ This one just shows the first 5 rows in the dataset.
 SELECT * FROM data LIMIT 5;
 ```
 
-This shows the uncoditional probability of the first 5 trial participants' BMI values.
+This shows the unconditional probability of the first 5 trial participants' BMI values.
 
 ```sql 
 SELECT bmi, (PROBABILITY DENSITY OF bmi UNDER model AS p) FROM data LIMIT 5;
