@@ -17,14 +17,14 @@ import json
 import math
 import pandas
 import pprint
-import sppl.compilers.spn_to_dict as spn_to_dict
+import sppl.compilers.spe_to_dict as spe_to_dict
 import sppl.distributions as distributions
 import sppl.math_util as math_util
 
 from collections import Counter
 from collections import OrderedDict
-from sppl.spn import ProductSPN
-from sppl.spn import SumSPN
+from sppl.spe import ProductSPE
+from sppl.spe import SumSPE
 from sppl.transforms import Identity
 
 pp = pprint.PrettyPrinter(indent=4)
@@ -207,7 +207,7 @@ def convert_cluster(Xs, Zs, metadata, categorical_mapping, tables):
     ]
     children_list = [cx + cz for cx, cz in zip(children_x, children_z)]
 
-    return [ProductSPN(children) for children in children_list]
+    return [ProductSPE(children) for children in children_list]
 
 
 def convert_view(Xs, Zs, metadata, categorical_mapping):
@@ -226,7 +226,7 @@ def convert_view(Xs, Zs, metadata, categorical_mapping):
     assert len(products) == len(log_weights)
 
     # Return a Sum of Products (or a single Product).
-    return SumSPN(products, log_weights) if len(products) > 1 else products[0]
+    return SumSPE(products, log_weights) if len(products) > 1 else products[0]
 
 
 def main():
@@ -299,9 +299,9 @@ def main():
         views.append(view)
 
     # Construct a Product of Sums (or a single Sum).
-    spn = ProductSPN(views) if len(views) > 1 else views[0]
+    spe = ProductSPE(views) if len(views) > 1 else views[0]
 
-    json.dump(spn_to_dict.spn_to_dict(spn), args.output)
+    json.dump(spe_to_dict.spe_to_dict(spe), args.output)
 
 
 if __name__ == "__main__":

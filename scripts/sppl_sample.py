@@ -15,17 +15,17 @@ if not hasattr(stats, "frechet_l"):
 import argparse
 import json
 import edn_format
-import sppl.compilers.spn_to_dict as spn_to_dict
+import sppl.compilers.spe_to_dict as spe_to_dict
 
 
-def save_samples(spn_samples, f):
+def save_samples(spe_samples, f):
     samples = [
         {
             edn_format.Keyword(k): v
             for k, v in row.items()
             if (not str(k).endswith("_cluster")) and (str(k) != "child")
         }
-        for row in spn_samples
+        for row in spe_samples
     ]
     f.write(edn_format.dumps(samples).replace("[", "(").replace("]", ")"))
 
@@ -37,12 +37,12 @@ def main():
     parser.add_argument(
         "--model",
         type=argparse.FileType("r"),
-        help="Path to SPN model (json) used to generate samples.",
+        help="Path to SPE model (json) used to generate samples.",
     )
     parser.add_argument(
         "--data",
         type=argparse.FileType("r"),
-        help="Path to CSV used to generate the SPN model.",
+        help="Path to CSV used to generate the SPE model.",
     )
     parser.add_argument(
         "--sample_count",
@@ -60,14 +60,14 @@ def main():
     )
 
     args = parser.parse_args()
-    spn_dict = json.load(args.model)
-    spn = spn_to_dict.spn_from_dict(spn_dict)
+    spe_dict = json.load(args.model)
+    spe = spe_to_dict.spe_from_dict(spe_dict)
 
     data = csv.reader(args.data)
     row_count = len(list(data)) - 1
 
     sample_count = args.sample_count or row_count
-    samples = spn.sample(sample_count)
+    samples = spe.sample(sample_count)
     save_samples(samples, args.output)
 
 

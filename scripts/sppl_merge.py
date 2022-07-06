@@ -13,11 +13,11 @@ if not hasattr(stats, "frechet_l"):
 
 import argparse
 import json
-import sppl.compilers.spn_to_dict as spn_to_dict
+import sppl.compilers.spe_to_dict as spe_to_dict
 import sppl.distributions as distributions
 
 from fractions import Fraction
-from sppl.spn import ExposedSumSPN
+from sppl.spe import ExposedSumSPE
 from sppl.transforms import Identity
 
 
@@ -47,8 +47,8 @@ def main():
         parser.print_help(sys.stderr)
         sys.exit(1)
 
-    spn_dicts = [json.load(model) for model in args.models]
-    children = [spn_to_dict.spn_from_dict(d) for d in spn_dicts]
+    spe_dicts = [json.load(model) for model in args.models]
+    children = [spe_to_dict.spe_from_dict(d) for d in spe_dicts]
 
     # Create an equal-weighted ExposedSum.
     id_children = Identity("child")
@@ -57,13 +57,13 @@ def main():
     children_probs = {i: Fraction(1, n_children) for i in children_keys}
     children_dist = id_children >> distributions.choice(children_probs)
     children_dict = dict(zip(children_keys, children))
-    spn_sum = ExposedSumSPN(children_dict, children_dist)
+    spe_sum = ExposedSumSPE(children_dict, children_dist)
 
     # Add the symbolic variable for querying.
-    spn = spn_sum if n_children > 1 else spn_sum.children[0]
-    spn.child = id_children
+    spe = spe_sum if n_children > 1 else spe_sum.children[0]
+    spe.child = id_children
 
-    json.dump(spn_to_dict.spn_to_dict(spn), args.output)
+    json.dump(spe_to_dict.spe_to_dict(spe), args.output)
 
 
 if __name__ == "__main__":
