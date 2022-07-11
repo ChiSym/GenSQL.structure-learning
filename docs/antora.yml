@@ -1,6 +1,6 @@
 name: auto-modeling
-title: InferenceQL
-version: main
-display_version: main
+title: Auto-modeling
+version: ~
+start_page: quick-start.adoc
 nav:
 - modules/ROOT/nav.adoc
