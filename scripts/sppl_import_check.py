@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-
+# scripts/sppl_import_check.py!/usr/bin/env python
 import scipy.stats as stats
 import sys
 
@@ -14,9 +13,9 @@ if not hasattr(stats, "frechet_l"):
 import argparse
 import edn_format
 import json
-import sppl.compilers.spn_to_dict as spn_to_dict
+import sppl.compilers.spe_to_dict as spe_to_dict
 
-from sppl.spn import ProductSPN
+from sppl.spe import ProductSPE
 from sppl.transforms import Identity
 from sppl_import import read_metadata, view_assignments_to_view_partition, convert_view
 
@@ -88,9 +87,9 @@ def main():
         views.append(view)
 
     # Construct a Product of Sums (or a single Sum).
-    spn = ProductSPN(views) if len(views) > 1 else views[0]
+    spe = ProductSPE(views) if len(views) > 1 else views[0]
 
-    json.dump(spn_to_dict.spn_to_dict(spn), args.output)
+    json.dump(spe_to_dict.spe_to_dict(spe), args.output)
 
 
 if __name__ == "__main__":

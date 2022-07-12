@@ -10,7 +10,7 @@ import yaml
 import argparse
 import json
 import edn_format
-import sppl.compilers.spn_to_dict as spn_to_dict
+import sppl.compilers.spe_to_dict as spe_to_dict
 from sppl.transforms import Identity as I
 
 if not hasattr(stats, "frechet_r"):
@@ -34,7 +34,7 @@ def main():
     parser.add_argument(
         "--model",
         type=argparse.FileType("r"),
-        help="Path to SPN model (json) used to generate samples.",
+        help="Path to SPE model (json) used to generate samples.",
     )
     parser.add_argument(
         "--mapping-table",
@@ -55,8 +55,8 @@ def main():
     parser.add_argument("--seed", type=int, default=1, help="CGPM seed.")
 
     args = parser.parse_args()
-    spn_dict = json.load(args.model)
-    spn = spn_to_dict.spn_from_dict(spn_dict)
+    spe_dict = json.load(args.model)
+    spe = spe_to_dict.spe_from_dict(spe_dict)
     np.random.seed(args.seed)
     mapping_table = edn_format.loads(args.mapping_table.read())
     df = pd.read_csv(args.data)
@@ -70,7 +70,7 @@ def main():
 
     cols = [
         k.__str__()
-        for k in spn.sample(1)[0].keys()
+        for k in spe.sample(1)[0].keys()
         if not k.__str__().endswith("_cluster")
     ]
     cols.sort()
@@ -98,7 +98,7 @@ def main():
     for c1, c2 in pairs:
         p1 = get_predicate(c1, configs[c1])
         p2 = get_predicate(c2, configs[c2])
-        mi = spn.mutual_information(p1, p2)
+        mi = spe.mutual_information(p1, p2)
         result["mi"][c1][c2] = mi
         result["mi"][c2][c1] = mi
     result["configs"] = configs
