@@ -55,8 +55,7 @@ satellites:
 [source,bash]
 ----
 mkdir data
-wget https://raw.githubusercontent.com/probcomp/bayeslite/master/tests/satellites.csv
-cp satellites.csv data/data.csv
+cp test/satellites/data.csv data/data.csv
 ----
 
 
@@ -88,7 +87,7 @@ Auto-modeling produces two quality control apps for comparing simulated data pro
 
 You can find them in `qc/app` folder.
 
-`qc-dashboard.html` shows comparisons between all combinations of columns, while `qc-splom.html` shows a scatter plot matrix of just numerical columns -- the latter is not so interesting here as we only have one numerical column.
+`qc-dashboard.html` shows comparisons between all combinations of columns, while `qc-splom.html` shows a scatter plot matrix of just numerical columns -- the latter is not so interesting here as none of the numerical columns are inferred automatically (though there are several numerical columns in the data, which one can add manually as in `test/satellites/params.yaml`).
 
 These apps are fully contained in their respective html files, so they can be easily moved around or shared.
 
