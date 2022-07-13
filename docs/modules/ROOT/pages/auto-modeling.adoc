@@ -14,7 +14,7 @@ sections go into more detail about different backends for auto-modeling and a nu
 === Dependencies
 
 We rely on the Nix package manager. Please find instructions to install it https://nixos.org/download.html[here]. Nix takes
-care of all our dependencies. However, on Windows, you also need to https://docs.microsoft.com/en-us/windows/wsl/install[install WSL].
+care of all our dependencies. (On Windows, you will need to first https://docs.microsoft.com/en-us/windows/wsl/install[install WSL] and then install Nix within WSL's Ubuntu terminal, following the https://nixos.org/download.html#nix-install-windows[Nix installation instructions for WSL].)
 
 === Download Auto-modeling
 
