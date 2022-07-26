@@ -306,6 +306,7 @@ stages:
       git clone https://github.com/OpenIQL/inferenceql.analyses.git publish-analysis-output &&
       mkdir publish-analysis-output/analyses/${dataset_name}/ &&
       mkdir publish-analysis-output/html-pages/${dataset_name}/ &&
+      cp params.yaml publish-analysis-output/analyses/${dataset_name}/params.yaml &&
       cp data/data.csv publish-analysis-output/analyses/${dataset_name}/data.csv &&
       cp data/schema.edn publish-analysis-output/analyses/${dataset_name}/schema.edn &&
       cp data/sppl/merged.json publish-analysis-output/analyses/${dataset_name}/merged.json &&
