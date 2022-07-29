@@ -45,8 +45,8 @@ def main():
         sys.exit(1)
 
     df = pandas.read_csv(args.data)
-    schema = edn_format.loads(args.schema.read())
-    mapping_table = edn_format.loads(args.mapping_table.read())
+    schema = edn_format.loads(args.schema.read(), write_ply_tables=False)
+    mapping_table = edn_format.loads(args.mapping_table.read(), write_ply_tables=False)
 
     def n_categories(column):
         return len(mapping_table[column])

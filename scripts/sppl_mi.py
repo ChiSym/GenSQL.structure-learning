@@ -58,7 +58,7 @@ def main():
     spe_dict = json.load(args.model)
     spe = spe_to_dict.spe_from_dict(spe_dict)
     np.random.seed(args.seed)
-    mapping_table = edn_format.loads(args.mapping_table.read())
+    mapping_table = edn_format.loads(args.mapping_table.read(), write_ply_tables=False)
     df = pd.read_csv(args.data)
     with open("params.yaml", "r") as stream:
         params = yaml.safe_load(stream)

@@ -59,7 +59,7 @@ def main():
     metadata = read_metadata(args.metadata)
     variable_mapping = dict(enumerate(metadata["col_names"]))
     inv_variable_mapping = invert(variable_mapping)
-    mapping_table = edn_format.loads(args.mapping_table.read())
+    mapping_table = edn_format.loads(args.mapping_table.read(), write_ply_tables=False)
     category_mapping = {
         inv_variable_mapping[k]: invert(v)
         for k, v in mapping_table.items()

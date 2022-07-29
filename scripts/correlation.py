@@ -64,7 +64,7 @@ def main():
     args = parser.parse_args()
     df = pandas.read_csv(args.data)
 
-    schema = edn_format.loads(args.schema.read())
+    schema = edn_format.loads(args.schema.read(), write_ply_tables=False)
 
     numerical_cols = [
         column
