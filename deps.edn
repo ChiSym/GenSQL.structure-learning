@@ -5,7 +5,7 @@
         clj-commons/clj-yaml {:mvn/version "0.7.106"}
         cheshire/cheshire {:mvn/version "5.10.0"}
         cljstache/cljstache {:mvn/version "2.0.6"}
-        medley/medley {:mvn/version "1.3.0"}
+        medley/medley {:mvn/version "1.4.0"}
         com.cognitect/transit-clj {:mvn/version "1.0.324"}
         selmer/selmer {:mvn/version "1.12.40"}
         openiql/inferenceql.inference {:git/url "https://github.com/OpenIQL/inferenceql.inference.git"
