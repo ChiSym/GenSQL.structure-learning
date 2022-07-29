@@ -273,7 +273,7 @@ def main():
     else:
         variable_mapping = dict(enumerate(pandas.read_csv(args.data)))
     inv_variable_mapping = invert(variable_mapping)
-    mapping_table = edn_format.loads(args.mapping_table.read())
+    mapping_table = edn_format.loads(args.mapping_table.read(), write_ply_tables=False)
     category_mapping = {
         inv_variable_mapping[k]: invert(v) for k, v in mapping_table.items()
     }
