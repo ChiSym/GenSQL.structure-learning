@@ -85,7 +85,7 @@ cd publish-analysis-output && gh auth login -w -h GitHub.com
 This command will ask you to authenticate yourself with GitHub.
 [source,bash]
 ----
-gh pr create --base public --title "My analsysis on [add dataset name and analysis goal here]" --body "Add more info here""
+gh pr create --base public --title "My analysis on [add dataset name and analysis goal here]" --body "Add more info here"
 ----
 This command will fork our analyses repository, push your data and results to a branch, and open a pull request back to our repo. Users can use git to customize what get's published.
 
