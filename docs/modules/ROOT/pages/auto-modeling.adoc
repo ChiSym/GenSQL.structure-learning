@@ -54,7 +54,6 @@ satellites:
 
 [source,bash]
 ----
-mkdir data
 cp test/satellites/data.csv data/data.csv
 ----
 
