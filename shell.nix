@@ -127,5 +127,5 @@ in pkgs.mkShell {
     pythonWithPackages
   ];
 
-  shellHook = "bb bin/git-init.clj; alias iql-query-server='clojure -X inferenceql.auto-modeling.query-server/run'; export PYTHONPATH=${pythonWithPackages}/${pythonWithPackages.sitePackages}";
+  shellHook = "bb bin/git-init.clj; mkdir -p data/; alias iql-query-server='clojure -X inferenceql.auto-modeling.query-server/run'; export PYTHONPATH=${pythonWithPackages}/${pythonWithPackages.sitePackages}";
 }
