@@ -241,24 +241,24 @@ stages:
       --model data/sppl/merged.json
       --data data/ignored.csv
       --sample_count $(bin/param qc.sample_count)
-      > qc/samples/samples-virtual.edn
+      > qc/samples/samples-synthetic.edn
     deps:
       - data/sppl/merged.json
       - data/ignored.csv
     outs:
-      - qc/samples/samples-virtual.edn
+      - qc/samples/samples-synthetic.edn
 
   qc-tag-samples:
     cmd: >
       clojure -X inferenceql.auto-modeling.qc.samples/tag
       :data data/ignored.csv
       :schema data/schema.edn
-      :samples-virtual qc/samples/samples-virtual.edn
+      :samples-synthetic qc/samples/samples-synthetic.edn
       > qc/samples/samples.edn
     deps:
       - data/ignored.csv
       - data/schema.edn
-      - qc/samples/samples-virtual.edn
+      - qc/samples/samples-synthetic.edn
       - src/inferenceql/auto_modeling/qc/samples.clj
     outs:
       - qc/samples/samples.edn

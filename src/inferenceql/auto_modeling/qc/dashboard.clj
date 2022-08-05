@@ -6,7 +6,7 @@
             [inferenceql.auto-modeling.dvc :as dvc]
             [inferenceql.auto-modeling.qc.vega :as vega]
             [inferenceql.auto-modeling.qc.util :refer [filtering-summary should-bin? bind-to-element
-                                                       obs-data-color virtual-data-color
+                                                       obs-data-color synthetic-data-color
                                                        unselected-color vega-type-fn
                                                        vl5-schema]]))
 
@@ -26,7 +26,7 @@
                   :groupby ["collection"]}
                  {:filter {:or [{:and [{:field "collection" :equal "observed"}
                                        {:field "row_number_subplot" :lte {:expr "numObservedPoints"}}]}
-                                {:and [{:field "collection" :equal "virtual"}
+                                {:and [{:field "collection" :equal "synthetic"}
                                        {:field "row_number_subplot" :lte (:num-valid fsum)}
                                        {:field "row_number_subplot" :lte {:expr "numVirtualPoints"}}]}]}}]
      :facet {:field "collection"
@@ -51,8 +51,8 @@
                                 :y {:aggregate "count"
                                     :type "quantitative"}
                                 :color {:field "collection"
-                                        :scale {:domain ["observed", "virtual"]
-                                                :range [obs-data-color virtual-data-color]}
+                                        :scale {:domain ["observed", "synthetic"]
+                                                :range [obs-data-color synthetic-data-color]}
                                         :legend {:orient "top"
                                                  :title nil}}}}]}}))
 
@@ -72,7 +72,7 @@
                   :groupby ["collection"]}
                  {:filter {:or [{:and [{:field "collection" :equal "observed"}
                                        {:field "row_number_subplot" :lte {:expr "numObservedPoints"}}]}
-                                {:and [{:field "collection" :equal "virtual"}
+                                {:and [{:field "collection" :equal "synthetic"}
                                        {:field "row_number_subplot" :lte (:num-valid f-sum)}
                                        {:field "row_number_subplot" :lte {:expr "numVirtualPoints"}}]}]}}]
      :params [{:name "brush-all"
@@ -91,8 +91,8 @@
                     :axis {:orient "top"}}
                 :color {:condition {:param "brush-all"
                                     :field "collection"
-                                    :scale {:domain ["observed", "virtual"]
-                                            :range [obs-data-color virtual-data-color]}
+                                    :scale {:domain ["observed", "synthetic"]
+                                            :range [obs-data-color synthetic-data-color]}
                                     :legend {:orient "top"
                                              :title nil
                                              :offset 10}}}}}))
@@ -110,7 +110,7 @@
                                          :groupby ["collection"]}
                                         {:filter {:or [{:and [{:field "collection" :equal "observed"}
                                                               {:field "row_number_subplot" :lte {:expr "numObservedPoints"}}]}
-                                                       {:and [{:field "collection" :equal "virtual"}
+                                                       {:and [{:field "collection" :equal "synthetic"}
                                                               {:field "row_number_subplot" :lte (:num-valid f-sum)}
                                                               {:field "row_number_subplot" :lte {:expr "numVirtualPoints"}}]}]}}]
                             :mark {:type "point"
@@ -143,13 +143,13 @@
                                                            :value 1}
                                                :value 0}
                                        :opacity {:field "collection"
-                                                 :scale {:domain ["observed", "virtual"]
+                                                 :scale {:domain ["observed", "synthetic"]
                                                          :range [{:expr "splomAlphaObserved"} {:expr "splomAlphaVirtual"}]}
                                                  :legend nil}
                                        :color {:condition {:param "brush-all"
                                                            :field "collection"
-                                                           :scale {:domain ["observed", "virtual"]
-                                                                   :range [obs-data-color virtual-data-color]}
+                                                           :scale {:domain ["observed", "synthetic"]
+                                                                   :range [obs-data-color synthetic-data-color]}
                                                            :legend {:orient "top"
                                                                     :title nil}}
                                                :value unselected-color}}}]}]
@@ -191,11 +191,11 @@
                  {:filter {:field y-field :oneOf y-cats}}
                  {:window [{:op "row_number", :as "row_number_subplot"}]
                   :groupby ["collection"]}
-                 ;; Displaying an equal number of virtual data points as observed datapoints.
-                 ;; Filtering virtual and observed datapoints based on user-set limit.
+                 ;; Displaying an equal number of synthetic data points as observed datapoints.
+                 ;; Filtering synthetic and observed datapoints based on user-set limit.
                  {:filter {:or [{:and [{:field "collection" :equal "observed"}
                                        {:field "row_number_subplot" :lte {:expr "numObservedPoints"}}]}
-                                {:and [{:field "collection" :equal "virtual"}
+                                {:and [{:field "collection" :equal "synthetic"}
                                        {:field "row_number_subplot" :lte (:num-valid f-sum)}
                                        {:field "row_number_subplot" :lte {:expr "numVirtualPoints"}}]}]}}]
      :width width
@@ -235,8 +235,8 @@
                         :value 0}
                 :color {:condition {:param "brush-all"
                                     :field "collection"
-                                    :scale {:domain ["observed", "virtual"]
-                                            :range [obs-data-color virtual-data-color]}
+                                    :scale {:domain ["observed", "synthetic"]
+                                            :range [obs-data-color synthetic-data-color]}
                                     :legend {:orient "top"
                                              :title nil
                                              :offset 10}}}}}))
@@ -257,11 +257,11 @@
                  {:filter {:field y-field :oneOf y-cats}}
                  {:window [{:op "row_number", :as "row_number_subplot"}]
                   :groupby ["collection"]}
-                 ;; Displaying an equal number of virtual data points as observed datapoints.
-                 ;; Filtering virtual and observed datapoints based on user-set limit.
+                 ;; Displaying an equal number of synthetic data points as observed datapoints.
+                 ;; Filtering synthetic and observed datapoints based on user-set limit.
                  {:filter {:or [{:and [{:field "collection" :equal "observed"}
                                        {:field "row_number_subplot" :lte {:expr "numObservedPoints"}}]}
-                                {:and [{:field "collection" :equal "virtual"}
+                                {:and [{:field "collection" :equal "synthetic"}
                                        {:field "row_number_subplot" :lte (:num-valid f-sum)}
                                        {:field "row_number_subplot" :lte {:expr "numVirtualPoints"}}]}]}}]
      :width {:step 20}
@@ -294,8 +294,8 @@
                        :legend nil}
                 :color {:condition {:param "brush-all"
                                     :field "collection"
-                                    :scale {:domain ["observed", "virtual"]
-                                            :range [obs-data-color virtual-data-color]}
+                                    :scale {:domain ["observed", "synthetic"]
+                                            :range [obs-data-color synthetic-data-color]}
                                     :legend {:orient "top"
                                              :title nil
                                              :offset 10}}}}}))
@@ -375,7 +375,7 @@
                :offset 40
                :frame "group"}})))
 
-(defn top-level-spec [data num-observed num-virtual sections]
+(defn top-level-spec [data num-observed num-synthetic sections]
   (let [spec {:$schema vl5-schema
               :vconcat sections
               :spacing 100
@@ -387,7 +387,7 @@
                        {:name "splomAlphaVirtual"
                         :value 0.7
                         :bind {:input "range" :min 0 :max 1 :step 0.05
-                               :name "scatter plots - alpha (virtual data)"}}
+                               :name "scatter plots - alpha (synthetic data)"}}
                        {:name "splomPointSize"
                         :value 30
                         :bind {:input "range" :min 1 :max 100 :step 1
@@ -397,9 +397,9 @@
                         :bind {:input "range" :min 1 :max num-observed :step 1
                                :name "number of points (observed data)"}}
                        {:name "numVirtualPoints"
-                        :value num-virtual
-                        :bind {:input "range" :min 1 :max num-virtual :step 1
-                               :name "number of points (virtual data)"}}
+                        :value num-synthetic
+                        :bind {:input "range" :min 1 :max num-synthetic :step 1
+                               :name "number of points (synthetic data)"}}
                        {:name "showRegression"
                         :value false
                         :bind {:input "checkbox"
@@ -425,8 +425,8 @@
         num-observed (-> (group-by :collection samples)
                          (get "observed")
                          (count))
-        num-virtual (-> (group-by :collection samples)
-                        (get "virtual")
+        num-synthetic (-> (group-by :collection samples)
+                        (get "synthetic")
                         (count))
 
         vega-type (vega-type-fn schema)
@@ -468,4 +468,4 @@
                                         category-limit
                                         samples)
         sections (remove nil? [histograms-quant histograms-nom scatter-plots strip-plots bubble-plots])]
-    (json/pprint (top-level-spec samples num-observed num-virtual sections))))
+    (json/pprint (top-level-spec samples num-observed num-synthetic sections))))

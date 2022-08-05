@@ -6,7 +6,7 @@
             [inferenceql.auto-modeling.dvc :as dvc]
             [inferenceql.auto-modeling.qc.vega :as vega]
             [inferenceql.auto-modeling.qc.util :refer [filtering-summary should-bin? bind-to-element
-                                                       obs-data-color virtual-data-color
+                                                       obs-data-color synthetic-data-color
                                                        unselected-color vega-type-fn
                                                        vl5-schema]]))
 
@@ -35,7 +35,7 @@
                                          :groupby ["collection"]}
                                         {:filter {:or [{:and [{:field "collection" :equal "observed"}
                                                               {:field "row_number_subplot" :lte {:expr "numObservedPoints"}}]}
-                                                       {:and [{:field "collection" :equal "virtual"}
+                                                       {:and [{:field "collection" :equal "synthetic"}
                                                               {:field "row_number_subplot" :lte (:num-valid f-sum)}
                                                               {:field "row_number_subplot" :lte {:expr "numVirtualPoints"}}]}]}}]
                             :encoding {:x {:field col-1
@@ -47,13 +47,13 @@
                                            :axis {:gridOpacity 0.4
                                                   :title col-2}}
                                        :opacity {:field "collection"
-                                                 :scale {:domain ["observed", "virtual"]
+                                                 :scale {:domain ["observed", "synthetic"]
                                                          :range [{:expr "splomAlphaObserved"} {:expr "splomAlphaVirtual"}]}
                                                  :legend nil}
                                        :color {:condition {:param "brush-all"
                                                            :field "collection"
-                                                           :scale {:domain ["observed", "virtual"]
-                                                                   :range [obs-data-color virtual-data-color]}
+                                                           :scale {:domain ["observed", "synthetic"]
+                                                                   :range [obs-data-color synthetic-data-color]}
                                                            :legend {:orient "top"
                                                                     :title nil
                                                                     :offset 30}}
@@ -70,7 +70,7 @@
                   :groupby ["collection"]}
                  {:filter {:or [{:and [{:field "collection" :equal "observed"}
                                        {:field "row_number_subplot" :lte {:expr "numObservedPoints"}}]}
-                                {:and [{:field "collection" :equal "virtual"}
+                                {:and [{:field "collection" :equal "synthetic"}
                                        {:field "row_number_subplot" :lte (:num-valid f-sum)}
                                        {:field "row_number_subplot" :lte {:expr "numVirtualPoints"}}]}]}}]
      :mark {:type "bar"
@@ -82,12 +82,12 @@
                     :type "quantitative"
                     :stack nil}
                 :opacity {:field "collection"
-                          :scale {:domain ["observed", "virtual"]
+                          :scale {:domain ["observed", "synthetic"]
                                   :range [{:expr "histAlphaObserved"} {:expr "histAlphaVirtual"}]}
                           :legend nil}
                 :color {:field "collection"
-                        :scale {:domain ["observed" "virtual"]
-                                :range [obs-data-color virtual-data-color]}
+                        :scale {:domain ["observed" "synthetic"]
+                                :range [obs-data-color synthetic-data-color]}
                         :legend {:orient "top"
                                  :offset 30
                                  :title nil}}}}))
@@ -132,8 +132,8 @@
         num-obs-samples (-> (group-by :collection samples)
                             (get "observed")
                             (count))
-        num-virtual-samples (-> (group-by :collection samples)
-                                (get "virtual")
+        num-synthetic-samples (-> (group-by :collection samples)
+                                (get "synthetic")
                                 (count))
 
         spec {:$schema vl5-schema
@@ -144,7 +144,7 @@
                        {:name "histAlphaVirtual"
                         :value 0.7
                         :bind {:input "range" :min 0 :max 1 :step 0.05
-                               :name "histograms - alpha (virtual data)"}}
+                               :name "histograms - alpha (synthetic data)"}}
                        {:name "splomAlphaObserved"
                         :value 0.7
                         :bind {:input "range" :min 0 :max 1 :step 0.05
@@ -152,7 +152,7 @@
                        {:name "splomAlphaVirtual"
                         :value 0.7
                         :bind {:input "range" :min 0 :max 1 :step 0.05
-                               :name "scatter plots - alpha (virtual data)"}}
+                               :name "scatter plots - alpha (synthetic data)"}}
                        {:name "splomPointSize"
                         :value 30
                         :bind {:input "range" :min 1 :max 100 :step 1
@@ -162,9 +162,9 @@
                         :bind {:input "range" :min 1 :max num-obs-samples :step 1
                                :name "number of points (observed data)"}}
                        {:name "numVirtualPoints"
-                        :value num-virtual-samples
-                        :bind {:input "range" :min 1 :max num-virtual-samples :step 1
-                               :name "number of points (virtual data)"}}
+                        :value num-synthetic-samples
+                        :bind {:input "range" :min 1 :max num-synthetic-samples :step 1
+                               :name "number of points (synthetic data)"}}
                        {:name "showRegression"
                         :value false
                         :bind {:input "checkbox"
