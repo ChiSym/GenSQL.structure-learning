@@ -8,11 +8,11 @@
         medley/medley {:mvn/version "1.4.0"}
         com.cognitect/transit-clj {:mvn/version "1.0.324"}
         selmer/selmer {:mvn/version "1.12.40"}
-        openiql/inferenceql.inference {:git/url "https://github.com/OpenIQL/inferenceql.inference.git"
+        openiql/inferenceql.inference {:git/url "https://github.com/InferenceQL/inferenceql.inference.git"
                                        :sha "6938e350673f93bc8383975d92e305ff6872cf61"}
-        openiql/inferenceql.gpm.spn {:git/url "https://github.com/OpenIQL/inferenceql.gpm.spn.git"
+        openiql/inferenceql.gpm.spn {:git/url "https://github.com/InferenceQL/inferenceql.gpm.spn.git"
                                        :sha "11814b6a07f0f1a230b6a9f235d84795d80e7e55"}
-        openiql/inferenceql.query {:git/url "https://github.com/OpenIQL/inferenceql.query.git"
+        openiql/inferenceql.query {:git/url "https://github.com/InferenceQL/inferenceql.query.git"
                                    :sha "37f8286b1950a6fcdc1fda4b727d08e24a833de4"}}
  :aliases {:test {:extra-paths ["test"]
                   :extra-deps {org.clojure/test.check {:mvn/version "1.1.1"}}}
