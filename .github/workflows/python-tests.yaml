@@ -1,5 +1,8 @@
 name: Python tests
-on: push
+on:
+  push:
+    paths:
+      - 'shell.nix'
 jobs:
   run-tests:
     runs-on: ubuntu-latest
