@@ -43,7 +43,7 @@ cgpm:
   #iterations: 1
   minutes: 1
 qc:
-  # Set this to the number of virtual samples desired in QC plots.
+  # Set this to the number of synthetic samples desired in QC plots.
   # When not set, the plots will display the same number of virual samples as
   # observed data points.
   sample_count: null

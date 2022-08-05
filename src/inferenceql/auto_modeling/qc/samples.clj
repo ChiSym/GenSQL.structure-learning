@@ -7,10 +7,10 @@
 
 (defn tag
   "Adds a collection attribute to both observed data and simulated data."
-  [{data-path :data samples-virtual-path :samples-virtual}]
+  [{data-path :data samples-synthetic-path :samples-synthetic}]
   (let [data (map #(update-keys % keyword) (io/slurp-csv (str data-path)))
-        samples-virtual (-> samples-virtual-path str slurp edn/read-string)
-        out (concat (map #(assoc % :collection "virtual") samples-virtual)
+        samples-synthetic (-> samples-synthetic-path str slurp edn/read-string)
+        out (concat (map #(assoc % :collection "synthetic") samples-synthetic)
                     (map #(assoc % :collection "observed") data))]
     (pprint out)))
 
