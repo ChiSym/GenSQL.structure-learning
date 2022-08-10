@@ -8,7 +8,7 @@
         inferenceql/inferenceql.inference {:git/url "https://github.com/InferenceQL/inferenceql.inference.git"
                                            :sha "6938e350673f93bc8383975d92e305ff6872cf61"}
         inferenceql/inferenceql.gpm.sppl {:git/url "https://github.com/InferenceQL/inferenceql.gpm.sppl.git"
-                                          :sha "11814b6a07f0f1a230b6a9f235d84795d80e7e55"}
+                                          :sha "cb5c76e337e73928bc55a4dc78feceda3d76144a"}
         inferenceql/inferenceql.query {:git/url "https://github.com/InferenceQL/inferenceql.query.git"
                                        :sha "0aca175b397abb4e80a3f407096a1d0b17b4c705"}
         org.babashka/cli {:mvn/version "0.3.34"}
