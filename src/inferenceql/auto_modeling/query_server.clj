@@ -4,7 +4,7 @@
             [clojure.edn :as edn]
             [clojure.java.io :as java.io]
             [clojure.string :as string]
-            [inferenceql.gpm.spn :as spn]
+            [inferenceql.gpm.sppl :as sppl]
             [inferenceql.query.io :as io]
             [inferenceql.query.db :as db]
             [inferenceql.query.server :as server]
@@ -24,7 +24,7 @@
 
 (def data (map rem-empty (io/slurp-csv "data/data.csv")))
 
-(def model_spn (spn/slurp "data/sppl/merged.json"))
+(def model-spe (sppl/slurp "data/sppl/merged.json"))
 
 (def schema (edn/read (java.io.PushbackReader. (java.io/reader "data/schema.edn"))))
 
@@ -78,7 +78,7 @@
                                     num-cols))))})))
 
 (def db
-  (let [db-map {:data data :schema schema-table (keyword model-name) model_spn}]
+  (let [db-map {:data data :schema schema-table (keyword model-name) model-spe}]
     (reduce-kv db/with-table (db/empty) (into (into db-map cors-table) deps-table))))
 
 (defn run [_]
