@@ -5,8 +5,8 @@
             [clojure.java.io :as java.io]
             [clojure.string :as string]
             [inferenceql.gpm.sppl :as sppl]
-            [inferenceql.query.io :as io]
             [inferenceql.query.db :as db]
+            [inferenceql.query.io :as io]
             [inferenceql.query.server :as server]
             [ring.adapter.jetty :as jetty]))
 
