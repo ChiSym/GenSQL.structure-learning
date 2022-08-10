@@ -5,12 +5,12 @@
         medley/medley {:mvn/version "1.4.0"}
         com.cognitect/transit-clj {:mvn/version "1.0.324"}
         selmer/selmer {:mvn/version "1.12.40"}
-        openiql/inferenceql.inference {:git/url "https://github.com/InferenceQL/inferenceql.inference.git"
-                                       :sha "6938e350673f93bc8383975d92e305ff6872cf61"}
-        openiql/inferenceql.gpm.spn {:git/url "https://github.com/InferenceQL/inferenceql.gpm.spn.git"
-                                     :sha "11814b6a07f0f1a230b6a9f235d84795d80e7e55"}
-        openiql/inferenceql.query {:git/url "https://github.com/InferenceQL/inferenceql.query.git"
-                                   :sha "0aca175b397abb4e80a3f407096a1d0b17b4c705"}
+        inferenceql/inferenceql.inference {:git/url "https://github.com/InferenceQL/inferenceql.inference.git"
+                                           :sha "6938e350673f93bc8383975d92e305ff6872cf61"}
+        inferenceql/inferenceql.gpm.spn {:git/url "https://github.com/InferenceQL/inferenceql.gpm.spn.git"
+                                         :sha "11814b6a07f0f1a230b6a9f235d84795d80e7e55"}
+        inferenceql/inferenceql.query {:git/url "https://github.com/InferenceQL/inferenceql.query.git"
+                                       :sha "0aca175b397abb4e80a3f407096a1d0b17b4c705"}
         org.babashka/cli {:mvn/version "0.3.34"}
         org.clojure/clojure {:mvn/version "1.11.1"}
         org.clojure/clojurescript {:mvn/version "1.11.54"}
