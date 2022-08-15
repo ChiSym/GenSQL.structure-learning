@@ -33,3 +33,5 @@
 (get-config-target "user.email")
 
 (println "git is configured. You can start to use auto-modeling!")
+
+(shutdown-agents)
