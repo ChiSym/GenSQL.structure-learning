@@ -117,7 +117,6 @@ in pkgs.mkShell {
   buildInputs = [
     dvc
     pkgs.clojure
-    pkgs.babashka
     pkgs.gh
     pkgs.git
     pkgs.openjdk11
@@ -127,5 +126,5 @@ in pkgs.mkShell {
     pythonWithPackages
   ];
 
-  shellHook = "bb bin/git-init.clj; alias iql-query-server='clojure -X inferenceql.auto-modeling.query-server/run'; export PYTHONPATH=${pythonWithPackages}/${pythonWithPackages.sitePackages}";
+  shellHook = "clojure -M bin/git-init.clj; alias iql-query-server='clojure -X inferenceql.auto-modeling.query-server/run'; export PYTHONPATH=${pythonWithPackages}/${pythonWithPackages.sitePackages}";
 }
