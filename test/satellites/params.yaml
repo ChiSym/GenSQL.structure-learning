@@ -1,3 +1,11 @@
+dataset_name: satellites
+database:
+  table_name: data
+  table_path: data/nullified.csv
+  model_name: baseline_model
+  model_path: data/xcat/complete/sample.0.edn
+  # model_path: data/xcat/merged.edn
+  # model_path: data/sppl/merged.json
 seed: 42
 sample_count: 3
 parallel:
