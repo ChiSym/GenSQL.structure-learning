@@ -45,41 +45,41 @@
      (get d c2-name)))
 
 (def deps-table
-  (let [modeled-cols (map key (remove (comp #{:ignore} val) schema))
-        deps (json/read-str (slurp "data/dep-prob.json"))]
-    (remove same? (reduce into
-                          []
-                          (map (fn [c1] (map (fn [c2]
-                                               {c1-name c1
-                                                c2-name c2
-                                                model-name-column model-name
-                                                'probability_predictive (safe-get c1 c2 deps)})
-                                             modeled-cols))
-                               modeled-cols)))))
+  (let [deps-path "data/dep-prob.json"]
+    (when (.exists (java.io/file deps-path))
+      {:predictive_relationships
+       (let [modeled-cols (map key (remove (comp #{:ignore} val) schema))
+             deps (json/read-str (slurp deps-path))]
+         (remove same? (reduce into
+                               []
+                               (map (fn [c1] (map (fn [c2]
+                                                    {c1-name c1
+                                                     c2-name c2
+                                                     model-name-column model-name
+                                                     'probability_predictive (safe-get c1 c2 deps)})
+                                                  modeled-cols))
+                                    modeled-cols))))})))
 
 (def cors-table
-  (let [num-cols (map key (filter (comp #{:numerical} val) schema))
-        cors (json/read-str (slurp "data/correlation.json"))]
-    (remove same? (reduce into
-                          []
-                          (map (fn [c1] (map (fn [c2]
-                                               {c1-name c1
-                                                c2-name c2
-                                                model-name-column "linear"
-                                                'r (get (safe-get c1 c2 cors) "r-value")
-                                                'p (get (safe-get c1 c2 cors) "p-value")})
-                                             num-cols))
-                               num-cols)))))
+  (let [cors-path "data/correlation.json"]
+    (when (.exists (java.io/file cors-path))
+      {:correlations
+       (let [num-cols (map key (filter (comp #{:numerical} val) schema))
+             cors (json/read-str (slurp cors-path))]
+         (remove same? (reduce into
+                               []
+                               (map (fn [c1] (map (fn [c2]
+                                                    {c1-name c1
+                                                     c2-name c2
+                                                     model-name-column "linear"
+                                                     'r (get (safe-get c1 c2 cors) "r-value")
+                                                     'p (get (safe-get c1 c2 cors) "p-value")})
+                                                  num-cols))
+                                    num-cols))))})))
 
-(def db (as-> (if false
-                "pass"
-                (db/empty))
-          %
-          (reduce-kv db/with-table % {:data data
-                                      :schema schema-table
-                                      :correlations cors-table
-                                      :predictive_relationships deps-table
-                                      (keyword model-name) model_spn})))
+(def db
+  (let [db-map {:data data :schema schema-table (keyword model-name) model_spn}]
+    (reduce-kv db/with-table (db/empty) (into (into db-map cors-table) deps-table))))
 
 (defn run [_]
   (println "starting server...")
