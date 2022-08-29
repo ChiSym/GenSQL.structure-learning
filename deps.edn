@@ -1,20 +1,31 @@
-{:deps {babashka/fs {:mvn/version "0.1.6"}
+{:paths ["src" "resources" "target/classes"]
+ :deps {babashka/fs {:mvn/version "0.1.6"}
+        babashka/process {:mvn/version "0.1.2"}
         cheshire/cheshire {:mvn/version "5.10.0"}
         clj-commons/clj-yaml {:mvn/version "0.7.106"}
         cljstache/cljstache {:mvn/version "2.0.6"}
         com.cognitect/transit-clj {:mvn/version "1.0.324"}
+        com.stuartsierra/component {:mvn/version "1.1.0"}
         io.github.inferenceql/inferenceql.gpm.sppl {:git/sha "cb5c76e337e73928bc55a4dc78feceda3d76144a"}
         io.github.inferenceql/inferenceql.inference {:git/sha "e1dcd0f2721dcdef388f8270dc9bd80eecde3ef9"}
         io.github.inferenceql/inferenceql.query {:git/sha "0aca175b397abb4e80a3f407096a1d0b17b4c705"}
+        lambdaisland/fetch {:mvn/version "1.0.41"}
         lambdaisland/regal {:mvn/version "0.0.143"}
+        lilactown/helix {:mvn/version "0.1.7"}
         medley/medley {:mvn/version "1.4.0"}
+        metosin/reitit {:mvn/version "0.5.18"}
         org.babashka/cli {:mvn/version "0.3.34"}
         org.clojure/clojure {:mvn/version "1.11.1"}
-        org.clojure/clojurescript {:mvn/version "1.11.54"}
+        org.clojure/clojurescript {:mvn/version "1.11.60"}
         org.clojure/data.csv {:mvn/version "1.0.0"}
         org.clojure/data.json {:mvn/version "2.4.0"}
+        ring/ring-jetty-adapter {:mvn/version "1.9.5"}
+        ring-middleware-format/ring-middleware-format {:mvn/version "0.7.5"}
         selmer/selmer {:mvn/version "1.12.40"}}
- :aliases {:test {:extra-paths ["test"]
+ :aliases {:build {:extra-paths ["dev"]
+                   :extra-deps {org.clojure/tools.namespace {:mvn/version "1.3.0"}
+                                io.github.clojure/tools.build {:git/tag "v0.8.3" :git/sha "0d20256"}}}
+           :test {:extra-paths ["test"]
                   :extra-deps {org.clojure/test.check {:mvn/version "1.1.1"}}}
            :clj-test {:extra-deps {io.github.cognitect-labs/test-runner {:git/tag "v0.5.0" :git/sha "48c3c67f98362ba1e20526db4eeb6996209c050a"}}
                       :main-opts ["-m" "cognitect.test-runner"]
