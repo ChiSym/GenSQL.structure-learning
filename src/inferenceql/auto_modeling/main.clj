@@ -119,7 +119,7 @@
 
 (defmethod read-model "json"
   [file]
-  (let [slurp-spn (requiring-resolve 'inferenceql.gpm.spn/slurp)]
+  (let [slurp-spn (requiring-resolve 'inferenceql.gpm.sppl/slurp)]
     (slurp-spn file)))
 
 (defmethod read-model "edn"
