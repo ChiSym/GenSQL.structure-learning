@@ -119,6 +119,7 @@
           pypkgs.matplotlib
           pypkgs.numpy
           pypkgs.pandas
+          pypkgs.pytest
         ]);
       in {
         devShell = pkgs.mkShell {
