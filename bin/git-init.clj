@@ -25,7 +25,7 @@
     (if (empty? err)
       (when-not (zero? exit)
         (input-config config-target))
-      (throw (Exception. err)))))
+      (throw (ex-info err {})))))
 
 ;; Initializes quitely.
 (shell/sh "sh" "-c" "git init -q")
