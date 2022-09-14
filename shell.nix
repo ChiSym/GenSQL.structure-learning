@@ -112,6 +112,7 @@ let
     pypkgs.matplotlib
     pypkgs.numpy
     pypkgs.pandas
+    pypkgs.xgboost
   ]);
 in pkgs.mkShell {
   buildInputs = [
