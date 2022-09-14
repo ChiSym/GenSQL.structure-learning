@@ -13,8 +13,7 @@ sections go into more detail about different backends for auto-modeling and a nu
 
 === Dependencies
 
-We rely on the Nix package manager. Please find instructions to install it https://nixos.org/download.html[here]. Nix takes
-care of all our dependencies. (On Windows, you will need to first https://docs.microsoft.com/en-us/windows/wsl/install[install WSL] and then install Nix within WSL's Ubuntu terminal, following the https://nixos.org/download.html#nix-install-windows[Nix installation instructions for WSL].)
+Auto-modeling uses the Nix package manager to manage its dependencies. To install the dependencies, first https://nixos.org/download.html[install Nix], then https://nixos.wiki/wiki/Flakes#Enable_flakes[enable flakes]. (On Windows, you will need to first https://docs.microsoft.com/en-us/windows/wsl/install[install WSL] and then install Nix within WSL's Ubuntu terminal, following the https://nixos.org/download.html#nix-install-windows[Nix installation instructions for WSL].)
 
 === Download Auto-modeling
 
@@ -29,7 +28,7 @@ If you are installing from gity
 git clone git@github.com:OpenIQL/inferenceql.auto-modeling.git InferenceQL
 ----
 
-=== Start the Nix shell
+=== Start the Nix development shell
 
 To install modeling capabilities, go to the auto-modeling directory:
 [source,bash]
@@ -39,9 +38,9 @@ cd InferenceQL
 and install the dependencies by running:
 [source,bash]
 ----
-nix-shell
+nix develop
 ----
-WARNING: on macOS, this step can take up to an hour. The reason is that certain dependencies get compiled from scratch. It will only be slow once. The second time you run the `nix-shell` command, it will succeed instantaneously.
+WARNING: on macOS, this step can take up to an hour. The reason is that certain dependencies get compiled from scratch. It will only be slow once. The second time you run the `nix develop` command, it will succeed instantaneously.
 
 == Building your first model
 
