@@ -33,12 +33,12 @@ To install modeling capabilities, go to the auto-modeling directory:
 ----
 cd InferenceQL
 ----
-and install the dependencies by running:
+and enter a development shell that includes all the dependencies by running:
 [source,bash]
 ----
-nix-shell
+nix develop
 ----
-WARNING: on macOS, this step can take up to an hour. The reason is that certain dependencies get compiled from scratch. It will only be slow once. The second time you run the `nix-shell` command, it will succeed instantaneously.
+WARNING: on macOS, this step can take up to an hour. The reason is that certain dependencies get compiled from scratch. It will only be slow once. The second time you run the `nix develop` command, it will succeed instantaneously.
 
 === Running auto-modeling
 Add a csv file:
