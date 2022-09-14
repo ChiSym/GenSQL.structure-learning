@@ -6,8 +6,9 @@
 (def messages {"user.name" "Git user name is not set. Please input your username here:",
                "user.email" "Git email address is not set. Please input an email address here:"})
 
-(defn input-config [config-target]
+(defn input-config
   "Read a specific git configuration from the commandline."
+  [config-target]
   (println (messages config-target))
   (println ">")
   (let [input-val (read-line)]
@@ -15,8 +16,9 @@
               "-c"
               (str "git config --global " config-target " " input-val))))
 
-(defn get-config-target [config-target]
+(defn get-config-target
   "Ensure that git is fully configured for auto-modeling."
+  [config-target]
   (let [{exit :exit out :out err :err} (shell/sh "sh"
                                                  "-c"
                                                  (str "git config " config-target))]
