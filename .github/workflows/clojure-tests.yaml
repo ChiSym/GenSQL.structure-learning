@@ -1,4 +1,4 @@
-name: Clojure Tests
+name: Clojure test
 on: push
 jobs:
   run-tests:

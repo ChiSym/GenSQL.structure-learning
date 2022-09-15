@@ -1,4 +1,4 @@
-name: Clojure Lint
+name: Clojure lint
 on: push
 jobs:
   clojure-lint:

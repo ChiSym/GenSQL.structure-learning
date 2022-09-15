@@ -1,4 +1,4 @@
-name: Smoke Test
+name: Smoke test
 on:
   schedule:
     - cron: 0 12 * * 1 # Every Monday at 8 AM EST (noon UTC)
