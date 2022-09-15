@@ -19,9 +19,9 @@
 (defn get-config-target
   "Ensure that git is fully configured for auto-modeling."
   [config-target]
-  (let [{exit :exit out :out err :err} (shell/sh "sh"
-                                                 "-c"
-                                                 (str "git config " config-target))]
+  (let [{:keys [exit err]} (shell/sh "sh"
+                                     "-c"
+                                     (str "git config " config-target))]
     (if (empty? err)
       (when-not (zero? exit)
         (input-config config-target))
