@@ -21,4 +21,4 @@ jobs:
         run: nix develop -c python -m pytest --pyargs cgpm -k "not __ci_"
 
       - name: Run SPPL tests
-        run: nix develop -c python -m pyteset --pyargs sppl
+        run: nix develop -c python -m pytest --pyargs sppl
