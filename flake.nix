@@ -57,8 +57,8 @@
             owner = "probcomp";
             repo = "cgpm";
             # head of 20200908-schaechtle-experimenting-porting-to-python3 branch
-            rev = "96c15a90284f84ec426e4f06663559a0b41540d2";
-            sha256 = "sha256-pEpnpPNOqWRXHZjekR8znvWrEFxmuae3hqVwu+X4pt8=";
+            rev = "026e3ce23b35df1981f52120b46650ec8d45b011";
+            sha256 = "sha256-H34vEeRfs+xmFCx0/FqOGTBkGcSrwSEOg9i4dxYZ3nQ=";
           };
 
           propagatedBuildInputs = with pypkgs; [
