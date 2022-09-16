@@ -1,10 +1,11 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/35a74aa665a681b60d68e3d3400fcaa11690ee50";
+    unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs, unstable, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
@@ -121,9 +122,12 @@
           pypkgs.pandas
           pypkgs.pytest
         ]);
+
+        clj-kondo = unstable.legacyPackages.${system}.clj-kondo;
       in {
         devShell = pkgs.mkShell {
           buildInputs = [
+            clj-kondo
             dvc
             pkgs.clojure
             pkgs.gh
