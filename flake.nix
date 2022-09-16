@@ -136,7 +136,13 @@
           ];
 
           shellHook = ''
-            clojure -M bin/git-init.clj;
+            if [[ $- == *i* ]]
+            then
+                dvc () {
+                    clojure -M bin/git-init.clj;
+                    command dvc "$@";
+                }
+            fi
             alias iql-query-server='clojure -X inferenceql.auto-modeling.query-server/run';
             export PYTHONPATH=${pythonWithPackages}/${pythonWithPackages.sitePackages};
           '';
