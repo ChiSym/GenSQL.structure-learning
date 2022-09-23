@@ -5,7 +5,7 @@
         com.cognitect/transit-clj {:mvn/version "1.0.324"}
         io.github.inferenceql/inferenceql.gpm.sppl {:git/sha "cb5c76e337e73928bc55a4dc78feceda3d76144a"}
         io.github.inferenceql/inferenceql.inference {:git/sha "e1dcd0f2721dcdef388f8270dc9bd80eecde3ef9"}
-        io.github.inferenceql/inferenceql.query {:git/sha "0aca175b397abb4e80a3f407096a1d0b17b4c705"}
+        io.github.inferenceql/inferenceql.query {:git/sha "6f38c6db21a5ccdac69f0cddab3e1fcbbbc83d7a"}
         lambdaisland/regal {:mvn/version "0.0.143"}
         medley/medley {:mvn/version "1.4.0"}
         org.babashka/cli {:mvn/version "0.3.34"}
