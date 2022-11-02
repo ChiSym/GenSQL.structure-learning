@@ -11,7 +11,7 @@
   (let [data (map #(update-keys % keyword) (io/slurp-csv (str data-path)))
         samples-synthetic (-> samples-synthetic-path str slurp edn/read-string)
         out (concat (map #(assoc % :collection "synthetic") samples-synthetic)
-                    (map #(assoc % :collection "observed") data))]
+                    (map #(assoc % :collection "observed") (take (count samples-synthetic) (shuffle data))))]
     (pprint out)))
 
 (defn sample-xcat
