@@ -22,3 +22,6 @@ jobs:
 
       - name: Run SPPL tests
         run: nix develop -c python -m pytest --pyargs sppl
+
+      - name: Run Auto Modeling's Python tests
+        run: nix develop -c python -m pytest test/scripts
