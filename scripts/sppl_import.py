@@ -97,6 +97,12 @@ def main():
         default=sys.stdin,
     )
     parser.add_argument(
+        "--dep-prob",
+        type=argparse.FileType("r"),
+        help="dependency probability JSON.",
+        default=sys.stdout,
+    )
+    parser.add_argument(
         "--output",
         type=argparse.FileType("w+"),
         help="Path to SPPL JSON.",
@@ -104,12 +110,11 @@ def main():
     )
 
     args = parser.parse_args()
-    if args.multi_mix_ast is None:
+    if any(arg is None for arg in [args.multi_mix_ast, args.dep_prob]):
         parser.print_help(sys.stderr)
         sys.exit(1)
 
     multi_mix_ast = edn_format.loads(args.multi_mix_ast.read(), write_ply_tables=False)
-
     # For each view, return the clustering (i.e. the sums of products).
     views = [
         convert_view(view_index, view_ast[Keyword("view/clusters")])
@@ -117,6 +122,19 @@ def main():
             multi_mix_ast[Keyword("multimixture/views")]
         )
     ]
+    # We need to add dummy latent variables for view-clusterings in case other
+    # models in the ensemble have more views than the current one.
+    # Otherwise, the leaf nodes of the individual models differ; which, in the sppl-merge stage,
+    # will cause SPPL to throw an error.
+    max_number_of_views = json.load(args.dep_prob)["Maximal number of views"]
+    current_number_views = len(views)
+    for view_index in range(len(views), max_number_of_views):
+        views.append(
+            Identity(f"view_{view_index}_cluster")
+            >> distributions.choice(
+                {f"Unused -- model has only {current_number_views} views": 1}
+            )
+        )
 
     # Construct a Product of Sums (or a single Sum).
     spe = ProductSPE(views) if len(views) > 1 else views[0]
