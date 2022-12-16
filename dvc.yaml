@@ -178,12 +178,14 @@ stages:
         parallel ${parallel.flags}
         'python scripts/sppl_import.py
         --multi-mix-ast {}
+        --dep-prob data/dep-prob.json
         --output data/sppl/unmerged/{/.}.json'
         :::: <(find data/ast -type f)
     params:
       - parallel.flags
     deps:
       - data/ast
+      - data/dep-prob.json
       - scripts/sppl_import.py
     outs:
       - data/sppl/unmerged
