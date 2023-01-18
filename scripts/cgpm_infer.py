@@ -66,6 +66,7 @@ def main():
         sys.exit(1)
 
     metadata = json.load(args.metadata)
+    metadata["X"] = replace(metadata["X"], lambda x: x is None, math.nan)
     rng = general.gen_rng(args.seed)
     state = State.from_metadata(metadata, rng=rng)
     if args.iterations is not None:
