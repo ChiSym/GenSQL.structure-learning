@@ -3,9 +3,9 @@
         clj-commons/clj-yaml {:mvn/version "0.7.106"}
         cljstache/cljstache {:mvn/version "2.0.6"}
         com.cognitect/transit-clj {:mvn/version "1.0.324"}
-        io.github.inferenceql/inferenceql.gpm.sppl {:git/sha "cb5c76e337e73928bc55a4dc78feceda3d76144a"}
-        io.github.inferenceql/inferenceql.inference {:git/sha "e1dcd0f2721dcdef388f8270dc9bd80eecde3ef9"}
-        io.github.inferenceql/inferenceql.query {:git/sha "6f38c6db21a5ccdac69f0cddab3e1fcbbbc83d7a"}
+        io.github.inferenceql/inferenceql.gpm.sppl {:git/sha "52f8316e094b3644709dccde8f0a935f9b55f187"}
+        io.github.inferenceql/inferenceql.inference {:git/sha "f8b864bffeb4b11913414796c2af0f0f0cd665cc"}
+        io.github.inferenceql/inferenceql.query {:git/sha "9f601603a47b9dfcfb7c38441af2d279f1764031"}
         lambdaisland/regal {:mvn/version "0.0.143"}
         medley/medley {:mvn/version "1.4.0"}
         org.babashka/cli {:mvn/version "0.3.34"}
