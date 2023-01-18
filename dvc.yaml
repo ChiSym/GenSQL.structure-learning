@@ -69,6 +69,7 @@ stages:
   cgpm-generate-metadata:
     cmd: >
       mkdir -p data/cgpm/hydrated &&
+      rm -f data/cgpm/inf.log &&
       seq 0 $(($(bin/param sample_count) - 1)) |
       parallel $(bin/param parallel.flags)
       'python scripts/cgpm_hydrate.py
@@ -95,6 +96,7 @@ stages:
       find data/cgpm/hydrated -type f |
       parallel jsonschema --instance {} schemas/cgpm.json &&
       mkdir -p data/cgpm/complete &&
+      echo $(bin/param cgpm.minutes) >> data/cgpm/inf.log &&
       find data/cgpm/hydrated -type f |
       sort |
       parallel $(bin/param parallel.flags)
