@@ -187,6 +187,17 @@ All the settings in `params.yaml` that apply to the CGPM backend also apply to t
 ==== Outputs
 The outputs produced are the same as those produced by the CGPM backend. Please see the ouputs section for that backend.
 
+==== Running additional inference
+
+Sometimes, a user may wish to run additional CGPM inference without losing progress previously made. In order to run additional inference, users can run
+
+[source,bash]
+----
+bin/update-inference
+----
+
+This will keep the previous result and spend another _n_ minutes with inference, where _n_ is specified in the `params.yaml` under `cgpm > minutes`.
+
 === Clojurecat
 
 ==== Key points
