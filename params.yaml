@@ -1,6 +1,6 @@
-dataset_name: test-pub
-seed: 0
-sample_count: 3
+dataset_name: japan-lpm
+seed: 42
+sample_count: 1
 parallel:
   # To limit the number of jobs GNU Parallel spawns use add the flag `--jobs n`.
   flags: >-
@@ -16,20 +16,94 @@ schema:
   # For example, to force the "age" column to be treated as a
   # numerical uncomment the following line:
   # age: numerical
-  Apogee_km: numerical
-  Perigee_km: numerical
+  rakutenid: ignore
+  household_composition_single: nominal
+  household_composition_spouse: nominal
+  household_composition_children’s_spouse: nominal
+  household_composition_parents_of_spouse: nominal
+  household_composition_children: nominal
+  household_composition_child's_wife_or_son_in_law: nominal
+  household_composition_grandchildren: nominal
+  household_composition_your_siblings: nominal
+  household_composition_spouse_siblings: nominal
+  household_composition_other_relatives: nominal
+  household_composition_non_relatives: nominal
+  final_education_you: nominal
+  final_education_spouse: nominal
+  final_education_father: nominal
+  final_education_mother: nominal
+  current_working_status: nominal
+  current_working_status_spouse: nominal
+  current_working_status_father: nominal
+  current_working_status_mother: nominal
+  hourly_wage_for_current_job: numerical
+  looking_for_a_job: nominal
+  spouse_looking_for_a_job: nominal
+  reservation_wage_hourly_wage: numerical
+  assets_such_as_houses_and_land: nominal
+  balance_of_financial_assets: nominal
+  current_mortgage_balance: nominal
+  non_mortgage_debt: nominal
+  big_five_extraverted_enthusiastic: nominal
+  big_five_critical_quarrelsome: nominal
+  big_five_dependable_self_disciplined: nominal
+  big_five_anxious_easily_upset: nominal
+  big_five_open_to_new_experiencescomplex: nominal
+  big_five_reserved_quiet: nominal
+  big_five_sympathetic_warm: nominal
+  big_five_disorganized_careless: nominal
+  big_five_calm_emotionally_stable: nominal
+  big_five_conventional_uncreative: nominal
+  gender: nominal
+  age: numerical
+  pref: nominal
+  region: nominal
+  p_extraversion: nominal
+  p_agreeableness: nominal
+  p_conscientiousness: nominal
+  p_neuroticism: nominal
+  p_openness: nominal
+  schooling: nominal
+  higher_ed: nominal
+  spouse_schooling: nominal
+  father_schooling: nominal
+  mother_schooling: nominal
+  income: numerical
+  income2: nominal
+  spouse_income: nominal
+  hh_income: nominal
+  hopeful_income: nominal
+  hhsize: nominal
+  children: nominal
+  child_underprimary: nominal
+  child_primary: nominal
+  child_secondary: nominal
+  child_university: nominal
+  dm_durablegoods: nominal
+  dm_dailygoods: nominal
+  dm_invest: nominal
+  v_intl: nominal
+  v_energy: nominal
+  v_eat: nominal
+  v_product: nominal
+  v_fairtrade: nominal
+  v_work: nominal
+  v_localgrown: nominal
+  v_ac: nominal
+  v_peace: nominal
+  v_invest: nominal
 loom:
   extra_passes: 1
 cgpm:
   #iterations: 1
-  minutes: 1
+  minutes: 5
 clojurecat:
   iterations: 150
 qc:
   # Set this to the number of synthetic samples desired in QC plots.
   # When not set, the plots will display the same number of virual samples as
   # observed data points.
-  sample_count: null
+  sample_count: 2000
   # Set this to specify the columns visualized in QC plots.
   # When not set, up to 8 columns--taken from the schema--will be visualized.
   # e.g. columns: ["foo", "bar", "baz"]
