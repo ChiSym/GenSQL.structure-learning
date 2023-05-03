@@ -19,10 +19,10 @@ schema:
   rakutenid: ignore
   household_composition_single: nominal
   household_composition_spouse: nominal
-  household_composition_children’s_spouse: nominal
+  household_composition_childrens_spouse: nominal
   household_composition_parents_of_spouse: nominal
   household_composition_children: nominal
-  household_composition_child's_wife_or_son_in_law: nominal
+  household_composition_childs_wife_or_son_in_law: nominal
   household_composition_grandchildren: nominal
   household_composition_your_siblings: nominal
   household_composition_spouse_siblings: nominal
@@ -36,10 +36,8 @@ schema:
   current_working_status_spouse: nominal
   current_working_status_father: nominal
   current_working_status_mother: nominal
-  hourly_wage_for_current_job: numerical
   looking_for_a_job: nominal
   spouse_looking_for_a_job: nominal
-  reservation_wage_hourly_wage: numerical
   assets_such_as_houses_and_land: nominal
   balance_of_financial_assets: nominal
   current_mortgage_balance: nominal
@@ -64,7 +62,6 @@ schema:
   p_neuroticism: nominal
   p_openness: nominal
   schooling: nominal
-  higher_ed: nominal
   spouse_schooling: nominal
   father_schooling: nominal
   mother_schooling: nominal
