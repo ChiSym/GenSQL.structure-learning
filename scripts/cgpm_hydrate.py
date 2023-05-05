@@ -63,7 +63,9 @@ def main():
         additional_metadata = {}
 
     base_metadata = dict(
-        X=df.values, cctypes=cctypes, distargs=distargs, outputs=range(df.shape[1])
+        X=df.values, cctypes=cctypes, distargs=distargs,
+        outputs=range(df.shape[1]),
+        Zv={i:0 for i in range(len(cctypes))}
     )
     metadata = {**base_metadata, **additional_metadata}
     rng = general.gen_rng(args.seed)
