@@ -289,18 +289,20 @@ stages:
     outs:
       - qc/samples/samples.edn
 
-  xcat-import:
-    cmd: >
-      mkdir -p data/xcat &&
-      find data/cgpm/complete -type f |
-      parallel $(bin/param parallel.flags)
-      'clojure -X:xcat-import
-      :cgpm-json {}
-      :data-csv data/ignored.csv
-      :mapping-table data/mapping-table.edn
-      :numericalized-csv data/numericalized.csv
-      :schema-edn data/schema.edn
-      > data/xcat/{/.}.edn'
+  xcat-complete-import:
+    desc: "Imports the final CGPM Crosscat samples as XCat records."
+    cmd:
+      - mkdir -p data/xcat/complete/
+      - >-
+        parallel ${parallel.flags}
+        'clojure -X inferenceql.auto-modeling.xcat/import
+        :cgpm-json {}
+        :data-csv data/ignored.csv
+        :mapping-table data/mapping-table.edn
+        :numericalized-csv data/numericalized.csv
+        :schema-edn data/schema.edn
+        > data/xcat/complete/{/.}.edn'
+        :::: <(find data/cgpm/complete -type f)
     params:
       - parallel.flags
     deps:
@@ -311,7 +313,7 @@ stages:
       - data/schema.edn
       - src/inferenceql/auto_modeling/xcat.clj
     outs:
-      - data/xcat
+      - data/xcat/complete/
 
   qc-dashboard-spec:
     cmd: >
