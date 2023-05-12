@@ -205,23 +205,47 @@ stages:
     outs:
       - data/correlation.json
 
-  sppl-import:
-    cmd: >
-      find data/cgpm/complete -type f |
-      parallel jsonschema --instance {} schemas/cgpm.json &&
-      mkdir -p data/sppl/unmerged &&
-      find data/cgpm/complete -type f |
-      parallel $(bin/param parallel.flags)
-      'python scripts/sppl_import.py
-      --metadata {}
-      --data data/ignored.csv
-      --mapping-table data/mapping-table.edn
-      --output data/sppl/unmerged/{/}'
+  ast-export:
+    desc: "Exports ASTs of the parametric model programs resulting from truncating CGPM-CrossCat models."
+    cmd:
+      - >-
+        parallel ${parallel.flags}
+        jsonschema --instance {} schemas/cgpm.json
+        :::: <(find data/cgpm/complete -type f)
+      - mkdir -p data/ast
+      - >-
+        parallel ${parallel.flags}
+        'python scripts/ast_export.py
+        --metadata {}
+        --data data/numericalized.csv
+        --mapping-table data/mapping-table.edn
+        --output data/ast/{/.}.edn'
+        :::: <(find data/cgpm/complete -type f)
     params:
       - parallel.flags
     deps:
       - data/cgpm/complete
       - data/ignored.csv
+      - scripts/ast_export.py
+    outs:
+      - data/ast
+
+  sppl-import:
+    desc: "Imports a Multi-Mix AST and exports it AS a sum-product network"
+    cmd:
+      - mkdir -p data/sppl/unmerged
+      - >-
+        parallel ${parallel.flags}
+        'python scripts/sppl_import.py
+        --multi-mix-ast {}
+        --dep-prob data/dep-prob.json
+        --output data/sppl/unmerged/{/.}.json'
+        :::: <(find data/ast -type f)
+    params:
+      - parallel.flags
+    deps:
+      - data/ast
+      - data/dep-prob.json
       - scripts/sppl_import.py
     outs:
       - data/sppl/unmerged
