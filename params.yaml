@@ -1,6 +1,6 @@
-dataset_name: test-pub
-seed: 0
-sample_count: 3
+dataset_name: lpm-ces
+seed: 42
+sample_count: 1
 parallel:
   # To limit the number of jobs GNU Parallel spawns use add the flag `--jobs n`.
   flags: >-
@@ -16,13 +16,12 @@ schema:
   # For example, to force the "age" column to be treated as a
   # numerical uncomment the following line:
   # age: numerical
-  Apogee_km: numerical
-  Perigee_km: numerical
+  state: nominal
 loom:
   extra_passes: 1
 cgpm:
-  #iterations: 1
-  minutes: 1
+  iterations: 1
+  #minutes: 1
 clojurecat:
   iterations: 150
 qc:
