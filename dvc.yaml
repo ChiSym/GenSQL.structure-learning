@@ -358,3 +358,10 @@ stages:
       - src/inferenceql/auto_modeling/qc/app.clj
     outs:
       - qc/app/qc-dashboard.html
+
+  copy-result:
+    cmd: >
+      mkdir -p results/models/ &&
+      cp data/sppl/merged.json results/models/merged-$(date +%F_%T).json
+    deps:
+      - data/sppl/merged.json
