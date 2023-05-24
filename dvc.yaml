@@ -134,18 +134,18 @@ stages:
     outs:
       - data/dep-prob.json
 
-  save-correlations:
+  save-linear-stats:
     cmd: >
-      python scripts/correlation.py
+      python scripts/linear_stats.py
       --data data/ignored.csv
       --schema data/schema.edn
-      --output data/correlation.json
+      --output data/linear-stats.json
     deps:
       - data/ignored.csv
       - data/schema.edn
-      - scripts/correlation.py
+      - scripts/linear_stats.py
     outs:
-      - data/correlation.json
+      - data/linear-stats.json
 
   ast-export:
     desc: "Exports ASTs of the parametric model programs resulting from truncating CGPM-CrossCat models."
@@ -281,14 +281,14 @@ stages:
       clojure -X inferenceql.auto-modeling.qc.dashboard/spec
       :samples qc/samples/samples.edn
       :schema data/schema.edn
-      :correlation data/correlation.json
+      :correlation data/linear-stats.json
       > qc/specs/qc-dashboard.vl.json
     params:
       - qc.columns
     deps:
       - qc/samples/samples.edn
       - data/schema.edn
-      - data/correlation.json
+      - data/linear-stats.json
       - src/inferenceql/auto_modeling/qc/dashboard.clj
       - src/inferenceql/auto_modeling/qc/util.clj
     outs:
@@ -314,14 +314,14 @@ stages:
       clojure -X inferenceql.auto-modeling.qc.splom/spec
       :samples qc/samples/samples.edn
       :schema data/schema.edn
-      :correlation data/correlation.json
+      :correlation data/linear-stats.json
       > qc/specs/qc-splom.vl.json
     params:
       - qc.columns
     deps:
       - qc/samples/samples.edn
       - data/schema.edn
-      - data/correlation.json
+      - data/linear-stats.json
       - src/inferenceql/auto_modeling/qc/splom.clj
       - src/inferenceql/auto_modeling/qc/util.clj
     outs:
