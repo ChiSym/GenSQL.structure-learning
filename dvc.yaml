@@ -193,28 +193,41 @@ stages:
 
   save-dependencies:
     cmd: >
-      find data/cgpm/complete -type f |
+      find data/cgpm/hydrated -type f |
       sort |
       xargs python scripts/dep_prob.py
       --data data/numericalized.csv
       --output data/dep-prob.json
     deps:
-      - data/cgpm/complete
+      - data/cgpm/hydrated
     outs:
       - data/dep-prob.json
 
-  save-correlations:
+  save-linear-stats:
     cmd: >
-      python scripts/correlation.py
+      python scripts/linear_stats.py
       --data data/ignored.csv
       --schema data/schema.edn
-      --output data/correlation.json
+      --output data/linear-stats.json
     deps:
       - data/ignored.csv
       - data/schema.edn
-      - scripts/correlation.py
+      - scripts/linear_stats.py
     outs:
-      - data/correlation.json
+      - data/linear-stats.json
+
+  compare-dep-prob-with-linear:
+    desc: "Compares results from dependency probability with standard statistical tests"
+    cmd: >
+      python scripts/compare_deps.py
+      --deps data/dep-prob.json
+      --linear data/linear-stats.json
+      >> data/qc-statistical-tests.txt
+    deps:
+      - data/dep-prob.json
+      - data/linear-stats.json
+    outs:
+      - data/qc-statistical-tests.txt
 
   ast-export:
     desc: "Exports ASTs of the parametric model programs resulting from truncating CGPM-CrossCat models."
@@ -331,14 +344,14 @@ stages:
       clojure -X inferenceql.auto-modeling.qc.dashboard/spec
       :samples qc/samples/samples.edn
       :schema data/schema.edn
-      :correlation data/correlation.json
+      :correlation data/linear-stats.json
       > qc/specs/qc-dashboard.vl.json
     params:
       - qc.columns
     deps:
       - qc/samples/samples.edn
       - data/schema.edn
-      - data/correlation.json
+      - data/linear-stats.json
       - src/inferenceql/auto_modeling/qc/dashboard.clj
       - src/inferenceql/auto_modeling/qc/util.clj
     outs:
