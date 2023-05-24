@@ -374,7 +374,19 @@ stages:
 
   copy-result:
     cmd: >
-      mkdir -p results/models/ &&
-      cp data/sppl/merged.json results/models/merged-$(date +%F_%T).json
+      mkdir -p results/ran-$(date +%F_%T) &&
+      cp data/sppl/merged.json results/ran-$(date +%F_%T)/merged.json &&
+      cp -r data/cgpm/ results/ran-$(date +%F_%T)/cgpm &&
+      cp -r data/ast/ results/ran-$(date +%F_%T)/ast &&
+      cp data/schema.edn results/ran-$(date +%F_%T)/schema.edn &&
+      cp data/dep-prob.json results/ran-$(date +%F_%T)/dep-prob.json &&
+      cp data/linear-stats.json results/ran-$(date +%F_%T)/linear-stats.json &&
+      cp data/qc-statistical-tests.txt results/ran-$(date +%F_%T)/qc-statistical-tests.txt
     deps:
       - data/sppl/merged.json
+      - data/cgpm
+      - data/ast
+      - data/schema.edn
+      - data/dep-prob.json
+      - data/linear-stats.json
+      - data/qc-statistical-tests.txt
