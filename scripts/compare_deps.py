@@ -71,7 +71,7 @@ def main():
     print("")
     if true_pos:
         for tn in true_pos:
-            print(fn)
+            print(tn)
     else:
         print("-- No relationships detected misssed by standard stats --")
     print("")
