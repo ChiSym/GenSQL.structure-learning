@@ -374,14 +374,14 @@ stages:
 
   copy-result:
     cmd: >
-      mkdir -p results/ran-$(date +%F_%T) &&
-      cp data/sppl/merged.json results/ran-$(date +%F_%T)/merged.json &&
-      cp -r data/cgpm/ results/ran-$(date +%F_%T)/cgpm &&
-      cp -r data/ast/ results/ran-$(date +%F_%T)/ast &&
-      cp data/schema.edn results/ran-$(date +%F_%T)/schema.edn &&
-      cp data/dep-prob.json results/ran-$(date +%F_%T)/dep-prob.json &&
-      cp data/linear-stats.json results/ran-$(date +%F_%T)/linear-stats.json &&
-      cp data/qc-statistical-tests.txt results/ran-$(date +%F_%T)/qc-statistical-tests.txt
+      mkdir -p results/ran-$(date +%F_%H:%M) &&
+      cp data/sppl/merged.json results/ran-$(date +%F_%H:%M)/merged.json &&
+      cp -r data/cgpm/ results/ran-$(date +%F_%H:%M)/cgpm &&
+      cp -r data/ast/ results/ran-$(date +%F_%H:%M)/ast &&
+      cp data/schema.edn results/ran-$(date +%F_%H:%M)/schema.edn &&
+      cp data/dep-prob.json results/ran-$(date +%F_%H:%M)/dep-prob.json &&
+      cp data/linear-stats.json results/ran-$(date +%F_%H:%M)/linear-stats.json &&
+      cp data/qc-statistical-tests.txt results/ran-$(date +%F_%H:%M)/qc-statistical-tests.txt
     deps:
       - data/sppl/merged.json
       - data/cgpm
