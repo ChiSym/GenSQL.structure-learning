@@ -3,6 +3,7 @@
         clj-commons/clj-yaml {:mvn/version "0.7.106"}
         cljstache/cljstache {:mvn/version "2.0.6"}
         com.cognitect/transit-clj {:mvn/version "1.0.324"}
+        com.github.haifengl/smile-core {:mvn/version "3.0.1"}
         io.github.inferenceql/inferenceql.gpm.sppl {:git/sha "52f8316e094b3644709dccde8f0a935f9b55f187"}
         io.github.inferenceql/inferenceql.inference {:git/sha "f8b864bffeb4b11913414796c2af0f0f0cd665cc"}
         io.github.inferenceql/inferenceql.query {:git/sha "9f601603a47b9dfcfb7c38441af2d279f1764031"}
@@ -13,6 +14,7 @@
         org.clojure/clojurescript {:mvn/version "1.11.54"}
         org.clojure/data.csv {:mvn/version "1.0.0"}
         org.clojure/data.json {:mvn/version "2.4.0"}
+        org.slf4j/slf4j-nop {:mvn/version "2.0.7"}
         selmer/selmer {:mvn/version "1.12.40"}}
  :aliases {:test {:extra-paths ["test"]
                   :extra-deps {org.clojure/test.check {:mvn/version "1.1.1"}}}
