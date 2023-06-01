@@ -103,6 +103,15 @@ def main():
         metadata["Zrv"] = Zrv
     columns_transition = [i for i in range(df.shape[1]) if i not in do_not_transition]
     rng = general.gen_rng(args.seed)
+    # Indepdence is solved using CGPM's independence constraints.
+    if "independence" in cgpm_params:
+        Ci = []
+        for c1, cols in cgpm_params["independence"].items():
+            for c2 in cols:
+                Ci.append(tuple([column_mapping[c1], column_mapping[c2]]))
+    else:
+        Ci = []
+    metadata["Ci"] = Ci
     state = State.from_metadata(metadata, rng=rng)
 
     if do_not_transition:
