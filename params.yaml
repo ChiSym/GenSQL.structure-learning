@@ -32,6 +32,14 @@ cgpm:
   #    - Purpose
   #  Launch_Site:
   #    - Type_of_Orbit
+  ## Independence is un-directional. For two columns foo and bar, setting `foo: - bar`
+  ## and `bar: - foo` has the identical effect.
+  #independence:
+  #  Perigee_km:
+  #    - Class_of_Orbit
+  #    - Apogee_km
+  #  Apogee_km:
+  #    - Class_of_Orbit
 clojurecat:
   iterations: 150
 qc:
