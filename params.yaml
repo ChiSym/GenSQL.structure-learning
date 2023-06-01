@@ -16,8 +16,8 @@ schema:
   # For example, to force the "age" column to be treated as a
   # numerical uncomment the following line:
   # age: numerical
-  Apogee_km: numerical
-  Perigee_km: numerical
+  # Apogee_km: numerical
+  # Perigee_km: numerical
 loom:
   extra_passes: 1
 cgpm:
