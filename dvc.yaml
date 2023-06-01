@@ -134,6 +134,17 @@ stages:
     outs:
       - data/dep-prob.json
 
+  save-max-number-views:
+    cmd: >
+      find data/cgpm/complete -type f |
+      xargs python scripts/save_n_views.py
+      >> data/max-number-views.txt
+    deps:
+      - data/cgpm/complete
+    outs:
+      - data/max-number-views.txt
+
+
   dep-prob-vl:
     cmd: >
       clojure -X inferenceql.auto-modeling.heatmap/dep-prob :json-path '"data/dep-prob.json"'
@@ -222,14 +233,14 @@ stages:
         parallel ${parallel.flags}
         'python scripts/sppl_import.py
         --multi-mix-ast {}
-        --dep-prob data/dep-prob.json
+        --max-number-views data/max-number-views.txt
         --output data/sppl/unmerged/{/.}.json'
         :::: <(find data/ast -type f)
     params:
       - parallel.flags
     deps:
       - data/ast
-      - data/dep-prob.json
+      - data/max-number-views.txt
       - scripts/sppl_import.py
     outs:
       - data/sppl/unmerged

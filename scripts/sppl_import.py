@@ -97,10 +97,10 @@ def main():
         default=sys.stdin,
     )
     parser.add_argument(
-        "--dep-prob",
+        "--max-number-views",
         type=argparse.FileType("r"),
-        help="dependency probability JSON.",
-        default=sys.stdout,
+        help="Text file recording maximum number of views",
+        default=sys.stdin,
     )
     parser.add_argument(
         "--output",
@@ -110,7 +110,7 @@ def main():
     )
 
     args = parser.parse_args()
-    if any(arg is None for arg in [args.multi_mix_ast, args.dep_prob]):
+    if any(arg is None for arg in [args.multi_mix_ast, args.max_number_views]):
         parser.print_help(sys.stderr)
         sys.exit(1)
 
@@ -126,7 +126,7 @@ def main():
     # models in the ensemble have more views than the current one.
     # Otherwise, the leaf nodes of the individual models differ; which, in the sppl-merge stage,
     # will cause SPPL to throw an error.
-    max_number_of_views = json.load(args.dep_prob)["Maximal number of views"]
+    max_number_of_views = int(args.max_number_views.read())
     current_number_views = len(views)
     for view_index in range(len(views), max_number_of_views):
         views.append(
