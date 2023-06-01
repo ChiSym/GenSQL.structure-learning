@@ -107,18 +107,20 @@ stages:
       --kernel rows
       --kernel columns
       --output data/cgpm/complete/{/}
+      --data data/numericalized.csv
+      --params params.yaml
       --seed $(($(bin/param seed) + {#} - 1))
       --minutes $(bin/param cgpm.minutes)'
       #--iterations $(bin/param cgpm.iterations)
     params:
       - parallel.flags
       - seed
-      - cgpm.minutes
-      #- cgpm.iterations
+      - cgpm
     deps:
       - data/cgpm/hydrated
       - schemas/cgpm.json
       - scripts/cgpm_infer.py
+      - data/numericalized.csv
     outs:
       - data/cgpm/complete
 

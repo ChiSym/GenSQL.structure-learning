@@ -23,6 +23,15 @@ loom:
 cgpm:
   #iterations: 1
   minutes: 1
+  #dependence:
+  #  # While the CrossCat implementation in CGPM takes dependence constraints, doing so
+  #  # throws a not-implemented-error. Hence, we apply a workaround:
+  #  #   - Supply a map from a target column name to a list of column names.
+  #  #   - Each column in said list gets moved to the target column's view.
+  #  Users:
+  #    - Purpose
+  #  Launch_Site:
+  #    - Type_of_Orbit
 clojurecat:
   iterations: 150
 qc:
