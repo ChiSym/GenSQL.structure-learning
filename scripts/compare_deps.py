@@ -41,9 +41,7 @@ def main():
     dep_prob = json.load(args.deps)
     linear = json.load(args.linear)
 
-    pairs = itertools.combinations(
-        [k for k in dep_prob.keys() if k != "Maximal number of views"], 2
-    )
+    pairs = itertools.combinations(dep_prob.keys(), 2)
     false_neg = []
     true_pos = []
     for c1, c2 in pairs:
