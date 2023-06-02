@@ -1,8 +1,22 @@
 (ns inferenceql.auto-modeling.heatmap
-  "Functions for generating dependence probability heatmaps."
-  (:require [clojure.data.json :as json])
+  "Functions for generating heatmaps."
+  (:require [clojure.data.json :as json]
+            [medley.core :as medley])
   (:import [smile.clustering HierarchicalClustering]
            [smile.clustering.linkage UPGMCLinkage]))
+
+;; The purpose of this file is to generate dependence probability heatmaps from
+;; a data structure called a statistic map. Statistic maps define the dependence
+;; probability between all pairs of columns in a dataset. A statistic map is a
+;; map of maps where the keys of both the outer map and the inner maps are
+;; columns, and the values of the inner maps are the probability that the
+;; columns are dependent or a map of statistics relating the two columns.
+
+(defn- columns
+  "Returns all the columns in a statistic map."
+  [sm]
+  (into (set (keys sm))
+        (mapcat keys (vals sm))))
 
 ;; The challenge when generating a dependence probability heatmap is finding a
 ;; column ordering that will position columns that have a high probability of
@@ -16,43 +30,30 @@
 ;; distance metric we define. We repeat this process until we generate the top
 ;; of the tree, where there is only one cluster.
 
-(defn- columns
-  "Returns all the columns in a dependence probability JSON."
-  [json]
-  (set (keys json)))
-
-(defn- prob-dependent
-  "Returns a function that will return the dependence probability between two
-  columns according to the provided dependence probability JSON."
-  [json]
-  (fn [col1 col2]
-    (double
-     (if (= col1 col2)
-       1.0
-       (get-in json [col1 col2] 0.0)))))
-
 (defn- clustering-comp
   "Returns a comparator function for use with `clojure.core/sort` that will sort
-  columns according to their dependence probability clustering."
-  [json]
+  columns according to a statistic map."
+  [sm]
   ;; We use an agglomerative clustering algorithm from the Smile machine
   ;; learning library. For our distance metric (the distance between columns) we
   ;; use the probability that the columns are dependent. Columns that have a
   ;; higer probability of dependence are considered closer together.
-  (let [prob-dependent (prob-dependent json)
-        ;; Smile's distance metrics require that you provide the distance
+  (let [;; Smile's distance metrics require that you provide the distance
         ;; between each pair of values as a two-dimensional array of doubles,
         ;; where the value at coordinate (x, y) in the array is the distance
         ;; between the items at index x and index y.
-        columns (vec (columns json))
+        columns (vec (columns sm))
         linkage (UPGMCLinkage/of
                  (into-array
                   (for [c1 (range (count columns))]
                     (double-array
                      (for [c2 (range (count columns))]
                        (let [col1 (nth columns c1)
-                             col2 (nth columns c2)]
-                         (prob-dependent col1 col2)))))))
+                             col2 (nth columns c2)
+                             stat (get-in sm [col1 col2] ::not-found)]
+                         (if (= ::not-found stat)
+                           (throw (ex-info "No statistic for columns." {:columns [col1 col2]}))
+                           stat)))))))
         clustering (HierarchicalClustering/fit linkage)]
     ;; The `HierarchicalClustering` class provides a method, `partition`, which
     ;; cuts the tree into n groups. `partition` returns an integer array where
@@ -74,52 +75,91 @@
               (recur (inc n-clusters))
               (> c1s c2s))))))))
 
-(defn- column-order
-  "Sorts columns according to their dependence probability clustering."
-  [json]
-  (let [columns (columns json)
-        clustering-comp (clustering-comp json)]
-    (->> columns
-         (sort clustering-comp)
-         (vec))))
+(defn- sort-spec
+  "Returns a Vega-Lite snippet that will cause columns in the x and y axes to be
+  sorted according to the provided comparator."
+  [sm]
+  (let [columns (columns sm)
+        clustering-comp (clustering-comp sm)
+        order (->> columns
+                   (sort clustering-comp)
+                   (vec))]
+    {:encoding {:x {:sort order}
+                :y {:sort order}}}))
 
-(defn- dep-prob-rows
-  "Returns a sequence of maps each of which refers to a pair of columns and
-  their dependence probability."
-  [json]
-  (let [prob-dependent (prob-dependent json)
-        columns (columns json)]
+(defn- domain-spec
+  [domain]
+  {:encoding {:fill {:scale {:domain domain}}}})
+
+(defn- scheme-spec
+  [scheme]
+  {:encoding {:fill {:scale {:scheme scheme}}}})
+
+(defn- heatmap-spec
+  [field]
+  {:mark {:type "rect"}
+   :encoding {:x {:title nil
+                  :field "col1"
+                  :type "nominal"
+                  :axis {:orient "top"
+                         :labelAngle 315}}
+              :y {:title nil
+                  :field "col2"
+                  :type "nominal"}
+              :fill {:title nil
+                     :field field
+                     :type "quantitative"}}})
+
+(defn- update-stats
+  "Given a map of maps, calls f on each value of each inner map and args."
+  [sm f & args]
+  (update-vals sm (fn [inner] (update-vals inner #(apply f % args)))))
+
+(defn- fill-missing
+  "Given a map of maps, ensures that the outer maps and the inner maps have the
+  same keys. Uses x as the value for any keys added to the inner maps."
+  [sm x]
+  (let [columns (columns sm)]
+    (reduce (fn [sm [col1 col2]]
+              (update-in sm [col1 col2] #(or % x)))
+            sm
+            (for [col1 columns
+                  col2 columns]
+              [col1 col2]))))
+
+(defn- values
+  "Transforms the provided statistic maps into a table, expressed as a vector of
+  maps. Each map in the vector has keys for the two columns and one key for each
+  of the statistics."
+  [key->sm]
+  (let [columns (into #{} (mapcat keys (vals key->sm)))]
     (for [col1 columns
           col2 columns]
-      {:col1 col1
-       :col2 col2
-       :dep-prob (prob-dependent col1 col2)})))
+      (reduce-kv (fn [row k sm]
+                   (assoc row k (get-in sm [col1 col2])))
+                 {:col1 col1
+                  :col2 col2}
+                 key->sm))))
 
-(defn- dep-prob-spec
-  "Returns a Vega-Lite spec for a dependence probability heatmap."
-  [json]
-  (let [column-order (column-order json)]
-    {:$schema "https://vega.github.io/schema/vega-lite/v5.json"
-     :data {:values (dep-prob-rows json)}
-     :mark {:type "rect"
-            :tooltip true}
-     :encoding {:x {:title false
-                    :field "col1"
-                    :type "nominal"
-                    :sort column-order}
-                :y {:title false
-                    :field "col2"
-                    :type "nominal"
-                    :sort column-order}
-                :color {:field "dep-prob"
-                        :type "quantitative"
-                        :scale {:domain [0.0 1.0]
-                                :scheme "blues"}}}}))
+(def ^:private vega-lite-schema "https://vega.github.io/schema/vega-lite/v5.json")
 
-(defn dep-prob
-  "Prints a Vega-Lite spec for a dependence probability heatmap."
-  [& {:keys [json-path]}]
-  (let [json (-> (slurp json-path)
-                 (json/read-str))
-        spec (dep-prob-spec json)]
+(defn vega-lite
+  "Prints a Vega-Lite spec for a statistic JSON file."
+  [& {:keys [default domain field name scheme stats-path sort-path]}]
+  (assert (some? name))
+  (assert (some? stats-path))
+  (let [sm (cond-> (slurp stats-path)
+             true (json/read-str)
+             field (update-stats #(get % field))
+             default (fill-missing default))
+        sort-sm (some-> (slurp sort-path)
+                        (json/read-str)
+                        (fill-missing default))
+        base-spec {:$schema vega-lite-schema
+                   :data {:values (values {name sm})}}
+        spec (medley/deep-merge base-spec
+                                (heatmap-spec name)
+                                (sort-spec (or sort-sm sm))
+                                (when domain (domain-spec domain))
+                                (when scheme (scheme-spec scheme)))]
     (json/write spec *out*)))

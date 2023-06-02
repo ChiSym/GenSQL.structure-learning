@@ -144,13 +144,18 @@ stages:
     outs:
       - data/max-number-views.txt
 
-
   dep-prob-vl:
     cmd: >
-      clojure -X inferenceql.auto-modeling.heatmap/dep-prob :json-path '"data/dep-prob.json"'
+      clojure -X inferenceql.auto-modeling.heatmap/vega-lite
+      :stats-path '"data/dep-prob.json"'
+      :domain '[0.0 1.0]'
+      :default 1.0
+      :name '"crosscat"'
+      :scheme '"blues"'
       > data/dep-prob.vl.json
     deps:
       - data/dep-prob.json
+      - src/inferenceql/auto_modeling/heatmap.clj
     outs:
       - data/dep-prob.vl.json
 
