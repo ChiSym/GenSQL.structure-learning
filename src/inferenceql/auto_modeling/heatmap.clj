@@ -88,14 +88,21 @@
                 :y {:sort order}}}))
 
 (defn- domain-spec
+  "Returns a Vega-Lite snippet that sets the domain for the fill encoding
+  channel."
   [domain]
   {:encoding {:fill {:scale {:domain domain}}}})
 
 (defn- scheme-spec
+  "Returns a Vega-Lite snippet that sets the color scheme for the fill encoding
+  channel."
   [scheme]
   {:encoding {:fill {:scale {:scheme scheme}}}})
 
 (defn- heatmap-spec
+  "Returns a Vega-Lite snippet that renders the data as a heatmap, using fields
+  \"col1\" and \"col2\" as the x and y axis, respectively. Accepts the
+  quantitative field to use in the fill encoding as an argument."
   [field]
   {:mark {:type "rect"}
    :encoding {:x {:title nil

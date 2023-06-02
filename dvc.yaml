@@ -192,6 +192,42 @@ stages:
     outs:
       - data/linear-stats.json
 
+  linear-stats-vl:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.heatmap/vega-lite
+      :stats-path '"data/linear-stats.json"'
+      :domain '[1.0 0.0]'
+      :default 1.0
+      :name '"statistics"'
+      :field '"p-value"'
+      :scheme '"oranges"'
+      > data/linear-stats.vl.json
+    deps:
+      - data/linear-stats.json
+      - src/inferenceql/auto_modeling/heatmap.clj
+    outs:
+      - data/linear-stats.vl.json
+
+  linear-stats-vg:
+    cmd: >
+      pnpm vl2vg
+      < data/linear-stats.vl.json
+      > data/linear-stats.vg.json
+    deps:
+      - data/linear-stats.vl.json
+    outs:
+      - data/linear-stats.vg.json
+
+  linear-stats-svg:
+    cmd: >
+      pnpm vg2svg
+      < data/linear-stats.vg.json
+      > data/linear-stats.svg
+    deps:
+      - data/linear-stats.vg.json
+    outs:
+      - data/linear-stats.svg
+
   compare-dep-prob-with-linear:
     desc: "Compares results from dependency probability with standard statistical tests"
     cmd: >
