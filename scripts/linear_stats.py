@@ -8,7 +8,6 @@ import pandas
 import sys
 import numpy as np
 import scipy.stats as stats
-from edn_format import Keyword
 from collections import defaultdict
 
 # Monkey patching this to work around https://github.com/scipy/scipy/pull/7838
