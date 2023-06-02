@@ -54,7 +54,7 @@ def test_convert_cluster():
         "column_foo": primitive_dist_categorical,
         "column_bar": primitive_dist_student_t,
     }
-    cluster_product_node = convert_cluster(cluster)
+    cluster_product_node = convert_cluster(0, 0, cluster)
     assert isinstance(cluster_product_node, sppl.spe.ProductSPE)
 
 
@@ -75,5 +75,5 @@ def test_convert_view():
             },
         },
     ]
-    view_sum_node = convert_view(view)
+    view_sum_node = convert_view(0, view)
     assert isinstance(view_sum_node, sppl.spe.SumSPE)
