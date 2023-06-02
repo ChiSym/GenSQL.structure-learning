@@ -284,14 +284,14 @@ stages:
         parallel ${parallel.flags}
         'python scripts/sppl_import.py
         --multi-mix-ast {}
-        --dep-prob data/dep-prob.json
+        --max-number-views data/max-number-views.txt
         --output data/sppl/unmerged/{/.}.json'
         :::: <(find data/ast -type f)
     params:
       - parallel.flags
     deps:
       - data/ast
-      - data/dep-prob.json
+      - data/max-number-views.txt
       - scripts/sppl_import.py
     outs:
       - data/sppl/unmerged
