@@ -194,7 +194,7 @@ stages:
 
   dep-prob-vl:
     cmd: >
-      clojure -X inferenceql.auto-modeling.heatmap/dep-prob :json-path '"data/dep-prob.json"'
+      clojure -X inferenceql.auto-modeling.heatmap/vega-lite :json-path '"data/dep-prob.json"'
       > data/dep-prob.vl.json
     deps:
       - data/dep-prob.json
