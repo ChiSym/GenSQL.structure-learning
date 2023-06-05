@@ -117,7 +117,13 @@ def main():
         4: "Did not vote in this race",
         5:  "There was no race for this office"
     }
-    education =  {1:"(a) no high school degree", 2:"(b) high school", 3:"(c) college, no degree", 4:"2-year college", 5: "4-year college", 6:"Post graduate"}
+    education =  {
+            1:"(a) no high school degree",
+            2:"(b) high school",
+            3:"(c) college, no degree",
+            4:"(d) 2-year college",
+            5:"(e) 4-year college",
+            6:"(f) Post graduate"}
     race =  {1:"White", 2:"Black", 3:"Latino", 4:"Asian", 5:"Native American", 8:"Middle Eastern", 6:"two or more", 7:"other"}
     incdec = {
             1: "(a) Increased a lot",
