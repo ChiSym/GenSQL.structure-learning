@@ -1,12 +1,20 @@
 stages:
-
   pre-process:
-    cmd: scripts/pre_process.py
+    cmd: >
+      scripts/pre_process.py
+      --states $(bin/param states)
+      --subsample $(bin/param sample_training_data)
+    params:
+      - states
+      - sample_training_data
     deps:
       - data/raw/CES22_Common.csv
       - scripts/pre_process.py
     outs:
       - data/data.csv
+      - data/test.csv
+      - data/data-orig.csv
+      - data/test-orig.csv
 
   validate-column-names:
     cmd: bin/validate.sh
@@ -27,50 +35,50 @@ stages:
     outs:
       - data/nullified.csv
 
-  guess-schema:
-    cmd: >
-      clojure -X inferenceql.auto-modeling.main/guess-schema
-      < data/nullified.csv
-      > data/schema.edn
-    deps:
-      - data/nullified.csv
-    params:
-      - schema
-    outs:
-      - data/schema.edn
+        #guess-schema:
+        #  cmd: >
+        #    clojure -X inferenceql.auto-modeling.main/guess-schema
+        #    < data/nullified.csv
+        #    > data/schema.edn
+        #  deps:
+        #    - data/nullified.csv
+        #  params:
+        #    - schema
+        #  outs:
+        #    - data/schema.edn
 
   cgpm-schema:
     cmd: >
       clojure -X inferenceql.auto-modeling.main/cgpm-schema
-      < data/schema.edn
+      < schema.edn
       > data/cgpm-schema.edn
     deps:
-      - data/schema.edn
+      - schema.edn
     outs:
       - data/cgpm-schema.edn
 
   ignore:
     cmd: >
       clojure -X inferenceql.auto-modeling.main/ignore
-      :schema '"data/schema.edn"'
+      :schema '"schema.edn"'
       < data/data.csv
       > data/ignored.csv
     deps:
       - data/nullified.csv
-      - data/schema.edn
+      - schema.edn
     outs:
       - data/ignored.csv
 
   numericalize:
     cmd: >
       clojure -X inferenceql.auto-modeling.main/numericalize
-      :schema '"data/schema.edn"'
+      :schema '"schema.edn"'
       :table data/mapping-table.edn
       < data/ignored.csv
       > data/numericalized.csv
     deps:
       - data/ignored.csv
-      - data/schema.edn
+      - schema.edn
     outs:
       - data/numericalized.csv
       - data/mapping-table.edn
@@ -78,10 +86,10 @@ stages:
   loom-schema:
     cmd: >
       clojure -X inferenceql.auto-modeling.main/loom-schema
-      < data/schema.edn
+      < schema.edn
       > data/loom-schema.json
     deps:
-      - data/schema.edn
+      - schema.edn
     outs:
       - data/loom-schema.json
 
@@ -236,11 +244,11 @@ stages:
     cmd: >
       python scripts/linear_stats.py
       --data data/ignored.csv
-      --schema data/schema.edn
+      --schema schema.edn
       --output data/linear-stats.json
     deps:
       - data/ignored.csv
-      - data/schema.edn
+      - schema.edn
       - scripts/linear_stats.py
     outs:
       - data/linear-stats.json
@@ -331,12 +339,12 @@ stages:
     cmd: >
       clojure -X inferenceql.auto-modeling.qc.samples/tag
       :data data/ignored.csv
-      :schema data/schema.edn
+      :schema schema.edn
       :samples-synthetic qc/samples/samples-synthetic.edn
       > qc/samples/samples.edn
     deps:
       - data/ignored.csv
-      - data/schema.edn
+      - schema.edn
       - qc/samples/samples-synthetic.edn
       - src/inferenceql/auto_modeling/qc/samples.clj
     outs:
@@ -353,7 +361,7 @@ stages:
         :data-csv data/ignored.csv
         :mapping-table data/mapping-table.edn
         :numericalized-csv data/numericalized.csv
-        :schema-edn data/schema.edn
+        :schema-edn schema.edn
         > data/xcat/complete/{/.}.edn'
         :::: <(find data/cgpm/complete -type f)
     params:
@@ -363,7 +371,7 @@ stages:
       - data/mapping-table.edn
       - data/ignored.csv
       - data/numericalized.csv
-      - data/schema.edn
+      - schema.edn
       - src/inferenceql/auto_modeling/xcat.clj
     outs:
       - data/xcat/complete/
@@ -372,14 +380,14 @@ stages:
     cmd: >
       clojure -X inferenceql.auto-modeling.qc.dashboard/spec
       :samples qc/samples/samples.edn
-      :schema data/schema.edn
+      :schema schema.edn
       :correlation data/linear-stats.json
       > qc/specs/qc-dashboard.vl.json
     params:
       - qc.columns
     deps:
       - qc/samples/samples.edn
-      - data/schema.edn
+      - schema.edn
       - data/linear-stats.json
       - src/inferenceql/auto_modeling/qc/dashboard.clj
       - src/inferenceql/auto_modeling/qc/util.clj
@@ -407,7 +415,7 @@ stages:
       cp data/sppl/merged.json results/ran-$(date +%F_%H:%M)/merged.json &&
       cp -r data/cgpm/ results/ran-$(date +%F_%H:%M)/cgpm &&
       cp -r data/ast/ results/ran-$(date +%F_%H:%M)/ast &&
-      cp data/schema.edn results/ran-$(date +%F_%H:%M)/schema.edn &&
+      cp schema.edn results/ran-$(date +%F_%H:%M)/schema.edn &&
       cp data/dep-prob.json results/ran-$(date +%F_%H:%M)/dep-prob.json &&
       cp data/linear-stats.json results/ran-$(date +%F_%H:%M)/linear-stats.json &&
       cp data/qc-statistical-tests.txt results/ran-$(date +%F_%H:%M)/qc-statistical-tests.txt
@@ -415,7 +423,7 @@ stages:
       - data/sppl/merged.json
       - data/cgpm
       - data/ast
-      - data/schema.edn
+      - schema.edn
       - data/dep-prob.json
       - data/linear-stats.json
       - data/qc-statistical-tests.txt
