@@ -193,15 +193,44 @@ stages:
 
   save-dependencies:
     cmd: >
-      find data/cgpm/hydrated -type f |
+      find data/cgpm/complete -type f |
       sort |
       xargs python scripts/dep_prob.py
       --data data/numericalized.csv
       --output data/dep-prob.json
     deps:
-      - data/cgpm/hydrated
+      - data/cgpm/complete
     outs:
       - data/dep-prob.json
+
+  dep-prob-vl:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.heatmap/dep-prob :json-path '"data/dep-prob.json"'
+      > data/dep-prob.vl.json
+    deps:
+      - data/dep-prob.json
+    outs:
+      - data/dep-prob.vl.json
+
+  dep-prob-vg:
+    cmd: >
+      pnpm vl2vg
+      < data/dep-prob.vl.json
+      > data/dep-prob.vg.json
+    deps:
+      - data/dep-prob.vl.json
+    outs:
+      - data/dep-prob.vg.json
+
+  dep-prob-svg:
+    cmd: >
+      pnpm vg2svg
+      < data/dep-prob.vg.json
+      > data/dep-prob.svg
+    deps:
+      - data/dep-prob.vg.json
+    outs:
+      - data/dep-prob.svg
 
   save-linear-stats:
     cmd: >
