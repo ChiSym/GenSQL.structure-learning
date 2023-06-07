@@ -312,6 +312,20 @@ stages:
     outs:
       - data/ast
 
+  write-gen-programs:
+    deps:
+      - data/ast
+    outs:
+      - data/code
+    cmd:
+      - mkdir -p data/code
+      - >-
+        parallel ${parallel.flags}
+        'clojure -X inferenceql.auto-modeling.code/pprint-string
+        :path \"{}\"
+        > data/code/{/.}.clj'
+        :::: <(find data/ast -type f)
+
   sppl-import:
     desc: "Imports a Multi-Mix AST and exports it AS a sum-product network"
     cmd:
