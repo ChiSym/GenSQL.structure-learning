@@ -198,6 +198,43 @@ bin/update-inference
 
 This will keep the previous result and spend another _n_ minutes with inference, where _n_ is specified in the `params.yaml` under `cgpm > minutes`.
 
+==== Set qualitative dependence constraints
+
+We can tell CrossCat to consider sets' of columns to be dependent or independent to improve modeling results.
+
+This can be set in the `params.yaml` file. For dependence, edit the `cgpm` section, for example:
+
+[source,yaml]
+----
+cgpm:
+  minutes: 1
+  dependence:
+    foo:
+      -bar
+    baz:
+      - quagga
+----
+
+While the CrossCat implementation in CGPM takes dependence constraints, doing so throws a not-implemented-error. Hence, we apply a workaround:
+    - Supply a map from a target column name to a list of column names.
+    - Each column in said list gets moved to the target column's view.
+
+Similarly, we can ensure independence:
+
+[source,yaml]
+----
+cgpm:
+  minutes: 1
+  independence:
+    foo:
+      - bar
+      - baz
+    quagga:
+      - foo
+----
+
+Independence is un-directional. For two columns foo and bar, setting `foo: - bar` and `bar: - foo` has the identical effect.
+
 === Clojurecat
 
 ==== Key points
