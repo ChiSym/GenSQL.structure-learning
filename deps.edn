@@ -1,4 +1,4 @@
-{:deps {babashka/fs {:mvn/version "0.1.6"}
+{:deps {babashka/fs {:mvn/version "0.4.19"}
         cheshire/cheshire {:mvn/version "5.10.0"}
         clj-commons/clj-yaml {:mvn/version "0.7.106"}
         cljstache/cljstache {:mvn/version "2.0.6"}

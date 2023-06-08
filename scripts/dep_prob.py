@@ -59,12 +59,6 @@ def main():
     for cgpm_dict in cgpm_dicts:
         cgpm_dict["Zv"] = dict(cgpm_dict["Zv"])
 
-    # Get the maximal number of views; needed later to create an ensemble-SPE in
-    # sppl_merge.py.
-    deps["Maximal number of views"] = max(
-        [len(set(cgpm_dict["Zv"].values())) for cgpm_dict in cgpm_dicts]
-    )
-
     for c1, c2 in pairs:
         p = dep_prob(cgpm_dicts, c1, c2, variable_mappings)
         if c1 in deps:

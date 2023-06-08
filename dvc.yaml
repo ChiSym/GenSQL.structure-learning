@@ -211,12 +211,28 @@ stages:
     outs:
       - data/dep-prob.json
 
+  save-max-number-views:
+    cmd: >
+      find data/cgpm/complete -type f |
+      xargs python scripts/save_n_views.py
+      >> data/max-number-views.txt
+    deps:
+      - data/cgpm/complete
+    outs:
+      - data/max-number-views.txt
+
   dep-prob-vl:
     cmd: >
-      clojure -X inferenceql.auto-modeling.heatmap/dep-prob :json-path '"data/dep-prob.json"'
+      clojure -X inferenceql.auto-modeling.heatmap/vega-lite
+      :stats-path '"data/dep-prob.json"'
+      :domain '[0.0 1.0]'
+      :default 1.0
+      :name '"crosscat"'
+      :scheme '"blues"'
       > data/dep-prob.vl.json
     deps:
       - data/dep-prob.json
+      - src/inferenceql/auto_modeling/heatmap.clj
     outs:
       - data/dep-prob.vl.json
 
@@ -244,14 +260,52 @@ stages:
     cmd: >
       python scripts/linear_stats.py
       --data data/ignored.csv
-      --schema schema.edn
+      --schema data/schema.edn
       --output data/linear-stats.json
     deps:
       - data/ignored.csv
-      - schema.edn
+      - data/schema.edn
       - scripts/linear_stats.py
     outs:
       - data/linear-stats.json
+
+  linear-stats-vl:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.heatmap/vega-lite
+      :stats-path '"data/linear-stats.json"'
+      :sort-path '"data/dep-prob.json"'
+      :domain '[1.0 0.0]'
+      :default 0.0
+      :name '"statistics"'
+      :field '"p-value"'
+      :scheme '"oranges"'
+      > data/linear-stats.vl.json
+    deps:
+      - data/linear-stats.json
+      - data/dep-prob.json
+      - src/inferenceql/auto_modeling/heatmap.clj
+    outs:
+      - data/linear-stats.vl.json
+
+  linear-stats-vg:
+    cmd: >
+      pnpm vl2vg
+      < data/linear-stats.vl.json
+      > data/linear-stats.vg.json
+    deps:
+      - data/linear-stats.vl.json
+    outs:
+      - data/linear-stats.vg.json
+
+  linear-stats-svg:
+    cmd: >
+      pnpm vg2svg
+      < data/linear-stats.vg.json
+      > data/linear-stats.svg
+    deps:
+      - data/linear-stats.vg.json
+    outs:
+      - data/linear-stats.svg
 
   compare-dep-prob-with-linear:
     desc: "Compares results from dependency probability with standard statistical tests"
@@ -299,18 +353,17 @@ stages:
         parallel ${parallel.flags}
         'python scripts/sppl_import.py
         --multi-mix-ast {}
-        --dep-prob data/dep-prob.json
+        --max-number-views data/max-number-views.txt
         --output data/sppl/unmerged/{/.}.json'
         :::: <(find data/ast -type f)
     params:
       - parallel.flags
     deps:
       - data/ast
-      - data/dep-prob.json
+      - data/max-number-views.txt
       - scripts/sppl_import.py
     outs:
       - data/sppl/unmerged
-
   sppl-merge:
     cmd: >
       find data/sppl/unmerged -type f |
@@ -427,3 +480,22 @@ stages:
       - data/dep-prob.json
       - data/linear-stats.json
       - data/qc-statistical-tests.txt
+
+  sppl-predict:
+    cmd: >
+      python scripts/poststrat.py
+      --model data/sppl/merged.json
+      --test data/test.csv
+      --targets $(bin/param targets)
+      --output data/predictions.csv
+      --reweight $(bin/param reweight_on)
+    params:
+      - targets
+      - reweight_on
+    deps:
+      - data/sppl/merged.json
+      - data/test.csv
+    outs:
+      - data/predictions.csv
+
+
