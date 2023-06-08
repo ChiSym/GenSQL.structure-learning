@@ -1,6 +1,6 @@
 dataset_name: lpm-ces
 seed: 42
-sample_count: 15
+sample_count: 14
 sample_training_data: 20000 # Set to -1 for no subsampling.
 parallel:
   # To limit the number of jobs GNU Parallel spawns use add the flag `--jobs n`.
@@ -25,8 +25,7 @@ qc:
   sample_count: null
   # Set this to specify the columns visualized in QC plots.
   # When not set, up to 8 columns--taken from the schema--will be visualized.
-  # e.g. columns: ["foo", "bar", "baz"]
-  columns: null
+  columns: ["US_citizen", "registered_to_vote", "age", "where_was_ballot_returned", "divorced_last_year", "policy_support_repealing_ACA"]
   # This limits the number of categories shown for categorical variables in
   # 2-dimensional QC plots. Set this to null for no limit.
   category_limit: 10
@@ -59,5 +58,73 @@ states: # List states to be held-out here.
   - Idaho
   - Ohio
   - Mississippi
-
-
+targets:
+  - policy_support_expanding_medicare
+  - policy_support_repealing_ACA
+  - policy_support_ban_assault_rifles
+reweight_on: # List columns to reweight on
+  - age
+  - gender
+  - education
+  - race
+  - religion
+  - union_member
+  - device_used
+  - party_allegiance
+  - used_social_media_in_past_24hrs
+  - watched_tv_news_in_past_24hrs
+  - read_newspaper_in_past_24hrs
+  - listened_to_radio_news_in_past_24hrs
+  - national_econony_has
+  - my_house_income_has
+  - prices_have
+    #- did_you_vote
+    #- how_did_you_vote
+    #- where_was_ballot_returned
+    #- problem_voting
+    #- state_senate_vote
+    #- lower_chamber_vote
+    #- waiting_for_voting
+    #- married_last_year
+    #- lost_job_last_year
+    #- finished_school_last_year
+    #- retired_last_year
+    #- divorced_last_year
+    #- had_a_child_last_year
+    #- taken_new_job_last_year
+    #- been_victim_of_crime_last_year
+    #- visited_emergency_room_last_year
+    #- visited_doctor_for_regular_examination_last_year
+    #- received_a_raise_last_year
+    #- jad_pay_cut_last_year
+    #- police_makes_me_feel
+    #- I_had_COVID_last_year
+    #- family_member_had_COVID_last_year
+    #- friend_had_COVID_last_year
+    #- co_worker_had_COVID_last_year
+    #- vaccination_status
+    #- pandemic_work_hours_reduced
+    #- pandemic_work_hours_restored
+    #- pandemic_temporarily_laid_off
+    #- pandemic_re_hired_after_temporarily_laid_off
+    #- pandemic_multiple_jobs_lost_one
+    #- pandemic_hours_increased
+    #- pandemic_take_additional_jobs
+    #- pay_for_emergency_with_credit_card_pay_off_next_statement
+    #- pay_for_emergency_with_credit_card_pay_off_over_time
+    #- pay_for_emergency_with_money_in_credit_savings_account
+    #- pay_for_emergency_with_bank_loan
+    #- pay_for_emergency_by_borrowing_from_friends_or_family
+    #- pay_for_emergency_with_advance_or_overdraft
+    #- pay_for_emergency_by_sell_something
+    #- mental_health_status
+    #- which_party_has_majority_house
+    #- which_party_has_majority_senate
+    #- which_party_has_majority_in_my_state_senate
+    #- which_party_has_majority_in_my_state_lower_chamber
+    #- apporoval_president
+    #- apporoval_congress
+    #- apporoval_governor
+    #- apporoval_state_legislature
+    #- apporoval_my_current_member_congress
+    #- apporoval_my_current_second_senator
