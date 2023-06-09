@@ -150,6 +150,7 @@
           pypkgs.numpy
           pypkgs.pandas
           pypkgs.pytest
+          pypkgs.pyyaml
         ]);
       in {
         devShell = pkgs.mkShell {
