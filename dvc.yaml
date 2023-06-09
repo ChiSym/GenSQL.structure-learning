@@ -498,4 +498,18 @@ stages:
     outs:
       - data/predictions.csv
 
+  save-synth:
+    desc: "Save synth data from the model to disk"
+    cmd: >
+        python scripts/save_synth.py
+        --model data/sppl/merged.json
+        --output data/synthetic-iql.csv
+        --data data/ignored.csv
+    deps:
+      - scripts/save_synth.py
+      - data/sppl/merged.json
+      - data/ignored.csv
+    outs:
+      - data/synthetic-iql.csv
+
 
