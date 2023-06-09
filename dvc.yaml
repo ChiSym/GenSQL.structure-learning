@@ -498,6 +498,19 @@ stages:
     outs:
       - data/predictions.csv
 
+
+  glm-predict:
+    cmd: >
+      python scripts/predict_glm.py
+    params:
+      - targets
+      - reweight_on
+    deps:
+      - data/data-orig.csv
+      - data/test-orig.csv
+    outs:
+      - data/predictions-glm.csv
+
   save-synth:
     desc: "Save synth data from the model to disk"
     cmd: >
