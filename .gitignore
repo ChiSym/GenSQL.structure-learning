@@ -1,3 +1,7 @@
+jupyter/figs/*
+jupyter/.ipynb_checkpoints/*
+
+
 *.class
 *.jar
 .cpcache/
