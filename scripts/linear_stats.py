@@ -47,12 +47,22 @@ def chi_squared(xs, ys):
     return {"chi2": chi2, "p-value": p, "dof": dof}
 
 
+def not_null(v):
+    if isinstance(v, str):
+        return True
+    elif v is None:
+        return False
+    elif np.isnan(v):
+        return False
+    return True
+
+
 def anova(df, c1, c2):
     """Compute One-way ANOVA"""
     samples = []
     for categorical_value in df[c1].unique():
         # Check whether this is actually a string category
-        if isinstance(categorical_value, str):
+        if not_null(categorical_value):
             samples.append(
                 df[(df[c1] == categorical_value) & (~df[c2].isnull())][c2].values
             )
