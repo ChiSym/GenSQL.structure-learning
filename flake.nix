@@ -151,6 +151,8 @@
           pypkgs.pandas
           pypkgs.pytest
           pypkgs.pyyaml
+          pypkgs.s3fs
+          pypkgs.boto3
         ]);
       in {
         devShell = pkgs.mkShell {
