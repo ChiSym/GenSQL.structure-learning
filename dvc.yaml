@@ -498,7 +498,6 @@ stages:
     outs:
       - data/predictions.csv
 
-
   glm-predict:
     cmd: >
       python scripts/predict_glm.py
