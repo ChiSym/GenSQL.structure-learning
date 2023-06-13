@@ -35,18 +35,6 @@ stages:
     outs:
       - data/nullified.csv
 
-        #guess-schema:
-        #  cmd: >
-        #    clojure -X inferenceql.auto-modeling.main/guess-schema
-        #    < data/nullified.csv
-        #    > data/schema.edn
-        #  deps:
-        #    - data/nullified.csv
-        #  params:
-        #    - schema
-        #  outs:
-        #    - data/schema.edn
-
   cgpm-schema:
     cmd: >
       clojure -X inferenceql.auto-modeling.main/cgpm-schema
