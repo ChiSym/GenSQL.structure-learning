@@ -164,6 +164,7 @@ def main():
                 9:  "Atheist",
                 10: "Agnostic",
                 11: "Nothing in particular",
+                12: "Something else",
         }
     def saveint(v):
         if not np.isnan(v):

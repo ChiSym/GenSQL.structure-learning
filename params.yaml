@@ -14,7 +14,7 @@ nullify:
 loom:
   extra_passes: 50
 cgpm:
-  iterations: 5
+  iterations: 10
   #minutes: 1
 clojurecat:
   iterations: 150
@@ -22,7 +22,7 @@ qc:
   # Set this to the number of synthetic samples desired in QC plots.
   # When not set, the plots will display the same number of virual samples as
   # observed data points.
-  sample_count: null
+  sample_count: 2000
   # Set this to specify the columns visualized in QC plots.
   # When not set, up to 8 columns--taken from the schema--will be visualized.
   columns: ["US_citizen", "registered_to_vote", "age", "where_was_ballot_returned", "divorced_last_year", "policy_support_repealing_ACA"]
