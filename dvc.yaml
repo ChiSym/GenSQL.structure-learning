@@ -13,8 +13,10 @@ stages:
     outs:
       - data/data.csv
       - data/test.csv
+      - data/test-in-distribution.csv
       - data/data-orig.csv
       - data/test-orig.csv
+      - data/test-orig-in-distribution.csv
 
   validate-column-names:
     cmd: bin/validate.sh

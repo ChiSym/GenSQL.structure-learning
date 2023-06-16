@@ -8,8 +8,8 @@ stages:
       md5: 1561d160a0178415feaba1687a022c51
       size: 154854944
     - path: scripts/pre_process.py
-      md5: b69dca4664695a92d804d7ac019eec8d
-      size: 13314
+      md5: b7495bd8b4a12d5fd78fe35795bacaf0
+      size: 13671
     params:
       params.yaml:
         sample_training_data: 20000
@@ -31,6 +31,12 @@ stages:
     - path: data/data.csv
       md5: e553b78f46c9d4ea6bfb1b8eda7873f3
       size: 13999626
+    - path: data/test-in-distribution.csv
+      md5: 2f1b439dd4089c15c2a1ce0c1c8e517e
+      size: 20610533
+    - path: data/test-orig-in-distribution.csv
+      md5: 3fc94adf700048b4b9312c6f33d9d259
+      size: 7898175
     - path: data/test-orig.csv
       md5: a6042942155c1974beccfc66e0d02724
       size: 2824441

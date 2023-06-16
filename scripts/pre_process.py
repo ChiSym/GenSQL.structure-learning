@@ -314,13 +314,16 @@ def main():
     if args.subsample > 0:
         print(f"==== Subsample {args.subsample} training rows ===")
         out = df_training[cols.values()].sample(args.subsample, random_state=42)
+        df_test_in_dist = df_training[cols.values()].loc[[i for i in df_training.index if i not in out.index]]
         print(f"Number of rows in training data: {args.subsample}")
     else:
         out = df_training[cols.values()]
+        df_test_in_dist = pd.DataFrame({"Nothing_left_out_in_dist":0})
         print(f"Number of rows in training data: {out.shape[0]}")
 
     out.to_csv("data/data.csv", index=False)
     df_test[cols.values()].to_csv("data/test.csv", index=False)
+    df_test_in_dist.to_csv("data/test-in-distribution.csv", index=False)
 
     print(f"Number of rows in test data: {df_test.shape[0]}")
     # Load original dataframe and save:
@@ -329,6 +332,8 @@ def main():
 
     original_df.loc[out.index].to_csv("data/data-orig.csv", index=False)
     original_df.loc[df_test.index].to_csv("data/test-orig.csv", index=False)
+    original_df.loc[df_test_in_dist.index].to_csv("data/test-orig-in-distribution.csv", index=False)
+
 
 if __name__ == "__main__":
     main()
