@@ -6,5 +6,5 @@ then
     printf 'Invalid column names:\n\n%s\n' "$INVALID_COLUMNS"
     exit 1
 else
-    cp data/data.csv data/validated.csv
+    cp data/subsampled.csv data/validated.csv
 fi
