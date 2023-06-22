@@ -1,4 +1,22 @@
 stages:
+  subsample:
+    cmd: >
+      mkdir -p data/test &&
+      python scripts/subsample.py
+      --data data/data.csv
+      --test-data-dir data/test
+      --params params.yaml
+      --output data/subsampled.csv
+    deps:
+      - data/data.csv
+      - scripts/subsample.py
+    params:
+      - sub_sample
+      - seed
+    outs:
+      - data/subsampled.csv
+      - data/test
+
   validate-column-names:
     cmd: bin/validate.sh
     deps:
