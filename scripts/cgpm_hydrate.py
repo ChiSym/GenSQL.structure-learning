@@ -36,6 +36,12 @@ def main():
     parser.add_argument(
         "--metadata", type=argparse.FileType("r"), help="Path to input CGPM metadata."
     )
+    parser.add_argument(
+        "--model",
+        type=str,
+        help="Prior, can be one of 'CrossCat', 'DPMM', 'Independent'; currently not compatible with Loom.",
+        default="CrossCat",
+    )
     parser.add_argument("--seed", type=int, default=1, help="CGPM seed.")
 
     args = parser.parse_args()
@@ -65,6 +71,17 @@ def main():
     base_metadata = dict(
         X=df.values, cctypes=cctypes, distargs=distargs, outputs=range(df.shape[1])
     )
+    if args.model == "CrossCat":
+        pass  # don't constrain the model space further.
+    elif args.model == "DPMM":
+        base_metadata["Zv"] = {i: 0 for i in range(len(cctypes))}
+    elif args.model == "Independent":
+        base_metadata["Zv"] = {i: i for i in range(len(cctypes))}
+        cluster_idx = [0] * df.shape[0]
+        base_metadata["Zrv"] = {i: cluster_idx for i in range(df.shape[1])}
+    else:
+        raise ValueError(f"Model '{args.model}' not definied")
+
     metadata = {**base_metadata, **additional_metadata}
     rng = general.gen_rng(args.seed)
 
