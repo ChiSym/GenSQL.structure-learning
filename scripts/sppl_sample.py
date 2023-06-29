@@ -2,7 +2,7 @@
 
 import scipy.stats as stats
 import sys
-import csv
+import pandas as pd
 
 # Monkey patching this to work around https://github.com/scipy/scipy/pull/7838
 
@@ -14,20 +14,16 @@ if not hasattr(stats, "frechet_l"):
 
 import argparse
 import json
-import edn_format
 import sppl.compilers.spe_to_dict as spe_to_dict
+from sppl.transforms import Identity
 
 
-def save_samples(spe_samples, f):
-    samples = [
-        {
-            edn_format.Keyword(k): v
-            for k, v in row.items()
-            if (not str(k).endswith("_cluster")) and (str(k) != "child")
-        }
-        for row in spe_samples
-    ]
-    f.write(edn_format.dumps(samples).replace("[", "(").replace("]", ")"))
+def generate(spe, columns, N):
+    spe_samples = spe.sample_subset(N, columns)
+    sample_df = pd.DataFrame(
+        [{str(k): v for k, v in row.items()} for row in spe_samples]
+    )
+    return sample_df
 
 
 def main():
@@ -63,12 +59,13 @@ def main():
     spe_dict = json.load(args.model)
     spe = spe_to_dict.spe_from_dict(spe_dict)
 
-    data = csv.reader(args.data)
-    row_count = len(list(data)) - 1
+    data = pd.read_csv(args.data)
+    row_count = len(data)
 
     sample_count = args.sample_count or row_count
-    samples = spe.sample(sample_count)
-    save_samples(samples, args.output)
+    columns = [Identity(c) for c in data.columns]
+    samples = generate(spe, sample_count, columns)
+    samples.to_csv(args.output, index=False)
 
 
 if __name__ == "__main__":
