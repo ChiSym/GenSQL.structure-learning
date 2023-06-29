@@ -1,6 +1,5 @@
 (ns inferenceql.auto-modeling.qc.samples
-  (:require [clojure.edn :as edn]
-            [clojure.pprint :refer [pprint]]
+  (:require [clojure.pprint :refer [pprint]]
             [inferenceql.inference.gpm :as gpm]
             [inferenceql.query.io :as io]))
 
@@ -9,7 +8,7 @@
   "Adds a collection attribute to both observed data and simulated data."
   [{data-path :data samples-synthetic-path :samples-synthetic}]
   (let [data (map #(update-keys % keyword) (io/slurp-csv (str data-path)))
-        samples-synthetic (-> samples-synthetic-path str slurp edn/read-string)
+        samples-synthetic (map #(update-keys % keyword) (io/slurp-csv (str samples-synthetic-path)))
         out (concat (map #(assoc % :collection "synthetic") samples-synthetic)
                     (map #(assoc % :collection "observed") (take (count samples-synthetic) (shuffle data))))]
     (pprint out)))
