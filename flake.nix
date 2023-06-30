@@ -145,6 +145,7 @@
           edn-format
           sppl
           pypkgs.black
+          pypkgs.catboost
           pypkgs.jsonschema
           pypkgs.matplotlib
           pypkgs.numpy
