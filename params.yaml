@@ -67,6 +67,11 @@ mi:
     # Set MI configs here. If not set, the configs are chosen at random.
     # For example, to set the config for health_status.
     # health_status: ["c) Average", "b) Below average"]
+synthetic_data_evaluation:
+  # If target is not specified, a random target is chosen for prediction.
+  #target: Apogee_km
+  predictor: Random_forest # One of "Random_forest" or "GLM"
+    #N: 10000 # Subsample held-out dataframe with 1000 samples
 database:
   table_name: data
   table_path: data/nullified.csv
