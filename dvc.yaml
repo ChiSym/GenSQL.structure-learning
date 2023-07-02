@@ -473,6 +473,27 @@ stages:
     outs:
       - qc/app/qc-splom.html
 
+  predict:
+      cmd: >
+        python scripts/predict.py
+        --schema data/schema.edn
+        --training data/ignored.csv
+        --training data/synthetic-data-iql.csv
+        --test data/test/test.csv
+        --output data/predictions.csv
+        #--test data/test/test-shifted.csv
+      params:
+        - synthetic_data_evaluation
+      deps:
+        - scripts/predict.py
+        - data/schema.edn
+        - data/ignored.csv
+        - data/synthetic-data-iql.csv
+        - data/test/test.csv
+        #- data/test/test-shifted.csv
+      outs:
+        - data/predictions.csv
+
   prepare-publish:
     cmd: >
       rm -rf publish-analysis-output/ &&
