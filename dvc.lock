@@ -1,0 +1,788 @@
+schema: '2.0'
+stages:
+  validate-column-names:
+    cmd: bin/validate.sh
+    deps:
+    - path: data/subsampled.csv
+      md5: 7d6a2635f99f292b5c004b8af7e5e40e
+      size: 1394817
+    outs:
+    - path: data/validated.csv
+      md5: 7d6a2635f99f292b5c004b8af7e5e40e
+      size: 1394817
+  subsample:
+    cmd: "mkdir -p data/test && python scripts/subsample.py --data data/data.csv --test-data-dir\
+      \ data/test --params params.yaml --output data/subsampled.csv\n"
+    deps:
+    - path: data/data.csv
+      md5: a18ccc6e65d5c3d94fc90dcc50da6758
+      size: 5191321
+    - path: scripts/subsample.py
+      md5: e984c015340dc2e50d926b4e3931b9dd
+      size: 1821
+    params:
+      params.yaml:
+        seed: 42
+        sub_sample:
+          according_to_columns:
+            Provider:
+            - Sanofi
+          N: 10000
+    outs:
+    - path: data/subsampled.csv
+      md5: 7d6a2635f99f292b5c004b8af7e5e40e
+      size: 1394817
+    - path: data/test
+      md5: cca36af3b33a3eb91851f64e23b06c70.dir
+      size: 3797174
+      nfiles: 2
+  nullify:
+    cmd: "clojure -X inferenceql.auto-modeling.main/nullify < data/validated.csv >\
+      \ data/nullified.csv\n"
+    deps:
+    - path: data/validated.csv
+      md5: 7d6a2635f99f292b5c004b8af7e5e40e
+      size: 1394817
+    params:
+      params.yaml:
+        nullify:
+    outs:
+    - path: data/nullified.csv
+      md5: 7d6a2635f99f292b5c004b8af7e5e40e
+      size: 1394817
+  guess-schema:
+    cmd: "clojure -X inferenceql.auto-modeling.main/guess-schema < data/nullified.csv\
+      \ > data/schema.edn\n"
+    deps:
+    - path: data/nullified.csv
+      md5: 7d6a2635f99f292b5c004b8af7e5e40e
+      size: 1394817
+    params:
+      params.yaml:
+        schema:
+          Cancer: ignore
+          Provider: ignore
+          Year: ignore
+          Age: ignore
+          Visit: ignore
+          Glucose: numerical
+          Sodium: numerical
+          Lymphocytes: ignore
+          Alkaline_Phosphatase: numerical
+          Chloride: numerical
+          Phosphorus: numerical
+          Systolic_Blood_Pressure: numerical
+          Magnesium: numerical
+          Bicarbonate: numerical
+          Alanine_Amino_Transferase: numerical
+          Potassium: numerical
+          Blood_Urea_Nitrogen: numerical
+          Temperature: numerical
+          Heart_Rate: ignore
+          Bilirubin: ignore
+          Hemoglobin: ignore
+          Prostate_Specific_Antigen: ignore
+          Body_Mass_Index: numerical
+          Albumin: numerical
+          Creatinine: numerical
+    outs:
+    - path: data/schema.edn
+      md5: 10d55718b2458341d138e5928df2f25f
+      size: 691
+  cgpm-schema:
+    cmd: "clojure -X inferenceql.auto-modeling.main/cgpm-schema < data/schema.edn\
+      \ > data/cgpm-schema.edn\n"
+    deps:
+    - path: data/schema.edn
+      md5: 10d55718b2458341d138e5928df2f25f
+      size: 691
+    outs:
+    - path: data/cgpm-schema.edn
+      md5: 5310d7b5de2b9d1b799411901d7e4f9c
+      size: 438
+  loom-schema:
+    cmd: "clojure -X inferenceql.auto-modeling.main/loom-schema < data/schema.edn\
+      \ > data/loom-schema.json\n"
+    deps:
+    - path: data/schema.edn
+      md5: 10d55718b2458341d138e5928df2f25f
+      size: 691
+    outs:
+    - path: data/loom-schema.json
+      md5: 5bb366511e68ceb764dff5c66413407d
+      size: 374
+  ignore:
+    cmd: "clojure -X inferenceql.auto-modeling.main/ignore :schema '\"data/schema.edn\"\
+      ' < data/nullified.csv > data/ignored.csv\n"
+    deps:
+    - path: data/nullified.csv
+      md5: 7d6a2635f99f292b5c004b8af7e5e40e
+      size: 1394817
+    - path: data/schema.edn
+      md5: 10d55718b2458341d138e5928df2f25f
+      size: 691
+    outs:
+    - path: data/ignored.csv
+      md5: 70fd1803b1ec005b8a5612271e49e00b
+      size: 1015497
+  numericalize:
+    cmd: "clojure -X inferenceql.auto-modeling.main/numericalize :schema '\"data/schema.edn\"\
+      ' :table data/mapping-table.edn < data/ignored.csv > data/numericalized.csv\n"
+    deps:
+    - path: data/ignored.csv
+      md5: 70fd1803b1ec005b8a5612271e49e00b
+      size: 1015497
+    - path: data/schema.edn
+      md5: 10d55718b2458341d138e5928df2f25f
+      size: 691
+    outs:
+    - path: data/mapping-table.edn
+      md5: 00713366ae65d4f0a0ce7484f6d241c4
+      size: 102
+    - path: data/numericalized.csv
+      md5: d36b0a55de402fc164a529097edc18e6
+      size: 964648
+  loom-ingest:
+    cmd: ./bin/loom_task ingest loom data/loom-schema.json data/numericalized.csv
+    deps:
+    - path: data/loom-schema.json
+      md5: 5bb366511e68ceb764dff5c66413407d
+      size: 374
+    - path: data/numericalized.csv
+      md5: d36b0a55de402fc164a529097edc18e6
+      size: 964648
+    outs:
+    - path: loom/ingest
+      md5: 795b06d079e282a01c862a2da216b6f2.dir
+      size: 590953
+      nfiles: 7
+    - path: loom/query
+      md5: 68a0355af9ad97596c910ac8433d483c.dir
+      size: 106
+      nfiles: 1
+  loom-infer-config:
+    cmd: "clojure -X inferenceql.auto-modeling.main/infer-config < params.yaml > data/infer-config.json\n"
+    params:
+      params.yaml:
+        loom.extra_passes: 50
+        seed: 42
+    outs:
+    - path: data/infer-config.json
+      md5: 10702555e9a00da2129bc02e87991235
+      size: 42
+  loom-infer:
+    cmd: ./bin/loom_task infer loom $(bin/param sample_count) data/infer-config.json
+    deps:
+    - path: data/infer-config.json
+      md5: 10702555e9a00da2129bc02e87991235
+      size: 42
+    - path: loom/ingest
+      md5: 795b06d079e282a01c862a2da216b6f2.dir
+      size: 590953
+      nfiles: 7
+    - path: loom/query
+      md5: 68a0355af9ad97596c910ac8433d483c.dir
+      size: 106
+      nfiles: 1
+    params:
+      params.yaml:
+        sample_count: 15
+    outs:
+    - path: loom/samples
+      md5: c333d5a740afb430f9f4e759147491ba.dir
+      size: 6501998
+      nfiles: 214
+  loom-dump-metadata:
+    cmd: "mkdir -p data/cgpm/raw && find loom/samples -mindepth 1 -maxdepth 1 -type\
+      \ d | parallel $(bin/param parallel.flags) ./bin/loom python scripts/loom_dump.py\
+      \ {} --output data/cgpm/raw/{/}.json\n"
+    deps:
+    - path: loom/samples
+      md5: c333d5a740afb430f9f4e759147491ba.dir
+      size: 6501998
+      nfiles: 214
+    - path: scripts/loom_dump.py
+      md5: c43616fe12258e9314fe1b481a6971e8
+      size: 1978
+    params:
+      params.yaml:
+        parallel.flags: --verbose
+    outs:
+    - path: data/cgpm/raw
+      md5: afa054f7acf7410b158e407ccb7ee2e3.dir
+      size: 3759413
+      nfiles: 15
+  cgpm-hydrate-metadata:
+    cmd: "find data/cgpm/raw -type f | parallel jsonschema --instance {} schemas/cgpm.json\
+      \ && mkdir -p data/cgpm/hydrated && rm -f data/cgpm/inf.log && find data/cgpm/raw\
+      \ -type f | sort | parallel $(bin/param parallel.flags) 'python scripts/cgpm_hydrate.py\
+      \ --metadata {} --output data/cgpm/hydrated/{/} --data data/numericalized.csv\
+      \ --schema data/cgpm-schema.edn --mapping-table data/mapping-table.edn --seed\
+      \ $(($(bin/param seed) + {#} - 1))'\n"
+    deps:
+    - path: data/cgpm-schema.edn
+      md5: 5310d7b5de2b9d1b799411901d7e4f9c
+      size: 438
+    - path: data/cgpm/raw
+      md5: afa054f7acf7410b158e407ccb7ee2e3.dir
+      size: 3759413
+      nfiles: 15
+    - path: data/mapping-table.edn
+      md5: 00713366ae65d4f0a0ce7484f6d241c4
+      size: 102
+    - path: data/numericalized.csv
+      md5: d36b0a55de402fc164a529097edc18e6
+      size: 964648
+    - path: schemas/cgpm.json
+      md5: 75fb21013e98a73e03fbe1ace14426f2
+      size: 4039
+    - path: scripts/cgpm_hydrate.py
+      md5: 0ad32ff550f8b45a3642bddf279c9664
+      size: 2971
+    params:
+      params.yaml:
+        parallel.flags: --verbose
+        seed: 42
+    outs:
+    - path: data/cgpm/hydrated
+      md5: 0049f91235cbe89f29f2e1c179a9be0a.dir
+      size: 22957219
+      nfiles: 15
+  cgpm-infer-hyperparameters:
+    cmd: "find data/cgpm/hydrated -type f | parallel jsonschema --instance {} schemas/cgpm.json\
+      \ && mkdir -p data/cgpm/complete && echo $(bin/param cgpm.iterations) >> data/cgpm/inf.log\
+      \ && find data/cgpm/hydrated -type f | sort | parallel $(bin/param parallel.flags)\
+      \ 'python scripts/cgpm_infer.py {} --kernel alpha --kernel view_alphas --kernel\
+      \ column_hypers --kernel rows --kernel columns --output data/cgpm/complete/{/}\
+      \ --data data/numericalized.csv --params params.yaml --seed $(($(bin/param seed)\
+      \ + {#} - 1)) --iterations $(bin/param cgpm.iterations)' #--iterations $(bin/param\
+      \ cgpm.iterations)\n"
+    deps:
+    - path: data/cgpm/hydrated
+      md5: 0049f91235cbe89f29f2e1c179a9be0a.dir
+      size: 22957219
+      nfiles: 15
+    - path: data/numericalized.csv
+      md5: d36b0a55de402fc164a529097edc18e6
+      size: 964648
+    - path: schemas/cgpm.json
+      md5: 75fb21013e98a73e03fbe1ace14426f2
+      size: 4039
+    - path: scripts/cgpm_infer.py
+      md5: 8c953870a8ac391bb77deeb105403131
+      size: 4523
+    params:
+      params.yaml:
+        cgpm:
+          iterations: 5
+        parallel.flags: --verbose
+        seed: 42
+    outs:
+    - path: data/cgpm/complete
+      md5: e784b99049fcbd88ac80f5b49e92205e.dir
+      size: 23015385
+      nfiles: 15
+  ast-export:
+    cmd:
+    - 'parallel --verbose jsonschema --instance {} schemas/cgpm.json :::: <(find data/cgpm/complete
+      -type f)'
+    - mkdir -p data/ast
+    - "parallel --verbose 'python scripts/ast_export.py --metadata {} --data data/numericalized.csv\
+      \ --mapping-table data/mapping-table.edn --output data/ast/{/.}.edn' :::: <(find\
+      \ data/cgpm/complete -type f)"
+    deps:
+    - path: data/cgpm/complete
+      md5: e784b99049fcbd88ac80f5b49e92205e.dir
+      size: 23015385
+      nfiles: 15
+    - path: data/ignored.csv
+      md5: 70fd1803b1ec005b8a5612271e49e00b
+      size: 1015497
+    - path: scripts/ast_export.py
+      md5: 573cc404efd53361edc764e5c517ee8e
+      size: 11046
+    params:
+      params.yaml:
+        parallel.flags: --verbose
+    outs:
+    - path: data/ast
+      md5: a41613f93a8deb4a2dd9ae3f2ebade10.dir
+      size: 3795280
+      nfiles: 15
+  save-max-number-views:
+    cmd: "find data/cgpm/complete -type f | xargs python scripts/save_n_views.py >>\
+      \ data/max-number-views.txt\n"
+    deps:
+    - path: data/cgpm/complete
+      md5: e784b99049fcbd88ac80f5b49e92205e.dir
+      size: 23015385
+      nfiles: 15
+    outs:
+    - path: data/max-number-views.txt
+      md5: d3d9446802a44259755d38e6d163e820
+      size: 2
+  sppl-import:
+    cmd:
+    - mkdir -p data/sppl/unmerged
+    - "parallel --verbose 'python scripts/sppl_import.py --multi-mix-ast {} --max-number-views\
+      \ data/max-number-views.txt --output data/sppl/unmerged/{/.}.json' :::: <(find\
+      \ data/ast -type f)"
+    deps:
+    - path: data/ast
+      md5: a41613f93a8deb4a2dd9ae3f2ebade10.dir
+      size: 3795280
+      nfiles: 15
+    - path: data/max-number-views.txt
+      md5: d3d9446802a44259755d38e6d163e820
+      size: 2
+    - path: scripts/sppl_import.py
+      md5: 60da181980209f224dd1ed4f8b92c57e
+      size: 4743
+    params:
+      params.yaml:
+        parallel.flags: --verbose
+    outs:
+    - path: data/sppl/unmerged
+      md5: 8c4ff39dcc00395622bb7e0926509675.dir
+      size: 3030598
+      nfiles: 15
+  sppl-merge:
+    cmd: "find data/sppl/unmerged -type f | sort | xargs python scripts/sppl_merge.py\
+      \ --output data/sppl/merged.json\n"
+    deps:
+    - path: data/sppl/unmerged
+      md5: 8c4ff39dcc00395622bb7e0926509675.dir
+      size: 3030598
+      nfiles: 15
+    outs:
+    - path: data/sppl/merged.json
+      md5: 85b506b6b00c8b189bc12542bac52389
+      size: 3032209
+  sppl-sample:
+    cmd: "python scripts/sppl_sample.py --model data/sppl/merged.json --data data/ignored.csv\
+      \ --sample_count $(bin/param qc.sample_count) > data/synthetic-data-iql.csv\n"
+    deps:
+    - path: data/ignored.csv
+      md5: 70fd1803b1ec005b8a5612271e49e00b
+      size: 1015497
+    - path: data/sppl/merged.json
+      md5: 85b506b6b00c8b189bc12542bac52389
+      size: 3032209
+    - path: scripts/sppl_sample.py
+      md5: 65c711874e0eda0e7d79b4a4a3eb6076
+      size: 1843
+    outs:
+    - path: data/synthetic-data-iql.csv
+      md5: 8dc1f0e0618539acfdec2bd941a8a8b1
+      size: 2859377
+  save-linear-stats:
+    cmd: "python scripts/linear_stats.py --data data/ignored.csv --schema data/schema.edn\
+      \ --output data/linear-stats.json\n"
+    deps:
+    - path: data/ignored.csv
+      md5: 70fd1803b1ec005b8a5612271e49e00b
+      size: 1015497
+    - path: data/schema.edn
+      md5: 10d55718b2458341d138e5928df2f25f
+      size: 691
+    - path: scripts/linear_stats.py
+      md5: f6942368946252ea24f0e4f5232cf6e7
+      size: 4247
+    outs:
+    - path: data/linear-stats.json
+      md5: 19d45363167a11aaaf90fbccf6d2016e
+      size: 35890
+  xcat-complete-import:
+    cmd:
+    - mkdir -p data/xcat/complete/
+    - "parallel --verbose 'clojure -X inferenceql.auto-modeling.xcat/import :cgpm-json\
+      \ {} :data-csv data/ignored.csv :mapping-table data/mapping-table.edn :numericalized-csv\
+      \ data/numericalized.csv :schema-edn data/schema.edn > data/xcat/complete/{/.}.edn'\
+      \ :::: <(find data/cgpm/complete -type f)"
+    deps:
+    - path: data/cgpm/complete
+      md5: e784b99049fcbd88ac80f5b49e92205e.dir
+      size: 23015385
+      nfiles: 15
+    - path: data/ignored.csv
+      md5: 70fd1803b1ec005b8a5612271e49e00b
+      size: 1015497
+    - path: data/mapping-table.edn
+      md5: 00713366ae65d4f0a0ce7484f6d241c4
+      size: 102
+    - path: data/numericalized.csv
+      md5: d36b0a55de402fc164a529097edc18e6
+      size: 964648
+    - path: data/schema.edn
+      md5: 10d55718b2458341d138e5928df2f25f
+      size: 691
+    - path: src/inferenceql/auto_modeling/xcat.clj
+      md5: dc5d691d8f3cd744340cb3c2168a7050
+      size: 4629
+    params:
+      params.yaml:
+        parallel.flags: --verbose
+    outs:
+    - path: data/xcat/complete/
+      md5: 35f8ebe8128def40bc8dd773b09f28ea.dir
+      size: 112419281
+      nfiles: 15
+  assemble-database:
+    cmd: "clojure -M:exec inferenceql.auto-modeling.main assemble-database --table-name\
+      \ $(bin/param database.table_name) --table-path $(bin/param database.table_path)\
+      \ --model-name $(bin/param database.model_name) --model-path $(bin/param database.model_path)\
+      \ > data/db.edn\n"
+    deps:
+    - path: data/cgpm
+      md5: 2a5bcfe1bcb932e9f73aa0215b7a039e.dir
+      size: 49732044
+      nfiles: 47
+    - path: data/nullified.csv
+      md5: 7d6a2635f99f292b5c004b8af7e5e40e
+      size: 1394817
+    - path: data/xcat
+      md5: 52b667a54f6f8647d09ed88d220afc09.dir
+      size: 112419291
+      nfiles: 16
+    params:
+      params.yaml:
+        database.model_name: baseline_model
+        database.model_path: data/xcat/complete/sample.0.edn
+        database.table_name: data
+        database.table_path: data/nullified.csv
+    outs:
+    - path: data/db.edn
+      md5: dfc7325631a304ea678695838b7a4dd9
+      size: 11520522
+  save-dependencies:
+    cmd: "find data/cgpm/complete -type f | sort | xargs python scripts/dep_prob.py\
+      \ --data data/numericalized.csv --output data/dep-prob.json\n"
+    deps:
+    - path: data/cgpm/complete
+      md5: e784b99049fcbd88ac80f5b49e92205e.dir
+      size: 23015385
+      nfiles: 15
+    outs:
+    - path: data/dep-prob.json
+      md5: 5d54709ac9e619204e9c3907af83d2e2
+      size: 7745
+  compare-dep-prob-with-linear:
+    cmd: "python scripts/compare_deps.py --deps data/dep-prob.json --linear data/linear-stats.json\
+      \ >> data/qc-statistical-tests.txt\n"
+    deps:
+    - path: data/dep-prob.json
+      md5: 5d54709ac9e619204e9c3907af83d2e2
+      size: 7745
+    - path: data/linear-stats.json
+      md5: 19d45363167a11aaaf90fbccf6d2016e
+      size: 35890
+    outs:
+    - path: data/qc-statistical-tests.txt
+      md5: 697d832c78462ec047358c43f94ee75e
+      size: 4670
+  qc-tag-samples:
+    cmd: "clojure -X inferenceql.auto-modeling.qc.samples/tag :data data/ignored.csv\
+      \ :samples-synthetic data/synthetic-data-iql.csv > qc/samples/samples.edn\n"
+    deps:
+    - path: data/ignored.csv
+      md5: 70fd1803b1ec005b8a5612271e49e00b
+      size: 1015497
+    - path: data/synthetic-data-iql.csv
+      md5: 8dc1f0e0618539acfdec2bd941a8a8b1
+      size: 2859377
+    - path: src/inferenceql/auto_modeling/qc/samples.clj
+      md5: 5c0fcc265aabd819c96ae861bdff7587
+      size: 1100
+    outs:
+    - path: qc/samples/samples.edn
+      md5: 7a4013d1631eeac975b34107e7ccc052
+      size: 9870770
+  cgpm-generate-metadata:
+    cmd: "mkdir -p data/cgpm/hydrated && rm -f data/cgpm/inf.log && seq 0 $(($(bin/param\
+      \ sample_count) - 1)) | parallel $(bin/param parallel.flags) 'python scripts/cgpm_hydrate.py\
+      \ --output data/cgpm/hydrated/sample.{}.json --data data/numericalized.csv --schema\
+      \ data/cgpm-schema.edn --mapping-table data/mapping-table.edn --seed $(($(bin/param\
+      \ seed) + {#} - 1))'\n"
+    deps:
+    - path: data/cgpm-schema.edn
+      md5: 9a9ad899fc23f832558d755bcf590098
+      size: 611
+    - path: data/mapping-table.edn
+      md5: 224c5faa5e41c3f7425f63def4fd4d2c
+      size: 164
+    - path: data/numericalized.csv
+      md5: ed0dc0138a56eec632f3136676b50aa0
+      size: 80888
+    - path: schemas/cgpm.json
+      md5: 75fb21013e98a73e03fbe1ace14426f2
+      size: 4039
+    - path: scripts/cgpm_hydrate.py
+      md5: 0ad32ff550f8b45a3642bddf279c9664
+      size: 2971
+    params:
+      params.yaml:
+        parallel.flags: --verbose
+        sample_count: 1
+        seed: 42
+    outs:
+    - path: data/cgpm/hydrated
+      md5: b9ad9c82f944c1815d9c47ab72bed71f.dir
+      size: 164171
+      nfiles: 1
+  linear-stats-vl:
+    cmd: "clojure -X inferenceql.auto-modeling.heatmap/vega-lite :stats-path '\"data/linear-stats.json\"\
+      ' :sort-path '\"data/dep-prob.json\"' :domain '[1.0 0.0]' :default 0.0 :name\
+      \ '\"statistics\"' :field '\"p-value\"' :scheme '\"oranges\"' > data/linear-stats.vl.json\n"
+    deps:
+    - path: data/dep-prob.json
+      md5: 5d54709ac9e619204e9c3907af83d2e2
+      size: 7745
+    - path: data/linear-stats.json
+      md5: 19d45363167a11aaaf90fbccf6d2016e
+      size: 35890
+    - path: src/inferenceql/auto_modeling/heatmap.clj
+      md5: 6413cddd3b16a428a008cc88375fac36
+      size: 7369
+    outs:
+    - path: data/linear-stats.vl.json
+      md5: 9e50629b13261c2f998adf2cff69af30
+      size: 23819
+  linear-stats-vg:
+    cmd: "pnpm vl2vg < data/linear-stats.vl.json > data/linear-stats.vg.json\n"
+    deps:
+    - path: data/linear-stats.vl.json
+      md5: 9e50629b13261c2f998adf2cff69af30
+      size: 23819
+    outs:
+    - path: data/linear-stats.vg.json
+      md5: 030f795a18f89019194aa3f4ec445970
+      size: 26315
+  qc-dashboard-spec:
+    cmd: "clojure -X inferenceql.auto-modeling.qc.dashboard/spec :samples qc/samples/samples.edn\
+      \ :schema data/schema.edn :correlation data/linear-stats.json > qc/specs/qc-dashboard.vl.json\n"
+    deps:
+    - path: data/linear-stats.json
+      md5: 19d45363167a11aaaf90fbccf6d2016e
+      size: 35890
+    - path: data/schema.edn
+      md5: 10d55718b2458341d138e5928df2f25f
+      size: 691
+    - path: qc/samples/samples.edn
+      md5: 7a4013d1631eeac975b34107e7ccc052
+      size: 9870770
+    - path: src/inferenceql/auto_modeling/qc/dashboard.clj
+      md5: ceae831bc1ad605ca51069128772ed31
+      size: 24673
+    - path: src/inferenceql/auto_modeling/qc/util.clj
+      md5: 3f010451e4a984ba25520fd9c3b36654
+      size: 3975
+    params:
+      params.yaml:
+        qc.columns:
+        - Race
+        - Alkaline_Phosphatase
+        - Phosphorus
+        - Creatine
+        - Chloride
+        - Sodium
+        - Bicarbonate
+        - Body_Mass_Index
+    outs:
+    - path: qc/specs/qc-dashboard.vl.json
+      md5: cbc1334d2e481db843ac72a0cc804952
+      size: 10986578
+  qc-dashboard-app:
+    cmd: "clojure -X inferenceql.auto-modeling.qc.app/create :template qc/templates/index.html\
+      \ :spec qc/specs/qc-dashboard.vl.json :renderer canvas :title '\"QC dashboard\"\
+      ' > qc/app/qc-dashboard.html\n"
+    deps:
+    - path: qc/specs/qc-dashboard.vl.json
+      md5: cbc1334d2e481db843ac72a0cc804952
+      size: 10986578
+    - path: qc/templates/index.html
+      md5: ac51efb107febc1caf14b5e2c6d0489d
+      size: 1685
+    - path: src/inferenceql/auto_modeling/qc/app.clj
+      md5: 9d4c0718ef4e415b3a8a82bf707296eb
+      size: 519
+    outs:
+    - path: qc/app/qc-dashboard.html
+      md5: 013acbfbf7592864b9e1c6f1b04a9eab
+      size: 10988248
+  write-gen-programs:
+    cmd:
+    - mkdir -p data/code
+    - "parallel --verbose 'clojure -X inferenceql.auto-modeling.code/pprint-string\
+      \ :path \\\"{}\\\" > data/code/{/.}.clj' :::: <(find data/ast -type f)"
+    deps:
+    - path: data/ast
+      md5: a41613f93a8deb4a2dd9ae3f2ebade10.dir
+      size: 3795280
+      nfiles: 15
+    outs:
+    - path: data/code
+      md5: 07ab25c599b2c6b611eb24f9b060a2c9.dir
+      size: 1127508
+      nfiles: 15
+  dep-prob-vl:
+    cmd: "clojure -X inferenceql.auto-modeling.heatmap/vega-lite :stats-path '\"data/dep-prob.json\"\
+      ' :domain '[0.0 1.0]' :default 1.0 :name '\"crosscat\"' :scheme '\"blues\"'\
+      \ > data/dep-prob.vl.json\n"
+    deps:
+    - path: data/dep-prob.json
+      md5: 5d54709ac9e619204e9c3907af83d2e2
+      size: 7745
+    - path: src/inferenceql/auto_modeling/heatmap.clj
+      md5: 6413cddd3b16a428a008cc88375fac36
+      size: 7369
+    outs:
+    - path: data/dep-prob.vl.json
+      md5: a6533806175bfd1fbf259cc7ad5dc8e4
+      size: 20315
+  dep-prob-vg:
+    cmd: "pnpm vl2vg < data/dep-prob.vl.json > data/dep-prob.vg.json\n"
+    deps:
+    - path: data/dep-prob.vl.json
+      md5: a6533806175bfd1fbf259cc7ad5dc8e4
+      size: 20315
+    outs:
+    - path: data/dep-prob.vg.json
+      md5: 0e254f832885fcf239c2d44910c45107
+      size: 22504
+  dep-prob-svg:
+    cmd: "pnpm vg2svg < data/dep-prob.vg.json > data/dep-prob.svg\n"
+    deps:
+    - path: data/dep-prob.vg.json
+      md5: 0e254f832885fcf239c2d44910c45107
+      size: 22504
+    outs:
+    - path: data/dep-prob.svg
+      md5: 1d650ecca0607eaa7eae1f2f359818e9
+      size: 66252
+  qc-splom-spec:
+    cmd: "clojure -X inferenceql.auto-modeling.qc.splom/spec :samples qc/samples/samples.edn\
+      \ :schema data/schema.edn :correlation data/linear-stats.json > qc/specs/qc-splom.vl.json\n"
+    deps:
+    - path: data/linear-stats.json
+      md5: 19d45363167a11aaaf90fbccf6d2016e
+      size: 35890
+    - path: data/schema.edn
+      md5: 10d55718b2458341d138e5928df2f25f
+      size: 691
+    - path: qc/samples/samples.edn
+      md5: 7a4013d1631eeac975b34107e7ccc052
+      size: 9870770
+    - path: src/inferenceql/auto_modeling/qc/splom.clj
+      md5: 739b58b1607577931865aae958121b67
+      size: 10862
+    - path: src/inferenceql/auto_modeling/qc/util.clj
+      md5: 3f010451e4a984ba25520fd9c3b36654
+      size: 3975
+    params:
+      params.yaml:
+        qc.columns:
+        - Race
+        - Alkaline_Phosphatase
+        - Phosphorus
+        - Creatine
+        - Chloride
+        - Sodium
+        - Bicarbonate
+        - Body_Mass_Index
+    outs:
+    - path: qc/specs/qc-splom.vl.json
+      md5: ec9f1341f13549eb355f9b3b8e6d2142
+      size: 11016920
+  qc-splom-app:
+    cmd: "clojure -X inferenceql.auto-modeling.qc.app/create :template qc/templates/index.html\
+      \ :spec qc/specs/qc-splom.vl.json :renderer canvas :title '\"QC scatter plot\
+      \ matrix\"' > qc/app/qc-splom.html\n"
+    deps:
+    - path: qc/specs/qc-splom.vl.json
+      md5: ec9f1341f13549eb355f9b3b8e6d2142
+      size: 11016920
+    - path: qc/templates/index.html
+      md5: ac51efb107febc1caf14b5e2c6d0489d
+      size: 1685
+    - path: src/inferenceql/auto_modeling/qc/app.clj
+      md5: 9d4c0718ef4e415b3a8a82bf707296eb
+      size: 519
+    outs:
+    - path: qc/app/qc-splom.html
+      md5: f032efd3d85f9234b0eefa7296458eed
+      size: 11018600
+  prepare-publish:
+    cmd: "rm -rf publish-analysis-output/ && git clone https://github.com/OpenIQL/inferenceql.analyses.git\
+      \ publish-analysis-output && mkdir publish-analysis-output/analyses/pds/ &&\
+      \ mkdir publish-analysis-output/html-pages/pds/ && cp params.yaml publish-analysis-output/analyses/pds/params.yaml\
+      \ && cp data/data.csv publish-analysis-output/analyses/pds/data.csv && cp data/schema.edn\
+      \ publish-analysis-output/analyses/pds/schema.edn && cp data/sppl/merged.json\
+      \ publish-analysis-output/analyses/pds/merged.json && touch publish-analysis-output/analyses/pds/queries.iql\
+      \ && cp qc/app/qc-dashboard.html publish-analysis-output/html-pages/pds/qc-dashboard.html\
+      \ && cp qc/app/qc-splom.html publish-analysis-output/html-pages/pds/qc-splom.html\
+      \ && cd publish-analysis-output && git checkout -b pds-to-publish && git add\
+      \ ./analyses/* && git add ./html-pages/* && git commit -m \"automatic initial\
+      \ commit\"\n"
+    deps:
+    - path: data/data.csv
+      md5: a18ccc6e65d5c3d94fc90dcc50da6758
+      size: 5191321
+    - path: data/schema.edn
+      md5: 5f20879fb8ce518aed1a5ad9d9a4d37d
+      size: 707
+    - path: data/sppl/merged.json
+      md5: 8822179fe32c1fdbc3e1644f8e53944c
+      size: 112796
+    - path: qc/app/qc-dashboard.html
+      md5: f405de40e3435c1d87cb1de08f798a5c
+      size: 12474310
+    - path: qc/app/qc-splom.html
+      md5: 65757e25117c447f930d4cddf2d32835
+      size: 12612269
+    outs:
+    - path: publish-analysis-output/analyses/pds/
+      md5: a37a38b754def2aec369d17012550a01.dir
+      size: 5308045
+      nfiles: 5
+    - path: publish-analysis-output/html-pages/pds/
+      md5: f20da16b55d6192214ecb7cedbd50e7a.dir
+      size: 25086579
+      nfiles: 2
+  linear-stats-svg:
+    cmd: "pnpm vg2svg < data/linear-stats.vg.json > data/linear-stats.svg\n"
+    deps:
+    - path: data/linear-stats.vg.json
+      md5: 030f795a18f89019194aa3f4ec445970
+      size: 26315
+    outs:
+    - path: data/linear-stats.svg
+      md5: 8e6cba0e1426aadf5a41db2138e3e9c7
+      size: 68684
+  predict:
+    cmd: "python scripts/predict.py --schema data/schema.edn --training data/ignored.csv\
+      \ --training data/synthetic-data-iql.csv --test data/test/test.csv --output\
+      \ data/predictions.csv #--test data/test/test-shifted.csv\n"
+    deps:
+    - path: data/ignored.csv
+      md5: 70fd1803b1ec005b8a5612271e49e00b
+      size: 1015497
+    - path: data/schema.edn
+      md5: 10d55718b2458341d138e5928df2f25f
+      size: 691
+    - path: data/synthetic-data-iql.csv
+      md5: 8dc1f0e0618539acfdec2bd941a8a8b1
+      size: 2859377
+    - path: data/test/test.csv
+      md5: b251755d3e9a4c70f572dc1782ec18fe
+      size: 2385776
+    - path: scripts/predict.py
+      md5: 465e872cc1a43aec563bd45fa163c456
+      size: 7403
+    params:
+      params.yaml:
+        synthetic_data_evaluation:
+          predictor: Random_forest
+    outs:
+    - path: data/predictions.csv
+      md5: a2494d5d47930d31b8d113ab40354fbc
+      size: 1788825

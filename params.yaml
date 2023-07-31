@@ -1,14 +1,11 @@
-dataset_name: test-pub
-seed: 0
-sample_count: 3
+dataset_name: pds
+seed: 42
+sample_count: 15
 sub_sample:
-  #according_to_columns:
-  #  Class_of_Orbit:
-  #    - LEO
-  #    - GEO
-  #  Users:
-  #    - Commercial
-  N: 1000
+  according_to_columns:
+    Provider:
+      - Sanofi
+  N: 10000
 parallel:
   # To limit the number of jobs GNU Parallel spawns use add the flag `--jobs n`.
   flags: >-
@@ -23,14 +20,35 @@ schema:
   # for each column. The available types are as follows: numerical, nominal, and ignore.
   # For example, to force the "age" column to be treated as a
   # numerical uncomment the following line:
-  # age: numerical
-  # Apogee_km: numerical
-  # Perigee_km: numerical
+  Cancer: ignore
+  Provider: ignore
+  Year: ignore
+  Age: ignore
+  Visit: ignore
+  Glucose: numerical
+  Sodium: numerical
+  Lymphocytes: ignore
+  Alkaline_Phosphatase: numerical
+  Chloride: numerical
+  Phosphorus: numerical
+  Systolic_Blood_Pressure: numerical
+  Magnesium: numerical
+  Bicarbonate: numerical
+  Alanine_Amino_Transferase: numerical
+  Potassium: numerical
+  Blood_Urea_Nitrogen: numerical
+  Temperature: numerical
+  Heart_Rate: ignore
+  Bilirubin: ignore
+  Hemoglobin: ignore
+  Prostate_Specific_Antigen: ignore
+  Body_Mass_Index: numerical
+  Albumin: numerical
+  Creatinine: numerical
 loom:
-  extra_passes: 1
+  extra_passes: 50
 cgpm:
-  #iterations: 1
-  minutes: 1
+  iterations: 5
   #dependence:
   #  # While the CrossCat implementation in CGPM takes dependence constraints, doing so
   #  # throws a not-implemented-error. Hence, we apply a workaround:
@@ -58,7 +76,15 @@ qc:
   # Set this to specify the columns visualized in QC plots.
   # When not set, up to 8 columns--taken from the schema--will be visualized.
   # e.g. columns: ["foo", "bar", "baz"]
-  columns: null
+  columns:
+    - Race
+    - Alkaline_Phosphatase
+    - Phosphorus
+    - Creatine
+    - Chloride
+    - Sodium
+    - Bicarbonate
+    - Body_Mass_Index
   # This limits the number of categories shown for categorical variables in
   # 2-dimensional QC plots. Set this to null for no limit.
   category_limit: 10
@@ -79,3 +105,4 @@ database:
   model_path: data/xcat/complete/sample.0.edn
   # model_path: data/xcat/merged.edn
   # model_path: data/sppl/merged.json
+
