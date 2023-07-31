@@ -1,2 +1,5 @@
 [core]
     analytics = false
+    remote = pds-s3-remote
+['remote "pds-s3-remote"']
+    url = s3://lpm-research/PDS
