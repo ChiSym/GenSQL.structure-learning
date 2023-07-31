@@ -63,10 +63,13 @@ def anova(df, c1, c2):
     for categorical_value in df[c1].unique():
         # Check whether this is actually a string category
         if not_null(categorical_value):
-            samples.append(
-                df[(df[c1] == categorical_value) & (~df[c2].isnull())][c2].values
-            )
-    F, p = stats.f_oneway(*samples)
+            vals = df[(df[c1] == categorical_value) & (~df[c2].isnull())][c2].values
+            if vals.shape[0] > 0:
+                samples.append(vals)
+    if len(samples) > 1:
+        F, p = stats.f_oneway(*samples)
+    else:
+        F, p = 0,1
     return {
         "F": F,
         "p-value": p,
