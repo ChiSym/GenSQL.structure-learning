@@ -48,7 +48,7 @@ schema:
 loom:
   extra_passes: 50
 cgpm:
-  iterations: 5
+  iterations: 50
   #dependence:
   #  # While the CrossCat implementation in CGPM takes dependence constraints, doing so
   #  # throws a not-implemented-error. Hence, we apply a workaround:
@@ -80,7 +80,7 @@ qc:
     - Race
     - Alkaline_Phosphatase
     - Phosphorus
-    - Creatine
+    - Creatinine
     - Chloride
     - Sodium
     - Bicarbonate
