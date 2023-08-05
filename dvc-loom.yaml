@@ -214,6 +214,16 @@ stages:
     outs:
       - data/dep-prob.json
 
+  save-max-number-views:
+    cmd: >
+      find data/cgpm/complete -type f |
+      xargs python scripts/save_n_views.py
+      >> data/max-number-views.txt
+    deps:
+      - data/cgpm/complete
+    outs:
+      - data/max-number-views.txt
+
   dep-prob-vl:
     cmd: >
       clojure -X inferenceql.auto-modeling.heatmap/vega-lite :json-path '"data/dep-prob.json"'
