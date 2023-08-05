@@ -62,7 +62,7 @@ stages:
     cmd: >
       clojure -X inferenceql.auto-modeling.main/ignore
       :schema '"data/schema.edn"'
-      < data/data.csv
+      < data/nullified.csv
       > data/ignored.csv
     deps:
       - data/nullified.csv
