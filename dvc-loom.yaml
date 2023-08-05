@@ -226,10 +226,16 @@ stages:
 
   dep-prob-vl:
     cmd: >
-      clojure -X inferenceql.auto-modeling.heatmap/vega-lite :json-path '"data/dep-prob.json"'
+      clojure -X inferenceql.auto-modeling.heatmap/vega-lite
+      :stats-path '"data/dep-prob.json"'
+      :domain '[0.0 1.0]'
+      :default 1.0
+      :name '"crosscat"'
+      :scheme '"blues"'
       > data/dep-prob.vl.json
     deps:
       - data/dep-prob.json
+      - src/inferenceql/auto_modeling/heatmap.clj
     outs:
       - data/dep-prob.vl.json
 
@@ -270,14 +276,16 @@ stages:
     cmd: >
       clojure -X inferenceql.auto-modeling.heatmap/vega-lite
       :stats-path '"data/linear-stats.json"'
+      :sort-path '"data/dep-prob.json"'
       :domain '[1.0 0.0]'
-      :default 1.0
+      :default 0.0
       :name '"statistics"'
       :field '"p-value"'
       :scheme '"oranges"'
       > data/linear-stats.vl.json
     deps:
       - data/linear-stats.json
+      - data/dep-prob.json
       - src/inferenceql/auto_modeling/heatmap.clj
     outs:
       - data/linear-stats.vl.json
@@ -301,7 +309,6 @@ stages:
       - data/linear-stats.vg.json
     outs:
       - data/linear-stats.svg
-
   compare-dep-prob-with-linear:
     desc: "Compares results from dependency probability with standard statistical tests"
     cmd: >
