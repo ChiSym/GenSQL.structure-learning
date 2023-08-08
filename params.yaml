@@ -1,14 +1,8 @@
 dataset_name: test-pub
 seed: 0
-sample_count: 3
+sample_count: 59
 sub_sample:
-  #according_to_columns:
-  #  Class_of_Orbit:
-  #    - LEO
-  #    - GEO
-  #  Users:
-  #    - Commercial
-  N: 1000
+  N: 20000
 parallel:
   # To limit the number of jobs GNU Parallel spawns use add the flag `--jobs n`.
   flags: >-
@@ -24,10 +18,31 @@ schema:
   # For example, to force the "age" column to be treated as a
   # numerical uncomment the following line:
   # age: numerical
-  # Apogee_km: numerical
-  # Perigee_km: numerical
+  year: nominal
+  state: nominal
+  gender: nominal
+  age: numerical
+  educ: nominal
+  race_h: nominal
+  religion: nominal
+  relig_imp: nominal
+  marstat: nominal
+  ownhome: nominal
+  has_child: nominal
+  no_milstat: nominal
+  vv_turnout_gvm: nominal
+  pid7: nominal
+  ideo5: nominal
+  faminc: nominal
+  employ: nominal
+  no_healthins: nominal
+  union: nominal
+  economy_retro: nominal
+  newsint: nominal
+  approval_pres: nominal
+  voted_pres_party: nominal
 loom:
-  extra_passes: 1
+  extra_passes: 500
 cgpm:
   #iterations: 1
   minutes: 1
@@ -76,6 +91,6 @@ database:
   table_name: data
   table_path: data/nullified.csv
   model_name: baseline_model
-  model_path: data/xcat/complete/sample.0.edn
+  # model_path: data/xcat/complete/sample.0.edn
   # model_path: data/xcat/merged.edn
-  # model_path: data/sppl/merged.json
+  model_path: data/sppl/merged.json

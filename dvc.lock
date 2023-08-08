@@ -1,0 +1,149 @@
+schema: '2.0'
+stages:
+  select-columns:
+    cmd: python scripts/select_cols.py
+    deps:
+    - path: data/full_data.csv
+      md5: 685aa7d722a3f7af15a0dcfe1ca85eab
+      size: 571582165
+    outs:
+    - path: data/selected_cols_data.csv
+      md5: be0aff865bb0db8d942cfceea2d053f5
+      size: 147967798
+  subsample:
+    cmd: "mkdir -p data/test && python scripts/subsample.py --data data/selected_cols_data.csv\
+      \ --test-data-dir data/test --params params.yaml --output data/data.csv\n"
+    deps:
+    - path: data/selected_cols_data.csv
+      md5: be0aff865bb0db8d942cfceea2d053f5
+      size: 147967798
+    - path: scripts/subsample.py
+      md5: e984c015340dc2e50d926b4e3931b9dd
+      size: 1821
+    params:
+      params.yaml:
+        seed: 0
+        sub_sample:
+          N: 20000
+    outs:
+    - path: data/data.csv
+      md5: 81791184e676e854348dc97bdd40a235
+      size: 4791107
+    - path: data/test
+      md5: cdfcd32d46d72a24e14076029bddbcd1.dir
+      size: 143177095
+      nfiles: 2
+  validate-column-names:
+    cmd: bin/validate.sh
+    deps:
+    - path: data/data.csv
+      md5: 81791184e676e854348dc97bdd40a235
+      size: 4791107
+    outs:
+    - path: data/validated.csv
+      md5: 81791184e676e854348dc97bdd40a235
+      size: 4791107
+  nullify:
+    cmd: "clojure -X inferenceql.auto-modeling.main/nullify < data/validated.csv >\
+      \ data/nullified.csv\n"
+    deps:
+    - path: data/validated.csv
+      md5: 81791184e676e854348dc97bdd40a235
+      size: 4791107
+    params:
+      params.yaml:
+        nullify:
+    outs:
+    - path: data/nullified.csv
+      md5: 81791184e676e854348dc97bdd40a235
+      size: 4791107
+  guess-schema:
+    cmd: "clojure -X inferenceql.auto-modeling.main/guess-schema < data/nullified.csv\
+      \ > data/schema.edn\n"
+    deps:
+    - path: data/nullified.csv
+      md5: 81791184e676e854348dc97bdd40a235
+      size: 4791107
+    params:
+      params.yaml:
+        schema:
+          year: nominal
+          state: nominal
+          gender: nominal
+          age: numerical
+          educ: nominal
+          race_h: nominal
+          religion: nominal
+          relig_imp: nominal
+          marstat: nominal
+          ownhome: nominal
+          has_child: nominal
+          no_milstat: nominal
+          vv_turnout_gvm: nominal
+          pid7: nominal
+          ideo5: nominal
+          faminc: nominal
+          employ: nominal
+          no_healthins: nominal
+          union: nominal
+          economy_retro: nominal
+          newsint: nominal
+          approval_pres: nominal
+          voted_pres_party: nominal
+    outs:
+    - path: data/schema.edn
+      md5: 24dcd95fc204ff382ef25b22aa06e151
+      size: 481
+  cgpm-schema:
+    cmd: "clojure -X inferenceql.auto-modeling.main/cgpm-schema < data/schema.edn\
+      \ > data/cgpm-schema.edn\n"
+    deps:
+    - path: data/schema.edn
+      md5: 24dcd95fc204ff382ef25b22aa06e151
+      size: 481
+    outs:
+    - path: data/cgpm-schema.edn
+      md5: 91923d432c471c29c533823a06676bbd
+      size: 588
+  loom-schema:
+    cmd: "clojure -X inferenceql.auto-modeling.main/loom-schema < data/schema.edn\
+      \ > data/loom-schema.json\n"
+    deps:
+    - path: data/schema.edn
+      md5: 24dcd95fc204ff382ef25b22aa06e151
+      size: 481
+    outs:
+    - path: data/loom-schema.json
+      md5: fe9f44139c1e8bfe93718834117969ba
+      size: 366
+  ignore:
+    cmd: "clojure -X inferenceql.auto-modeling.main/ignore :schema '\"data/schema.edn\"\
+      ' < data/data.csv > data/ignored.csv\n"
+    deps:
+    - path: data/nullified.csv
+      md5: 81791184e676e854348dc97bdd40a235
+      size: 4791107
+    - path: data/schema.edn
+      md5: 24dcd95fc204ff382ef25b22aa06e151
+      size: 481
+    outs:
+    - path: data/ignored.csv
+      md5: 81791184e676e854348dc97bdd40a235
+      size: 4791107
+  numericalize:
+    cmd: "clojure -X inferenceql.auto-modeling.main/numericalize :schema '\"data/schema.edn\"\
+      ' :table data/mapping-table.edn < data/ignored.csv > data/numericalized.csv\n"
+    deps:
+    - path: data/ignored.csv
+      md5: 81791184e676e854348dc97bdd40a235
+      size: 4791107
+    - path: data/schema.edn
+      md5: 24dcd95fc204ff382ef25b22aa06e151
+      size: 481
+    outs:
+    - path: data/mapping-table.edn
+      md5: 0e1267d6b227f760402c38966ba37bab
+      size: 3226
+    - path: data/numericalized.csv
+      md5: eaa2572c89e2505c1c7923b48577e845
+      size: 939745
