@@ -1,4 +1,11 @@
 stages:
+  dta-to-csv:
+    cmd: python scripts/dta_to_csv.py
+    deps:
+      - data/cumulative_2006-2022.dta
+    outs:
+      - data/full_data.csv
+
   select-columns: 
     cmd: python scripts/select_cols.py
     deps:
