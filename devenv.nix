@@ -6,6 +6,7 @@
     system-packages = with pkgs; [
       clj-kondo
       parallel
+      xsv
     ];
     python-packages = with config.languages.python.package.pkgs; [
       numpy
