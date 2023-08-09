@@ -20,3 +20,14 @@
 pom.xml
 pom.xml.asc
 sum-product-dsl/
+
+# Devenv
+.devenv*
+devenv.local.nix
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml
+
