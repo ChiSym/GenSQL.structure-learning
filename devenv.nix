@@ -9,6 +9,7 @@
     ];
     python-packages = with config.languages.python.package.pkgs; [
       numpy
+      pandas
       scipy
     ];
   in system-packages ++ python-packages;
