@@ -1,0 +1,16 @@
+{
+  "packages": [
+    "nodejs@latest",
+    "nodePackages.pnpm@latest",
+    "python3@latest",
+    "poetry@latest",
+    "clojure@latest",
+    "jdk@latest"
+  ],
+  "shell": {
+    "init_hook": [
+      "poetry shell",
+      "pnpm install --frozen-lockfile --loglevel=warn"
+    ]
+  }
+}

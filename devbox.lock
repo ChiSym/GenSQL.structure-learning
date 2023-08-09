@@ -1,0 +1,42 @@
+{
+  "lockfile_version": "1",
+  "packages": {
+    "clojure@latest": {
+      "last_modified": "2023-06-30T04:44:22Z",
+      "resolved": "github:NixOS/nixpkgs/3c614fbc76fc152f3e1bc4b2263da6d90adf80fb#clojure",
+      "source": "devbox-search",
+      "version": "1.11.1.1347"
+    },
+    "jdk@latest": {
+      "last_modified": "2023-06-01T03:57:58Z",
+      "resolved": "github:NixOS/nixpkgs/8d4d822bc0efa9de6eddc79cb0d82897a9baa750#jdk8",
+      "source": "devbox-search",
+      "version": "8u362-ga"
+    },
+    "nodePackages.pnpm@latest": {
+      "last_modified": "2023-07-23T03:35:12Z",
+      "resolved": "github:NixOS/nixpkgs/af8cd5ded7735ca1df1a1174864daab75feeb64a#nodePackages.pnpm",
+      "source": "devbox-search",
+      "version": "8.6.9"
+    },
+    "nodejs@latest": {
+      "last_modified": "2023-07-23T03:35:12Z",
+      "resolved": "github:NixOS/nixpkgs/af8cd5ded7735ca1df1a1174864daab75feeb64a#nodejs_20",
+      "source": "devbox-search",
+      "version": "20.5.0"
+    },
+    "poetry@latest": {
+      "last_modified": "2023-07-23T03:35:12Z",
+      "resolved": "github:NixOS/nixpkgs/af8cd5ded7735ca1df1a1174864daab75feeb64a#poetry",
+      "source": "devbox-search",
+      "version": "1.5.1"
+    },
+    "python3@latest": {
+      "last_modified": "2023-05-14T19:13:12Z",
+      "plugin_version": "0.0.1",
+      "resolved": "github:NixOS/nixpkgs/3007746b3f5bfcb49e102b517bca891822a41b31#python3",
+      "source": "devbox-search",
+      "version": "3.10.11"
+    }
+  }
+}
