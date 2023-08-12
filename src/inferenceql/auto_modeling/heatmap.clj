@@ -162,7 +162,7 @@
         sort-sm (some-> sort-path
                         (slurp)
                         (json/read-str)
-                        (fill-missing default))
+                        (fill-missing 1.))
         base-spec {:$schema vega-lite-schema
                    :data {:values (values {name sm})}}
         spec (medley/deep-merge base-spec
