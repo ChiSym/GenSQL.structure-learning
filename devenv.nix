@@ -6,12 +6,14 @@
     system-packages = with pkgs; [
       clj-kondo
       parallel
+      gcc-unwrapped
       xsv
     ];
     python-packages = with config.languages.python.package.pkgs; [
       numpy
       pandas
       scipy
+      notebook
     ];
   in system-packages ++ python-packages;
 
