@@ -65,14 +65,15 @@ def anova(df, c1, c2):
     for categorical_value in df[c1].unique():
         # Check whether this is actually a string category
         if not_null(categorical_value):
-            samples.append(
-                df[(df[c1] == categorical_value) & (~df[c2].isnull())][c2].values
-            )
-    F, p = stats.f_oneway(*samples)
-    return {
-        "F": F,
-        "p-value": p,
-    }
+            vals = df[(df[c1] == categorical_value) & (~df[c2].isnull())][c2].values
+            if vals.shape[0] > 0:
+                samples.append(vals)
+    if len(samples) > 1:
+        F, p = stats.f_oneway(*samples)
+        if (not (np.isnan(F) or np.isnan(p))) and np.isfinite(F) and np.isfinite(p):
+            return {"F": F, "p-value": p}
+    # Return dummy values if something went wrong.
+    return {"F": 0, "p-value": 1}
 
 
 def main():
