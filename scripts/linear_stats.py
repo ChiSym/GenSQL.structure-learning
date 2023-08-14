@@ -43,6 +43,8 @@ def lin_reg(xs, ys):
 def chi_squared(xs, ys):
     """Compute chi-square statistic"""
     contingency = pandas.crosstab(xs, ys)
+    if contingency.shape == (0, 0):
+        return {"chi2": 0, "p-value": 1, "dof": 0}
     chi2, p, dof, expected = stats.chi2_contingency(contingency)
     return {"chi2": chi2, "p-value": p, "dof": dof}
 
