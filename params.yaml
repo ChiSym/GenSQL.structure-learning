@@ -8,7 +8,6 @@ sub_sample:
   #    - GEO
   #  Users:
   #    - Commercial
-  N: 1000
 parallel:
   # To limit the number of jobs GNU Parallel spawns use add the flag `--jobs n`.
   flags: >-
@@ -26,11 +25,23 @@ schema:
   # age: numerical
   # Apogee_km: numerical
   # Perigee_km: numerical
+  index: ignore
+  PaCMAP-1: numerical
+  PaCMAP-2: numerical
+  PaCMAP-3: numerical
+  PaCMAP-4: numerical
+  PaCMAP-5: numerical
+  Clinical-Trial: nominal
+  Sample-Type: ignore
+  ELN-AML-2022-Diagnosis: nominal
+  Batch: ignore
+  Hematopoietic-Lineage: nominal
+  
 loom:
   extra_passes: 1
 cgpm:
-  #iterations: 1
-  minutes: 1
+  iterations: 200
+  #minutes: 1
   #dependence:
   #  # While the CrossCat implementation in CGPM takes dependence constraints, doing so
   #  # throws a not-implemented-error. Hence, we apply a workaround:

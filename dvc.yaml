@@ -128,8 +128,8 @@ stages:
       --data data/numericalized.csv
       --params params.yaml
       --seed $(($(bin/param seed) + {#} - 1))
-      --minutes $(bin/param cgpm.minutes)'
-      #--iterations $(bin/param cgpm.iterations)
+      --iterations $(bin/param cgpm.iterations)'
+      #--minutes $(bin/param cgpm.minutes)'
     params:
       - parallel.flags
       - seed
@@ -141,6 +141,39 @@ stages:
       - data/numericalized.csv
     outs:
       - data/cgpm/complete
+
+  cgpm-infer-hyperparameters-refined:
+    cmd: >
+      find data/cgpm/complete -type f |
+      parallel jsonschema --instance {} schemas/cgpm.json &&
+      mkdir -p data/cgpm/refined &&
+      echo $(bin/param cgpm.minutes) >> data/cgpm/inf.log &&
+      find data/cgpm/complete -type f |
+      sort |
+      parallel $(bin/param parallel.flags)
+      'python scripts/cgpm_infer_refined.py {}
+      --kernel alpha
+      --kernel view_alphas
+      --kernel column_hypers
+      --kernel rows
+      --kernel columns
+      --output data/cgpm/refined/{/}
+      --data data/numericalized.csv
+      --params params.yaml
+      --seed $(($(bin/param seed) + {#} - 1))
+      --iterations $(bin/param cgpm.iterations)'
+      #--minutes $(bin/param cgpm.minutes)'
+    params:
+      - parallel.flags
+      - seed
+      - cgpm
+    deps:
+      - data/cgpm/complete
+      - schemas/cgpm.json
+      - scripts/cgpm_infer_refined.py
+      - data/numericalized.csv
+    outs:
+      - data/cgpm/refined
 
   save-dependencies:
     cmd: >
@@ -158,12 +191,17 @@ stages:
     cmd: >
       find data/cgpm/complete -type f |
       xargs python scripts/save_n_views.py
-      >> data/max-number-views.txt
+      >> data/max-number-views.txt &&
+      find data/cgpm/refined -type f |
+      xargs python scripts/save_n_views.py
+      >> data/max-number-views-refined.txt
     deps:
       - data/cgpm/complete
+      - data/cgpm/refined
     outs:
       - data/max-number-views.txt
-
+      - data/max-number-views-refined.txt
+        
   dep-prob-vl:
     cmd: >
       clojure -X inferenceql.auto-modeling.heatmap/vega-lite
@@ -279,10 +317,23 @@ stages:
         --mapping-table data/mapping-table.edn
         --output data/ast/{/.}.edn'
         :::: <(find data/cgpm/complete -type f)
+      - >-
+        parallel ${parallel.flags}
+        jsonschema --instance {} schemas/cgpm.json
+        :::: <(find data/cgpm/refined -type f)
+      - >-
+        parallel ${parallel.flags}
+        'python scripts/ast_export.py
+        --metadata {}
+        --data data/numericalized.csv
+        --mapping-table data/mapping-table.edn
+        --output data/ast/refined-{/.}.edn'
+        :::: <(find data/cgpm/refined -type f)
     params:
       - parallel.flags
     deps:
       - data/cgpm/complete
+      - data/cgpm/refined
       - data/ignored.csv
       - scripts/ast_export.py
     outs:
@@ -318,48 +369,72 @@ stages:
     deps:
       - data/ast
       - data/max-number-views.txt
+      - data/max-number-views-refined.txt
       - scripts/sppl_import.py
     outs:
       - data/sppl/unmerged
 
   sppl-merge:
     desc: "Merges sum-product networks into a single network."
-    cmd: >
-      find data/sppl/unmerged -type f |
-      sort |
-      xargs python scripts/sppl_merge.py
-      --output data/sppl/merged.json
+    cmd:
+      - >
+        find data/sppl/unmerged/ -type f -regex 'data\/sppl\/unmerged\/refined.*' |
+        sort |
+        xargs python scripts/sppl_merge.py
+        --output data/sppl/merged-refined.json
+      - >
+        find data/sppl/unmerged/ -type f -regex 'data\/sppl\/unmerged\/[^(refined)].*' |
+        sort |
+        xargs python scripts/sppl_merge.py
+        --output data/sppl/merged.json
     deps:
       - data/sppl/unmerged
     outs:
       - data/sppl/merged.json
+      - data/sppl/merged-refined.json
 
   sppl-sample:
-    cmd: >
-      python scripts/sppl_sample.py
-      --model data/sppl/merged.json
-      --data data/ignored.csv
-      --sample_count $(bin/param qc.sample_count)
-      > data/synthetic-data-iql.csv
+    cmd: 
+      - > 
+        python scripts/sppl_sample.py
+        --model data/sppl/merged.json
+        --data data/ignored.csv
+        --sample_count $(bin/param qc.sample_count)
+        > data/synthetic-data-iql.csv
+      - > 
+        python scripts/sppl_sample.py
+        --model data/sppl/merged-refined.json
+        --data data/ignored.csv
+        --sample_count $(bin/param qc.sample_count)
+        > data/synthetic-data-iql-refined.csv
     deps:
       - scripts/sppl_sample.py
       - data/sppl/merged.json
       - data/ignored.csv
     outs:
       - data/synthetic-data-iql.csv
+      - data/synthetic-data-iql-refined.csv
 
   qc-tag-samples:
-    cmd: >
-      clojure -X inferenceql.auto-modeling.qc.samples/tag
-      :data data/ignored.csv
-      :samples-synthetic data/synthetic-data-iql.csv
-      > qc/samples/samples.edn
+    cmd:
+      - >
+        clojure -X inferenceql.auto-modeling.qc.samples/tag
+        :data data/ignored.csv
+        :samples-synthetic data/synthetic-data-iql.csv
+        > qc/samples/samples.edn
+      - >
+        clojure -X inferenceql.auto-modeling.qc.samples/tag
+        :data data/ignored.csv
+        :samples-synthetic data/synthetic-data-iql-refined.csv
+        > qc/samples/samples-refined.edn
     deps:
       - data/ignored.csv
       - data/synthetic-data-iql.csv
+      - data/synthetic-data-iql-refined.csv
       - src/inferenceql/auto_modeling/qc/samples.clj
     outs:
       - qc/samples/samples.edn
+      - qc/samples/samples-refined.edn
 
   xcat-complete-import:
     desc: "Imports the final CGPM Crosscat samples as XCat records."
@@ -408,80 +483,118 @@ stages:
       - data/db.edn
 
   qc-dashboard-spec:
-    cmd: >
-      clojure -X inferenceql.auto-modeling.qc.dashboard/spec
-      :samples qc/samples/samples.edn
-      :schema data/schema.edn
-      :correlation data/linear-stats.json
-      > qc/specs/qc-dashboard.vl.json
+    cmd:
+      - >
+        clojure -X inferenceql.auto-modeling.qc.dashboard/spec
+        :samples qc/samples/samples.edn
+        :schema data/schema.edn
+        :correlation data/linear-stats.json
+        > qc/specs/qc-dashboard.vl.json
+      - >
+        clojure -X inferenceql.auto-modeling.qc.dashboard/spec
+        :samples qc/samples/samples-refined.edn
+        :schema data/schema.edn
+        :correlation data/linear-stats.json
+        > qc/specs/qc-dashboard-refined.vl.json
     params:
       - qc.columns
     deps:
       - qc/samples/samples.edn
+      - qc/samples/samples-refined.edn
       - data/schema.edn
       - data/linear-stats.json
       - src/inferenceql/auto_modeling/qc/dashboard.clj
       - src/inferenceql/auto_modeling/qc/util.clj
     outs:
       - qc/specs/qc-dashboard.vl.json
+      - qc/specs/qc-dashboard-refined.vl.json
 
   qc-dashboard-app:
-    cmd: >
-      clojure -X inferenceql.auto-modeling.qc.app/create
-      :template qc/templates/index.html
-      :spec qc/specs/qc-dashboard.vl.json
-      :renderer canvas
-      :title '"QC dashboard"'
-      > qc/app/qc-dashboard.html
+    cmd:
+      - >
+        clojure -X inferenceql.auto-modeling.qc.app/create
+        :template qc/templates/index.html
+        :spec qc/specs/qc-dashboard.vl.json
+        :renderer canvas
+        :title '"QC dashboard"'
+        > qc/app/qc-dashboard.html
+      - >
+        clojure -X inferenceql.auto-modeling.qc.app/create
+        :template qc/templates/index.html
+        :spec qc/specs/qc-dashboard-refined.vl.json
+        :renderer canvas
+        :title '"QC dashboard"'
+        > qc/app/qc-dashboard-refined.html
     deps:
       - qc/templates/index.html
       - qc/specs/qc-dashboard.vl.json
+      - qc/specs/qc-dashboard-refined.vl.json
       - src/inferenceql/auto_modeling/qc/app.clj
     outs:
       - qc/app/qc-dashboard.html
+      - qc/app/qc-dashboard-refined.html
 
   qc-splom-spec:
-    cmd: >
-      clojure -X inferenceql.auto-modeling.qc.splom/spec
-      :samples qc/samples/samples.edn
-      :schema data/schema.edn
-      :correlation data/linear-stats.json
-      > qc/specs/qc-splom.vl.json
+    cmd:
+      - >
+        clojure -X inferenceql.auto-modeling.qc.splom/spec
+        :samples qc/samples/samples.edn
+        :schema data/schema.edn
+        :correlation data/linear-stats.json
+        > qc/specs/qc-splom.vl.json
+      - >
+        clojure -X inferenceql.auto-modeling.qc.splom/spec
+        :samples qc/samples/samples-refined.edn
+        :schema data/schema.edn
+        :correlation data/linear-stats.json
+        > qc/specs/qc-splom-refined.vl.json
     params:
       - qc.columns
     deps:
       - qc/samples/samples.edn
+      - qc/samples/samples-refined.edn
       - data/schema.edn
       - data/linear-stats.json
       - src/inferenceql/auto_modeling/qc/splom.clj
       - src/inferenceql/auto_modeling/qc/util.clj
     outs:
       - qc/specs/qc-splom.vl.json
+      - qc/specs/qc-splom-refined.vl.json
 
   qc-splom-app:
-    cmd: >
-      clojure -X inferenceql.auto-modeling.qc.app/create
-      :template qc/templates/index.html
-      :spec qc/specs/qc-splom.vl.json
-      :renderer canvas
-      :title '"QC scatter plot matrix"'
-      > qc/app/qc-splom.html
+    cmd:
+      - >
+        clojure -X inferenceql.auto-modeling.qc.app/create
+        :template qc/templates/index.html
+        :spec qc/specs/qc-splom.vl.json
+        :renderer canvas
+        :title '"QC scatter plot matrix"'
+        > qc/app/qc-splom.html
+      - >
+        clojure -X inferenceql.auto-modeling.qc.app/create
+        :template qc/templates/index.html
+        :spec qc/specs/qc-splom-refined.vl.json
+        :renderer canvas
+        :title '"QC scatter plot matrix (refined data)"'
+        > qc/app/qc-splom-refined.html
     deps:
       - qc/templates/index.html
       - qc/specs/qc-splom.vl.json
+      - qc/specs/qc-splom-refined.vl.json
       - src/inferenceql/auto_modeling/qc/app.clj
     outs:
       - qc/app/qc-splom.html
+      - qc/app/qc-splom-refined.html
 
   predict:
       cmd: >
-        python scripts/predict.py
-        --schema data/schema.edn
-        --training data/ignored.csv
-        --training data/synthetic-data-iql.csv
-        --test data/test/test.csv
-        --output data/predictions.csv
+        #python scripts/predict.py
+        #--schema data/schema.edn
+        #--training data/ignored.csv
+        #--training data/synthetic-data-iql.csv
         #--test data/test/test-shifted.csv
+        #--output data/predictions.csv
+        #--test data/test/test.csv
       params:
         - synthetic_data_evaluation
       deps:
@@ -489,10 +602,10 @@ stages:
         - data/schema.edn
         - data/ignored.csv
         - data/synthetic-data-iql.csv
-        - data/test/test.csv
-        #- data/test/test-shifted.csv
-      outs:
-        - data/predictions.csv
+        - data/test/test-shifted.csv
+        #- data/test/test.csv
+      #outs:
+        #- data/predictions.csv
 
   prepare-publish:
     cmd: >

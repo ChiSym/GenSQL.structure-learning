@@ -154,6 +154,7 @@
           pypkgs.pytest
           pypkgs.pyyaml
           pypkgs.s3fs
+          pypkgs.jupyter
         ]);
       in {
         devShell = pkgs.mkShell {
