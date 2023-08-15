@@ -348,6 +348,26 @@ stages:
     outs:
       - data/synthetic-data-iql.csv
 
+  ctgan-train-sample:
+    cmd: >
+      python scripts/train_baselines.py
+      --model ctgan
+      --data data/ignored.csv
+    deps:
+      - data/ignored.csv
+    outs:
+      - data/synthetic-data-ctgan.csv
+
+  copula-train-sample:
+    cmd: >
+      python scripts/train_baselines.py
+      --model copula
+      --data data/ignored.csv
+    deps:
+      - data/ignored.csv
+    outs:
+      - data/synthetic-data-copula.csv
+
   qc-tag-samples:
     cmd: >
       clojure -X inferenceql.auto-modeling.qc.samples/tag
