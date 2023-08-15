@@ -95,6 +95,7 @@ stages:
       --data data/numericalized.csv
       --schema data/cgpm-schema.edn
       --mapping-table data/mapping-table.edn
+      --params params.yaml
       --seed $(($(bin/param seed) + {#} - 1))'
     params:
       - parallel.flags
@@ -125,11 +126,9 @@ stages:
       --kernel rows
       --kernel columns
       --output data/cgpm/complete/{/}
-      --data data/numericalized.csv
-      --params params.yaml
       --seed $(($(bin/param seed) + {#} - 1))
       --minutes $(bin/param cgpm.minutes)'
-      #--iterations $(bin/param cgpm.iterations)
+      #--iterations $(bin/param cgpm.iterations)'
     params:
       - parallel.flags
       - seed
