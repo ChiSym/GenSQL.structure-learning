@@ -126,7 +126,7 @@ def main():
     for c1, c2 in pairs:
         stattypes = [schema[c1].name, schema[c2].name]
         if "ignore" in stattypes:
-            pass
+            continue
         pair_df = df[[c1, c2]].dropna()
 
         if len(pair_df) <= 1:
