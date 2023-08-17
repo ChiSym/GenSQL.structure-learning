@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "inferenceql-auto-modeling"
+version = "0.1.0"
+description = ""
+authors = ["Zane Shelby <poetry@zane.io>"]
+license = "Apache-2.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.10.12"
+cgpm = {git = "https://github.com/probcomp/cgpm", branch = "zane/hardcode-version"}
+dvc = "^3.13.3"
+sppl = {git = "https://github.com/probsys/sppl"}
+edn-format = "^0.7.5"
+jsonschema = "^4.19.0"
+matplotlib = "^3.7.2"
+catboost = "^1.2"
+scikit-learn = "^1.3.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.7.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

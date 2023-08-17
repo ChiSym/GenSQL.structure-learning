@@ -2,8 +2,11 @@ name: Python tests
 on:
   push:
     paths:
-      - 'flake.nix'
-      - 'flake.lock'
+      - 'devenv.nix'
+      - 'devenv.lock'
+      - 'devenv.yaml'
+      - 'pyproject.toml'
+      - 'requirements.txt'
 jobs:
   run-tests:
     runs-on: ubuntu-latest
