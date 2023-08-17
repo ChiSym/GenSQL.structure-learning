@@ -159,7 +159,7 @@ stages:
       --kernel columns
       --output data/cgpm/refined/{/}
       --data data/numericalized.csv
-      --refined-grids data/cgpm/refined-grids.json
+      --refined-grids data/cgpm/refined-grids/{/}
       --params params.yaml
       --seed $(($(bin/param seed) + {#} - 1))
       --iterations $(bin/param cgpm.iterations)
@@ -173,7 +173,7 @@ stages:
       - schemas/cgpm.json
       - scripts/cgpm_infer_refined.py
       - data/numericalized.csv
-      - data/cgpm/refined-grids.json # comment and remove the script arg for default
+      - data/cgpm/refined-grids # comment and remove the script arg for default
     outs:
       - data/cgpm/refined
 
