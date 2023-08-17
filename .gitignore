@@ -1,6 +1,8 @@
 *.class
 *.jar
 .cpcache/
+.devenv*
+.direnv
 .lein-deps-sum
 .lein-failures
 .lein-plugins/
@@ -10,14 +12,15 @@
 /.clj-kondo/.cache/
 /checkouts/
 /classes/
+/learning-dashboard/
 /lib/
 /loom
 /node_modules/
 /out/
 /qc/
-/learning-dashboard/
 /target/
+catboost_info/
+devenv.local.nix
 pom.xml
 pom.xml.asc
 sum-product-dsl/
-catboost_info/

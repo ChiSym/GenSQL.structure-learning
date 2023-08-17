@@ -14,4 +14,4 @@ jobs:
         run: nix develop -c bash -c ':'
 
       - name: Run black
-        run: nix develop -c black --check scripts
+        run: devenv shell black --check .

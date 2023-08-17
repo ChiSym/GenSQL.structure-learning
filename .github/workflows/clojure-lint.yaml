@@ -1,5 +1,11 @@
 name: Clojure lint
-on: push
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
 jobs:
   lint-files:
     runs-on: ubuntu-latest
