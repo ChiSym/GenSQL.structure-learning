@@ -10,14 +10,23 @@ jobs:
   lint-files:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup Nix
-        uses: cachix/install-nix-action@v16
+      - name: Check out repository
+        uses: actions/checkout@v3
 
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Install Nix
+        uses: cachix/install-nix-action@v22
 
-      - name: Prepare Nix shell
-        run: nix develop -c bash -c ':'
+      - name: Set up Cachix
+        uses: cachix/cachix-action@v12
+        with:
+          name: devenv
+
+      - name: Install devenv
+        run: nix profile install tarball+https://install.devenv.sh/latest
+        shell: sh
+
+      - name: Build developer environment and run checks
+        run: devenv ci
 
       - name: Lint files
-        run: nix develop -c clj-kondo --lint deps.edn src bin test --config '{:output {:pattern "::{{level}} file={{filename}},line={{row}},col={{col}}::{{message}}"}}'
+        run: devenv shell clj-kondo --lint deps.edn src bin test --config '{:output {:pattern "::{{level}} file={{filename}},line={{row}},col={{col}}::{{message}}"}}'
