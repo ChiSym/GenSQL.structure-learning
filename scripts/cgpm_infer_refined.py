@@ -15,23 +15,43 @@ from cgpm.crosscat.state import State
 none_to_nan = lambda x: float('nan') if x is None else x
 mapped_none_to_nan = lambda xs: list(map(none_to_nan, xs))
 
-def refine_crp_hyper_grids(state, n=30):
-    final_hyper = state.crp.hypers['alpha']
-    new_grid = np.linspace(0.80 * final_hyper, 1.2 * final_hyper, n)
-    state.crp.hyper_grids['alpha'] = new_grid
+lift_to_ndarray = lambda l: np.array(l) if isinstance(l, list) else l
 
-def refine_view_hyper_grids(state, cols, n=30):
-    for idx, view in state.views.items():
-        final_hyper = view.crp.hypers['alpha']
-        new_grid = np.linspace(0.80 * final_hyper, 1.2 * final_hyper, n)
-        state.views[idx].crp.hyper_grids['alpha'] = new_grid
+def refine_crp_hyper_grid(state, grid=None):
+    if grid is None:
+        final_hyper = state.crp.hypers['alpha']
+        grid = np.linspace(0.80 * final_hyper, 1.2 * final_hyper, 30)
+    state.crp.hyper_grids['alpha'] = lift_to_ndarray(grid)
 
-def refine_dim_hyper_grids(state, cols, n=30):
-    for col in cols:
-        final_hypers = state.dim_for(col).hypers
-        for name, val in final_hypers.items():
-            new_grid = np.linspace(0.80 * val, 1.2 * val, n) 
-            state.dim_for(col).hyper_grids[name] = new_grid
+def refine_view_hyper_grid(state, view_idx, grid=None):
+    if view_idx not in state.views.keys():
+        print(f'Warning: refinement for view {view_idx} provided, while ' +
+               'this view does not exist.\nSkipping refinement')
+        return
+    if grid is None:
+        final_hyper = state.views[view_idx].crp.hypers['alpha']
+        grid = np.linspace(0.80 * final_hyper, 1.2 * final_hyper, 30)
+    state.views[view_idx].crp.hyper_grids['alpha'] = lift_to_ndarray(grid)
+
+def refine_dim_hyper_grid(state, col_idx, hyper, grid=None):
+    if grid is None:
+        final_hyper = state.dim_for(col_idx).hypers[hyper]
+        grid = np.linspace(0.80 * final_hyper, 1.2 * final_hyper, 30)
+    state.dim_for(col_idx).hyper_grids[hyper] = lift_to_ndarray(grid)
+
+def refine_dim_hyper_grids(state, col_idx, grids=None):
+    for hyper in state.dim_for(col_idx).hypers.keys():
+        grid = grids[hyper] if grids is not None else None
+        refine_dim_hyper_grid(state, col_idx, hyper, grid)
+
+def default_refinement_grids(state):
+    refinement_grids = {'crp': None, 'dim': {}, 'view': {}}
+    for col in state.outputs:
+        col_hypers = state.dim_for(col).hypers.keys()
+        refinement_grids['dim'][col] = {hyper: None for hyper in col_hypers}
+    for view_idx in state.views.keys():
+        refinement_grids['view'][view_idx] = None
+    return refinement_grids
 
 def main():
     parser = argparse.ArgumentParser(description="")
@@ -50,6 +70,12 @@ def main():
         type=argparse.FileType("w+"),
         default=sys.stdout,
         metavar="PATH",
+    )
+
+    parser.add_argument(
+        "--refined-grids",
+        type=argparse.FileType("r"),
+        default=None,
     )
 
     parser.add_argument(
@@ -117,10 +143,19 @@ def main():
     rng = general.gen_rng(args.seed)
     metadata["Ci"] = Ci
     state = State.from_metadata(metadata, rng=rng)
+    
+    if args.refined_grids is None:
+        print('No refined grid specified. Using default refinement strategy.')
+        refinement_grids = default_refinement_grids(state)
+    else:
+        refinement_grids = json.load(args.refined_grids)
 
-    refine_crp_hyper_grids(state)
-    refine_view_hyper_grids(state, columns_transition)
-    refine_dim_hyper_grids(state, columns_transition)
+    refine_crp_hyper_grid(state, refinement_grids['crp'])
+    for col, hyper_grids in refinement_grids['dim'].items():
+        for hyper, grid in hyper_grids.items():
+            refine_dim_hyper_grid(state, int(col), hyper, grid)
+    for view_idx, view_grid in refinement_grids['view'].items():
+        refine_view_hyper_grid(state, view_idx, view_grid)
 
     if do_not_transition:
         # Update hyper-parameters for columns you want to fix.
