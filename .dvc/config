@@ -1,5 +1,5 @@
 [core]
     analytics = false
-    remote = default-s3-remote
-['remote "default-s3-remote"']
-    url = s3://lpm-research/default
+    remote = stackoverflow-s3-remote
+['remote "stackoverflow-s3-remote"']
+    url = s3://lpm-research/stackoverflow

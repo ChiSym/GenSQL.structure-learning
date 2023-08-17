@@ -347,20 +347,6 @@ stages:
     outs:
       - data/ast
 
-  write-gen-programs:
-    deps:
-      - data/ast
-    outs:
-      - data/code
-    cmd:
-      - mkdir -p data/code
-      - >-
-        parallel ${parallel.flags}
-        'clojure -X inferenceql.auto-modeling.code/pprint-string
-        :path \"{}\"
-        > data/code/{/.}.clj'
-        :::: <(find data/ast -type f)
-
   sppl-import:
     desc: "Imports a Multi-Mix AST and exports it AS a sum-product network"
     cmd:
@@ -418,32 +404,6 @@ stages:
       - src/inferenceql/auto_modeling/qc/samples.clj
     outs:
       - qc/samples/samples.edn
-
-  xcat-complete-import:
-    desc: "Imports the final CGPM Crosscat samples as XCat records."
-    cmd:
-      - mkdir -p data/xcat/complete/
-      - >-
-        parallel ${parallel.flags}
-        'clojure -X inferenceql.auto-modeling.xcat/import
-        :cgpm-json {}
-        :data-csv data/ignored.csv
-        :mapping-table data/mapping-table.edn
-        :numericalized-csv data/numericalized.csv
-        :schema-edn data/schema.edn
-        > data/xcat/complete/{/.}.edn'
-        :::: <(find data/cgpm/complete -type f)
-    params:
-      - parallel.flags
-    deps:
-      - data/cgpm/complete
-      - data/mapping-table.edn
-      - data/ignored.csv
-      - data/numericalized.csv
-      - data/schema.edn
-      - src/inferenceql/auto_modeling/xcat.clj
-    outs:
-      - data/xcat/complete/
 
   qc-dashboard-spec:
     cmd: >
