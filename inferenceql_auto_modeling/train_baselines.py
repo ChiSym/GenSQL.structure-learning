@@ -10,7 +10,7 @@ from sdv.single_table import (
 from sdv.metadata import SingleTableMetadata
 
 
-def train_baseline():
+def train_baseline_cli():
     description = "train baseline models"
     parser = argparse.ArgumentParser(description=description)
 
@@ -23,6 +23,13 @@ def train_baseline():
     model = args.model
     df = pd.read_csv(args.data)
 
+    synthesizer, synthetic_data = train_baseline(df, model)
+
+    pickle.dump(synthesizer, open(f"data/{model}.pkl", "wb"))
+    synthetic_data.to_csv(f"data/synthetic-data-{model}.csv", index=False)
+
+
+def train_baseline(df, model):
     metadata = SingleTableMetadata()
     metadata.detect_from_dataframe(data=df)
 
@@ -37,12 +44,10 @@ def train_baseline():
             raise NotImplementedError(f"model {model} not implemented")
 
     synthesizer.fit(df)
-
-    pickle.dump(synthesizer, open(f"data/{model}.pkl", "wb"))
-
     synthetic_data = synthesizer.sample(num_rows=len(df))
-    synthetic_data.to_csv(f"data/synthetic-data-{model}.csv", index=False)
+
+    return synthesizer, synthetic_data
 
 
 if __name__ == "__main__":
-    train_baseline()
+    train_baseline_cli()
