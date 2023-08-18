@@ -1,9 +1,9 @@
-name: Python tests
+name: Python build
 
 on:
   push:
     paths:
-      - '.github/workflows/python-tests.yaml'
+      - '.github/workflows/python-build-tests.yaml'
       - 'devenv.lock'
       - 'devenv.nix'
       - 'devenv.yaml'
@@ -12,7 +12,7 @@ on:
 
   pull_request:
     paths:
-      - '.github/workflows/python-tests.yaml'
+      - '.github/workflows/python-build-tests.yaml'
       - 'devenv.lock'
       - 'devenv.nix'
       - 'devenv.yaml'
@@ -52,6 +52,3 @@ jobs:
 
       - name: Run SPPL tests
         run: devenv shell python -m pytest --pyargs sppl
-
-      - name: Run Auto Modeling's Python tests
-        run: devenv shell python -m pytest test/scripts
