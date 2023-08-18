@@ -254,13 +254,13 @@ stages:
     params:
       params.yaml:
         cgpm:
-          minutes: 600
+          minutes: 1440
         parallel.flags: --verbose
         seed: 42
     outs:
     - path: data/cgpm/complete
-      md5: 507b02cc18646f8399c57f2ee74eb8ab.dir
-      size: 439920647
+      md5: 8f18855c72418e27f856675830c9c316.dir
+      size: 440105624
       nfiles: 60
   ast-export:
     cmd:
@@ -272,8 +272,8 @@ stages:
       \ data/cgpm/complete -type f)"
     deps:
     - path: data/cgpm/complete
-      md5: 507b02cc18646f8399c57f2ee74eb8ab.dir
-      size: 439920647
+      md5: 8f18855c72418e27f856675830c9c316.dir
+      size: 440105624
       nfiles: 60
     - path: data/ignored.csv
       md5: 3c70752fa37400ff1c47fd32479b1ff6
@@ -286,16 +286,16 @@ stages:
         parallel.flags: --verbose
     outs:
     - path: data/ast
-      md5: c260931c7a4a9a89145701d13663d0e6.dir
-      size: 112137002
+      md5: 71ab346573b142d3fc22b4d72986e1bd.dir
+      size: 115354937
       nfiles: 60
   save-max-number-views:
     cmd: "find data/cgpm/complete -type f | xargs python scripts/save_n_views.py >>\
       \ data/max-number-views.txt\n"
     deps:
     - path: data/cgpm/complete
-      md5: 507b02cc18646f8399c57f2ee74eb8ab.dir
-      size: 439920647
+      md5: 8f18855c72418e27f856675830c9c316.dir
+      size: 440105624
       nfiles: 60
     outs:
     - path: data/max-number-views.txt
@@ -309,8 +309,8 @@ stages:
       \ data/ast -type f)"
     deps:
     - path: data/ast
-      md5: c260931c7a4a9a89145701d13663d0e6.dir
-      size: 112137002
+      md5: 71ab346573b142d3fc22b4d72986e1bd.dir
+      size: 115354937
       nfiles: 60
     - path: data/max-number-views.txt
       md5: 9bf31c7ff062936a96d3c8bd1f8f2ff3
@@ -323,21 +323,21 @@ stages:
         parallel.flags: --verbose
     outs:
     - path: data/sppl/unmerged
-      md5: d8b119720353db7ea9a729ee29458313.dir
-      size: 56983052
+      md5: f24e2ff7ceacdeab8c5337de388f282b.dir
+      size: 58925853
       nfiles: 60
   sppl-merge:
     cmd: "find data/sppl/unmerged -type f | sort | xargs python scripts/sppl_merge.py\
       \ --output data/sppl/merged.json\n"
     deps:
     - path: data/sppl/unmerged
-      md5: d8b119720353db7ea9a729ee29458313.dir
-      size: 56983052
+      md5: f24e2ff7ceacdeab8c5337de388f282b.dir
+      size: 58925853
       nfiles: 60
     outs:
     - path: data/sppl/merged.json
-      md5: 5fc10b637ab0fb0e0dd4d44751e2f88d
-      size: 56989328
+      md5: 88cfb7d421c75dd46f1aedf61c1d9e8a
+      size: 58932129
   sppl-sample:
     cmd: "python scripts/sppl_sample.py --model data/sppl/merged.json --data data/ignored.csv\
       \ --sample_count $(bin/param qc.sample_count) > data/synthetic-data-iql.csv\n"
@@ -346,15 +346,15 @@ stages:
       md5: 3c70752fa37400ff1c47fd32479b1ff6
       size: 5682141
     - path: data/sppl/merged.json
-      md5: 5fc10b637ab0fb0e0dd4d44751e2f88d
-      size: 56989328
+      md5: 88cfb7d421c75dd46f1aedf61c1d9e8a
+      size: 58932129
     - path: scripts/sppl_sample.py
       md5: 65c711874e0eda0e7d79b4a4a3eb6076
       size: 1843
     outs:
     - path: data/synthetic-data-iql.csv
-      md5: 8571aa350ab50673322df360a0c4cbb9
-      size: 6301526
+      md5: 73e5ab3eb16b9430d067eb3dd1cc32c6
+      size: 6297321
   save-linear-stats:
     cmd: "python scripts/linear_stats.py --data data/ignored.csv --schema data/schema.edn\
       \ --output data/linear-stats.json\n"
@@ -377,21 +377,21 @@ stages:
       \ --data data/numericalized.csv --output data/dep-prob.json\n"
     deps:
     - path: data/cgpm/complete
-      md5: 507b02cc18646f8399c57f2ee74eb8ab.dir
-      size: 439920647
+      md5: 8f18855c72418e27f856675830c9c316.dir
+      size: 440105624
       nfiles: 60
     outs:
     - path: data/dep-prob.json
-      md5: 7bbd7716ebc1c6f73755fd26473ffbfb
-      size: 1425168
+      md5: ff3566244fa2154f6a67743e5b0b7e04
+      size: 1418352
   linear-stats-vl:
     cmd: "clojure -X inferenceql.auto-modeling.heatmap/vega-lite :stats-path '\"data/linear-stats.json\"\
       ' :sort-path '\"data/dep-prob.json\"' :domain '[1.0 0.0]' :default 0.0 :name\
       \ '\"statistics\"' :field '\"p-value\"' :scheme '\"oranges\"' > data/linear-stats.vl.json\n"
     deps:
     - path: data/dep-prob.json
-      md5: 7bbd7716ebc1c6f73755fd26473ffbfb
-      size: 1425168
+      md5: ff3566244fa2154f6a67743e5b0b7e04
+      size: 1418352
     - path: data/linear-stats.json
       md5: d2fed9a567ccd0e5ba3aff5ff9ae1069
       size: 4414556
@@ -400,32 +400,32 @@ stages:
       size: 7364
     outs:
     - path: data/linear-stats.vl.json
-      md5: 1ba4928bfc4614fb2b2ecd999d41eeb2
+      md5: 80d837c4d70e4cd2224b97e1e57dc133
       size: 3985248
   linear-stats-vg:
     cmd: "pnpm vl2vg < data/linear-stats.vl.json > data/linear-stats.vg.json\n"
     deps:
     - path: data/linear-stats.vl.json
-      md5: 1ba4928bfc4614fb2b2ecd999d41eeb2
+      md5: 80d837c4d70e4cd2224b97e1e57dc133
       size: 3985248
     outs:
     - path: data/linear-stats.vg.json
-      md5: aad6ecbcf88ad4aed1f0827909762853
+      md5: 2c5bf46a2d7b98b4b50bb17251c2f1fc
       size: 4002704
   compare-dep-prob-with-linear:
     cmd: "python scripts/compare_deps.py --deps data/dep-prob.json --linear data/linear-stats.json\
       \ >> data/qc-statistical-tests.txt\n"
     deps:
     - path: data/dep-prob.json
-      md5: 7bbd7716ebc1c6f73755fd26473ffbfb
-      size: 1425168
+      md5: ff3566244fa2154f6a67743e5b0b7e04
+      size: 1418352
     - path: data/linear-stats.json
       md5: d2fed9a567ccd0e5ba3aff5ff9ae1069
       size: 4414556
     outs:
     - path: data/qc-statistical-tests.txt
-      md5: d9b610bad575b99e606dee8a60ec8b4d
-      size: 397652
+      md5: fc20cc174ef35640605bd0b824521adf
+      size: 405706
   qc-tag-samples:
     cmd: "clojure -X inferenceql.auto-modeling.qc.samples/tag :data data/ignored.csv\
       \ :samples-synthetic data/synthetic-data-iql.csv > qc/samples/samples.edn\n"
@@ -434,15 +434,15 @@ stages:
       md5: 3c70752fa37400ff1c47fd32479b1ff6
       size: 5682141
     - path: data/synthetic-data-iql.csv
-      md5: 8571aa350ab50673322df360a0c4cbb9
-      size: 6301526
+      md5: 73e5ab3eb16b9430d067eb3dd1cc32c6
+      size: 6297321
     - path: src/inferenceql/auto_modeling/qc/samples.clj
       md5: 5c0fcc265aabd819c96ae861bdff7587
       size: 1100
     outs:
     - path: qc/samples/samples.edn
-      md5: 4b38ca23656e596898371ad27b103f29
-      size: 60685230
+      md5: 369f5f299ed42a1132405514b9a2467e
+      size: 60681050
   qc-dashboard-spec:
     cmd: "clojure -X inferenceql.auto-modeling.qc.dashboard/spec :samples qc/samples/samples.edn\
       \ :schema data/schema.edn :correlation data/linear-stats.json > qc/specs/qc-dashboard.vl.json\n"
@@ -454,8 +454,8 @@ stages:
       md5: 1809ada97d5d44e44f62a975adbdcb2d
       size: 5527
     - path: qc/samples/samples.edn
-      md5: 4b38ca23656e596898371ad27b103f29
-      size: 60685230
+      md5: 369f5f299ed42a1132405514b9a2467e
+      size: 60681050
     - path: src/inferenceql/auto_modeling/qc/dashboard.clj
       md5: ceae831bc1ad605ca51069128772ed31
       size: 24673
@@ -467,16 +467,16 @@ stages:
         qc.columns:
     outs:
     - path: qc/specs/qc-dashboard.vl.json
-      md5: adca1e9efdae582708d2bf2d0d1bf42b
-      size: 69014583
+      md5: 4f5cbf458844ab031769d3b6bb1427d6
+      size: 69010032
   qc-dashboard-app:
     cmd: "clojure -X inferenceql.auto-modeling.qc.app/create :template qc/templates/index.html\
       \ :spec qc/specs/qc-dashboard.vl.json :renderer canvas :title '\"QC dashboard\"\
       ' > qc/app/qc-dashboard.html\n"
     deps:
     - path: qc/specs/qc-dashboard.vl.json
-      md5: adca1e9efdae582708d2bf2d0d1bf42b
-      size: 69014583
+      md5: 4f5cbf458844ab031769d3b6bb1427d6
+      size: 69010032
     - path: qc/templates/index.html
       md5: ac51efb107febc1caf14b5e2c6d0489d
       size: 1685
@@ -485,43 +485,43 @@ stages:
       size: 519
     outs:
     - path: qc/app/qc-dashboard.html
-      md5: dd84c69b347382fd9025a8fc9d268788
-      size: 69016257
+      md5: 1d11c0326e7178fc1d2ffa77117a4441
+      size: 69011706
   dep-prob-vl:
     cmd: "clojure -X inferenceql.auto-modeling.heatmap/vega-lite :stats-path '\"data/dep-prob.json\"\
       ' :domain '[0.0 1.0]' :default 1.0 :name '\"crosscat\"' :scheme '\"blues\"'\
       \ > data/dep-prob.vl.json\n"
     deps:
     - path: data/dep-prob.json
-      md5: 7bbd7716ebc1c6f73755fd26473ffbfb
-      size: 1425168
+      md5: ff3566244fa2154f6a67743e5b0b7e04
+      size: 1418352
     - path: src/inferenceql/auto_modeling/heatmap.clj
       md5: f4f14b20f34f2f09c76dff87a7e908ee
       size: 7364
     outs:
     - path: data/dep-prob.vl.json
-      md5: 2dce7914da2fd81dc06837931264e88f
-      size: 3465984
+      md5: 8ee047d9ef27916f6efaa5e32fc1a5d0
+      size: 3459168
   dep-prob-vg:
     cmd: "pnpm vl2vg < data/dep-prob.vl.json > data/dep-prob.vg.json\n"
     deps:
     - path: data/dep-prob.vl.json
-      md5: 2dce7914da2fd81dc06837931264e88f
-      size: 3465984
+      md5: 8ee047d9ef27916f6efaa5e32fc1a5d0
+      size: 3459168
     outs:
     - path: data/dep-prob.vg.json
-      md5: 958b9f398de33f614e65c43adb42080c
-      size: 3442591
+      md5: f0d7638acdb6fb6c1aff131a7ea7ad9f
+      size: 3435119
   dep-prob-svg:
     cmd: "pnpm vg2svg < data/dep-prob.vg.json > data/dep-prob.svg\n"
     deps:
     - path: data/dep-prob.vg.json
-      md5: 958b9f398de33f614e65c43adb42080c
-      size: 3442591
+      md5: f0d7638acdb6fb6c1aff131a7ea7ad9f
+      size: 3435119
     outs:
     - path: data/dep-prob.svg
-      md5: 58a585f6493f220f29bb7842aa4ed86b
-      size: 9688910
+      md5: 9570638cd1185cf9b158b44031b5e8b2
+      size: 9683594
   qc-splom-spec:
     cmd: "clojure -X inferenceql.auto-modeling.qc.splom/spec :samples qc/samples/samples.edn\
       \ :schema data/schema.edn :correlation data/linear-stats.json > qc/specs/qc-splom.vl.json\n"
@@ -533,8 +533,8 @@ stages:
       md5: 1809ada97d5d44e44f62a975adbdcb2d
       size: 5527
     - path: qc/samples/samples.edn
-      md5: 4b38ca23656e596898371ad27b103f29
-      size: 60685230
+      md5: 369f5f299ed42a1132405514b9a2467e
+      size: 60681050
     - path: src/inferenceql/auto_modeling/qc/splom.clj
       md5: 739b58b1607577931865aae958121b67
       size: 10862
@@ -546,18 +546,18 @@ stages:
         qc.columns:
     outs:
     - path: qc/specs/qc-splom.vl.json
-      md5: 399f1c529d7c6732dc14f432147f0bcc
-      size: 68989726
+      md5: 0c701d668915cc742b61149c9cf54af1
+      size: 68985175
   linear-stats-svg:
     cmd: "pnpm vg2svg < data/linear-stats.vg.json > data/linear-stats.svg\n"
     deps:
     - path: data/linear-stats.vg.json
-      md5: aad6ecbcf88ad4aed1f0827909762853
+      md5: 2c5bf46a2d7b98b4b50bb17251c2f1fc
       size: 4002704
     outs:
     - path: data/linear-stats.svg
-      md5: 819d6c57c3cfab3db2d883c3ee973883
-      size: 10040691
+      md5: fa88aee593c3fe85d0f6139f4599e109
+      size: 10040727
   predict:
     cmd: "python scripts/predict.py --schema data/schema.edn --training data/ignored.csv\
       \ --training data/synthetic-data-iql.csv --test data/test/test.csv --output\
@@ -570,8 +570,8 @@ stages:
       md5: 1809ada97d5d44e44f62a975adbdcb2d
       size: 5527
     - path: data/synthetic-data-iql.csv
-      md5: 8571aa350ab50673322df360a0c4cbb9
-      size: 6301526
+      md5: 73e5ab3eb16b9430d067eb3dd1cc32c6
+      size: 6297321
     - path: data/test/test.csv
       md5: 4858a227e6aedbc7c971722bda02ad17
       size: 520634
@@ -585,16 +585,16 @@ stages:
           predictor: Random_forest
     outs:
     - path: data/predictions.csv
-      md5: 2a3ef1369b39404c51d7ae0174de081d
-      size: 73486
+      md5: daf2093124700ed8dbd516518c0840c9
+      size: 73471
   qc-splom-app:
     cmd: "clojure -X inferenceql.auto-modeling.qc.app/create :template qc/templates/index.html\
       \ :spec qc/specs/qc-splom.vl.json :renderer canvas :title '\"QC scatter plot\
       \ matrix\"' > qc/app/qc-splom.html\n"
     deps:
     - path: qc/specs/qc-splom.vl.json
-      md5: 399f1c529d7c6732dc14f432147f0bcc
-      size: 68989726
+      md5: 0c701d668915cc742b61149c9cf54af1
+      size: 68985175
     - path: qc/templates/index.html
       md5: ac51efb107febc1caf14b5e2c6d0489d
       size: 1685
@@ -603,5 +603,5 @@ stages:
       size: 519
     outs:
     - path: qc/app/qc-splom.html
-      md5: dd4c6dc6cbd85c800942445a34072865
-      size: 68991410
+      md5: 35e726ffc151bb36d9355836ae58113e
+      size: 68986859
