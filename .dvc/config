@@ -2,4 +2,4 @@
     analytics = false
     remote = default-s3-remote
 ['remote "default-s3-remote"']
-    url = s3://lpm-research/default
+    url = s3://lpm-research/mugamma/cancer
