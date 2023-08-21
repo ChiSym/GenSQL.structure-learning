@@ -21,13 +21,14 @@ class CGPMModel:
         df,
         schema,
         mapping_table,
-        seed,
-        model="Crosscat",
+        seed=0,
+        model="CrossCat",
         cgpm_params={},
         additional_metadata={"hooked_cgpms": {}},
     ):
         cctypes = [schema[column] for column in df.columns]
         distargs = [distarg(column, mapping_table, schema) for column in df.columns]
+        column_mapping = {c: i for i, c in enumerate(df.columns)}
 
         base_metadata = dict(
             X=df.values, cctypes=cctypes, distargs=distargs, outputs=range(df.shape[1])
@@ -38,25 +39,20 @@ class CGPMModel:
                 do_not_transition = []
                 # We can't transition columns that are constrained to be dependent.
                 if "dependence" in cgpm_params:
-                    Zv = (
-                        additional_metadata["Zv"]
-                        if "Zv" in additional_metadata.keys()
-                        else {}
-                    )
                     for target_column, columns_to_move in cgpm_params[
                         "dependence"
                     ].items():
                         for column_to_move in columns_to_move:
-                            if (
-                                Zv[column_mapping[column_to_move]]
-                                != Zv[column_mapping[target_column]]
-                            ):
-                                raise TypeError(
-                                    "Can't initialize a dependence-constrained model from a different model that doesn't satisfy those dependencies"
-                                )
+                            if "Zv" in additional_metadata.keys():
+                                if (
+                                    Zv[column_mapping[column_to_move]]
+                                    != Zv[column_mapping[target_column]]
+                                ):
+                                    raise TypeError(
+                                        "Can't initialize a dependence-constrained model from a different model that doesn't satisfy those dependencies"
+                                    )
                             do_not_transition.append(column_mapping[column_to_move])
                         do_not_transition.append(column_mapping[target_column])
-                    additional_metadata["Zv"] = Zv
                 # Independence is solved using CGPM's independence constraints.
                 if "independence" in cgpm_params:
                     Ci = []
@@ -66,16 +62,12 @@ class CGPMModel:
                     base_metadata["Ci"] = Ci
             case "DPMM":
                 base_metadata["Zv"] = {i: 0 for i in range(len(cctypes))}
-                do_not_transition = [
-                    i for i in range(df.shape[1]) if i not in do_not_transition
-                ]
+                do_not_transition = [i for i in range(df.shape[1])]
             case "Independent":
                 base_metadata["Zv"] = {i: i for i in range(len(cctypes))}
                 cluster_idx = [0] * df.shape[0]
                 base_metadata["Zrv"] = {i: cluster_idx for i in range(df.shape[1])}
-                do_not_transition = [
-                    i for i in range(df.shape[1]) if i not in do_not_transition
-                ]
+                do_not_transition = [i for i in range(df.shape[1])]
             case _:
                 raise ValueError(f"Model '{model}' not defined")
 
@@ -92,7 +84,7 @@ class CGPMModel:
         )
 
     @classmethod
-    def from_metadata(cls, path, seed):
+    def from_metadata(cls, path, seed=0):
         metadata = json.load(open(path, "r", encoding="utf8"))
         metadata["X"] = replace(metadata["X"], lambda x: x is None, math.nan)
 
