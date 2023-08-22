@@ -1,19 +1,25 @@
 from cgpm.crosscat.state import State
 from inferenceql_auto_modeling.utils import distarg, replace, _proportion_done
 import cgpm.utils.general as general
+import numpy as np
 import math
 import time
 import json
 
 
 class CGPMModel:
-    def __init__(self, cgpm, model_type, columns_to_not_transition=[]):
+    def __init__(
+        self, cgpm, model_type, columns_to_not_transition=[], hyper_grids=None
+    ):
         self.cgpm = cgpm
         self.model_type = model_type
         self.columns_to_not_transition = columns_to_not_transition
         self.columns_to_transition = [
             i for i in range(len(cgpm.outputs)) if i not in columns_to_not_transition
         ]
+        self.hyper_grids = (
+            self.make_hyper_grids_dict() if hyper_grids is None else hyper_grids
+        )
 
     @classmethod
     def from_data(
@@ -91,9 +97,13 @@ class CGPMModel:
         cgpm = State.from_metadata(metadata, rng=general.gen_rng(seed))
         model_type = metadata["model_type"]
         columns_to_not_transition = metadata["columns_to_not_transition"]
+        hyper_grids = metadata["hyper_grids"]
 
         return cls(
-            cgpm, model_type, columns_to_not_transition=columns_to_not_transition
+            cgpm,
+            model_type,
+            columns_to_not_transition=columns_to_not_transition,
+            hyper_grids=hyper_grids,
         )
 
     def to_metadata(self, path):
@@ -102,7 +112,46 @@ class CGPMModel:
         cgpm_metadata["model_type"] = self.model_type
         cgpm_metadata["columns_to_not_transition"] = self.columns_to_not_transition
         cgpm_metadata["columns_to_transition"] = self.columns_to_transition
+
+        cgpm_metadata["hyper_grids"] = self.make_hyper_grids_dict()
+
         json.dump(cgpm_metadata, open(path, "w", encoding="utf8"))
+
+    def set_hyper_grids(self, hyper_grids):
+        self.cgpm.crp.hyper_grids["alpha"] = np.array(hyper_grids["alpha"])
+
+        for idx, view in self.cgpm.views.items():
+            self.cgpm.views[idx].crp.hyper_grids["alpha"] = np.array(
+                hyper_grids["view_alphas"][idx]
+            )
+
+        n_cols = len(self.cgpm.X)
+        for col in range(n_cols):
+            self.cgpm.dim_for(col).hyper_grids = {
+                k: np.array(v) for k, v in hyper_grids["column_hypers"][col].items()
+            }
+
+        self.hyper_grids = hyper_grids
+
+    def make_hyper_grids_dict(self):
+        hyper_grids = {}
+
+        hyper_grids["alpha"] = self.cgpm.crp.hyper_grids["alpha"].tolist()
+
+        hyper_grids["view_alphas"] = {}
+        for idx, view in self.cgpm.views.items():
+            hyper_grids["view_alphas"][idx] = (
+                self.cgpm.views[idx].crp.hyper_grids["alpha"].tolist()
+            )
+
+        hyper_grids["column_hypers"] = {}
+        n_cols = len(self.cgpm.X)
+        for col in range(n_cols):
+            hyper_grids["column_hypers"][col] = {
+                k: v.tolist() for k, v in self.cgpm.dim_for(col).hyper_grids.items()
+            }
+
+        return hyper_grids
 
     def kernel_lookup(self, kernel):
         match kernel:
