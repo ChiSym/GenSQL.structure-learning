@@ -20,6 +20,7 @@ class CGPMModel:
         self.hyper_grids = (
             self.make_hyper_grids_dict() if hyper_grids is None else hyper_grids
         )
+        self.set_hyper_grids(self.hyper_grids)
 
     @classmethod
     def from_data(
@@ -97,7 +98,17 @@ class CGPMModel:
         cgpm = State.from_metadata(metadata, rng=general.gen_rng(seed))
         model_type = metadata["model_type"]
         columns_to_not_transition = metadata["columns_to_not_transition"]
-        hyper_grids = metadata["hyper_grids"]
+
+        # necessary because json converts int keys to str
+        hyper_grids = {
+            "alpha": metadata["hyper_grids"]["alpha"],
+            "view_alphas": {
+                int(k): v for k, v in metadata["hyper_grids"]["view_alphas"].items()
+            },
+            "column_hypers": {
+                int(k): v for k, v in metadata["hyper_grids"]["column_hypers"].items()
+            },
+        }
 
         return cls(
             cgpm,
