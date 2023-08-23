@@ -235,7 +235,7 @@ stages:
       > data/dep-prob.vl.json
     deps:
       - data/dep-prob.json
-      - src/inferenceql/auto_modeling/heatmap.clj
+      - src/clojure/inferenceql/auto_modeling/heatmap.clj
     outs:
       - data/dep-prob.vl.json
 
@@ -286,7 +286,7 @@ stages:
     deps:
       - data/linear-stats.json
       - data/dep-prob.json
-      - src/inferenceql/auto_modeling/heatmap.clj
+      - src/clojure/inferenceql/auto_modeling/heatmap.clj
     outs:
       - data/linear-stats.vl.json
 
@@ -415,7 +415,7 @@ stages:
     deps:
       - data/ignored.csv
       - data/synthetic-data-iql.csv
-      - src/inferenceql/auto_modeling/qc/samples.clj
+      - src/clojure/inferenceql/auto_modeling/qc/samples.clj
     outs:
       - qc/samples/samples.edn
 
@@ -441,7 +441,7 @@ stages:
       - data/ignored.csv
       - data/numericalized.csv
       - data/schema.edn
-      - src/inferenceql/auto_modeling/xcat.clj
+      - src/clojure/inferenceql/auto_modeling/xcat.clj
     outs:
       - data/xcat/complete/
 
@@ -458,8 +458,8 @@ stages:
       - qc/samples/samples.edn
       - data/schema.edn
       - data/linear-stats.json
-      - src/inferenceql/auto_modeling/qc/dashboard.clj
-      - src/inferenceql/auto_modeling/qc/util.clj
+      - src/clojure/inferenceql/auto_modeling/qc/dashboard.clj
+      - src/clojure/inferenceql/auto_modeling/qc/util.clj
     outs:
       - qc/specs/qc-dashboard.vl.json
 
@@ -474,7 +474,7 @@ stages:
     deps:
       - qc/templates/index.html
       - qc/specs/qc-dashboard.vl.json
-      - src/inferenceql/auto_modeling/qc/app.clj
+      - src/clojure/inferenceql/auto_modeling/qc/app.clj
     outs:
       - qc/app/qc-dashboard.html
 
@@ -491,8 +491,8 @@ stages:
       - qc/samples/samples.edn
       - data/schema.edn
       - data/linear-stats.json
-      - src/inferenceql/auto_modeling/qc/splom.clj
-      - src/inferenceql/auto_modeling/qc/util.clj
+      - src/clojure/inferenceql/auto_modeling/qc/splom.clj
+      - src/clojure/inferenceql/auto_modeling/qc/util.clj
     outs:
       - qc/specs/qc-splom.vl.json
 
@@ -507,7 +507,7 @@ stages:
     deps:
       - qc/templates/index.html
       - qc/specs/qc-splom.vl.json
-      - src/inferenceql/auto_modeling/qc/app.clj
+      - src/clojure/inferenceql/auto_modeling/qc/app.clj
     outs:
       - qc/app/qc-splom.html
 
