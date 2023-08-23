@@ -130,3 +130,19 @@ def test_metadata_preserves_grids():
         new_cgpm = CGPMModel.from_metadata(tmp.name)
 
         new_cgpm.hyper_grids == new_grid
+
+        state = new_cgpm.cgpm
+
+        assert np.all(state.crp.hyper_grids["alpha"] == new_grid["alpha"])
+
+        for view_idx, view in state.views.items():
+            assert np.all(
+                view.crp.hyper_grids["alpha"] == new_grid["view_alphas"][view_idx]
+            )
+
+        for col_idx, dim in enumerate(state.dims()):
+            for param_name in dim.hypers.keys():
+                assert np.all(
+                    dim.hyper_grids[param_name]
+                    == new_grid["column_hypers"][col_idx][param_name]
+                )
