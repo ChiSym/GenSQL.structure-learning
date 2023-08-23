@@ -115,7 +115,7 @@ stages:
       - data/infer-config.json
 
   loom-infer:
-    cmd: ./bin/loom_task infer loom $(bin/param sample_count) data/infer-config.json
+    cmd: ./bin/loom_task infer loom ${sample_count} data/infer-config.json
     deps:
       - loom/ingest
       - loom/query
@@ -129,7 +129,7 @@ stages:
     cmd: >
       mkdir -p data/cgpm/raw &&
       find loom/samples -mindepth 1 -maxdepth 1 -type d |
-      parallel $(bin/param parallel.flags)
+      parallel ${parallel.flags}
       ./bin/loom python scripts/loom_dump.py {}
       --output data/cgpm/raw/{/}.json
     params:
@@ -148,14 +148,14 @@ stages:
       rm -f data/cgpm/inf.log &&
       find data/cgpm/raw -type f |
       sort |
-      parallel $(bin/param parallel.flags)
+      parallel ${parallel.flags}
       'python scripts/cgpm_hydrate.py
       --metadata {}
       --output data/cgpm/hydrated/{/}
       --data data/numericalized.csv
       --schema data/cgpm-schema.edn
       --mapping-table data/mapping-table.edn
-      --seed $(($(bin/param seed) + {#} - 1))'
+      --seed $((${seed} + {#} - 1))'
     params:
       - parallel.flags
       - seed
@@ -174,10 +174,10 @@ stages:
       find data/cgpm/hydrated -type f |
       parallel jsonschema --instance {} schemas/cgpm.json &&
       mkdir -p data/cgpm/complete &&
-      echo $(bin/param cgpm.minutes) >> data/cgpm/inf.log &&
+      echo ${cgpm.minutes} >> data/cgpm/inf.log &&
       find data/cgpm/hydrated -type f |
       sort |
-      parallel $(bin/param parallel.flags)
+      parallel ${parallel.flags}
       'python scripts/cgpm_infer.py {}
       --kernel alpha
       --kernel view_alphas
@@ -187,9 +187,9 @@ stages:
       --output data/cgpm/complete/{/}
       --data data/numericalized.csv
       --params params.yaml
-      --seed $(($(bin/param seed) + {#} - 1))
-      --minutes $(bin/param cgpm.minutes)'
-      #--iterations $(bin/param cgpm.iterations)
+      --seed $((${seed} + {#} - 1))
+      --minutes ${cgpm.minutes}'
+      #--iterations ${cgpm.iterations}
     params:
       - parallel.flags
       - seed
@@ -397,8 +397,8 @@ stages:
       python scripts/sppl_sample.py
       --model data/sppl/merged.json
       --data data/ignored.csv
-      --sample_count $(bin/param qc.sample_count)
       > data/synthetic-data-iql.csv
+      # --sample_count ${qc.sample_count}
     deps:
       - scripts/sppl_sample.py
       - data/sppl/merged.json
