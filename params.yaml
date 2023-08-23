@@ -29,7 +29,7 @@ schema:
 loom:
   extra_passes: 1
 cgpm:
-  #iterations: 1
+  iterations: 1
   minutes: 1
   #dependence:
   #  # While the CrossCat implementation in CGPM takes dependence constraints, doing so
@@ -52,9 +52,7 @@ clojurecat:
   iterations: 150
 qc:
   # Set this to the number of synthetic samples desired in QC plots.
-  # When not set, the plots will display the same number of virual samples as
-  # observed data points.
-  sample_count: null
+  sample_count: 1000
   # Set this to specify the columns visualized in QC plots.
   # When not set, up to 8 columns--taken from the schema--will be visualized.
   # e.g. columns: ["foo", "bar", "baz"]

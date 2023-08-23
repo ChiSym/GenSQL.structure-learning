@@ -88,14 +88,14 @@ stages:
     cmd: >
       mkdir -p data/cgpm/hydrated &&
       rm -f data/cgpm/inf.log &&
-      seq 0 $(($(bin/param sample_count) - 1)) |
-      parallel $(bin/param parallel.flags)
+      seq 0 $((${sample_count} - 1)) |
+      parallel ${parallel.flags}
       'python scripts/cgpm_hydrate.py
       --output data/cgpm/hydrated/sample.{}.json
       --data data/numericalized.csv
       --schema data/cgpm-schema.edn
       --mapping-table data/mapping-table.edn
-      --seed $(($(bin/param seed) + {#} - 1))'
+      --seed $((${seed} + {#} - 1))'
     params:
       - parallel.flags
       - sample_count
@@ -114,10 +114,10 @@ stages:
       find data/cgpm/hydrated -type f |
       parallel jsonschema --instance {} schemas/cgpm.json &&
       mkdir -p data/cgpm/complete &&
-      echo $(bin/param cgpm.minutes) >> data/cgpm/inf.log &&
+      echo ${cgpm.minutes} >> data/cgpm/inf.log &&
       find data/cgpm/hydrated -type f |
       sort |
-      parallel $(bin/param parallel.flags)
+      parallel ${parallel.flags}
       'python scripts/cgpm_infer.py {}
       --kernel alpha
       --kernel view_alphas
@@ -127,9 +127,9 @@ stages:
       --output data/cgpm/complete/{/}
       --data data/numericalized.csv
       --params params.yaml
-      --seed $(($(bin/param seed) + {#} - 1))
-      --minutes $(bin/param cgpm.minutes)'
-      #--iterations $(bin/param cgpm.iterations)
+      --seed $((${seed} + {#} - 1))
+      --minutes ${cgpm.minutes}'
+      #--iterations ${cgpm.iterations}
     params:
       - parallel.flags
       - seed
@@ -339,8 +339,8 @@ stages:
       python scripts/sppl_sample.py
       --model data/sppl/merged.json
       --data data/ignored.csv
-      --sample_count $(bin/param qc.sample_count)
       > data/synthetic-data-iql.csv
+      # --sample_count ${qc.sample_count}
     deps:
       - scripts/sppl_sample.py
       - data/sppl/merged.json
@@ -390,10 +390,10 @@ stages:
   assemble-database:
     cmd: >
       clojure -M:exec inferenceql.auto-modeling.main assemble-database
-      --table-name $(bin/param database.table_name)
-      --table-path $(bin/param database.table_path)
-      --model-name $(bin/param database.model_name)
-      --model-path $(bin/param database.model_path)
+      --table-name ${database.table_name}
+      --table-path ${database.table_path}
+      --model-name ${database.model_name}
+      --model-path ${database.model_path}
       > data/db.edn
     params:
       - database.table_name
