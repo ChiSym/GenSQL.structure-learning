@@ -1,5 +1,5 @@
 [core]
     analytics = false
-    remote = default-s3-remote
-['remote "default-s3-remote"']
-    url = s3://lpm-research/default
+    remote = l2-s3-remote
+['remote "l2-s3-remote"']
+    url = s3://lpm-commercial/l2
