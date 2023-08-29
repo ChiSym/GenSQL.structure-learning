@@ -1,6 +1,9 @@
-dataset_name: test-pub
-seed: 0
-sample_count: 3
+# [x] change sample count back to 60
+# [o] change minutes to 1440
+dataset_name: l2large
+seed: 42
+sample_count: 1
+subcols: 15
 sub_sample:
   #according_to_columns:
   #  Class_of_Orbit:
@@ -8,7 +11,7 @@ sub_sample:
   #    - GEO
   #  Users:
   #    - Commercial
-  N: 1000
+  N: 10000
 parallel:
   # To limit the number of jobs GNU Parallel spawns use add the flag `--jobs n`.
   flags: >-
@@ -24,20 +27,27 @@ schema:
   # For example, to force the "age" column to be treated as a
   # numerical uncomment the following line:
   # age: numerical
-  # Apogee_km: numerical
-  # Perigee_km: numerical
+  Address_State: nominal
+  County: ignore
+  Age: numerical
+  Home_Purchase_Price: numerical
+  Property_Home_Square_Footage: numerical
+  Most_Recent_2nd_Mortgage_Amount: numerical
+  Home_Est_Current_Value_ConfidenceScore: numerical
+  Home_Est_Current_Value: numerical
+  Home_Mortgage_Amount: numerical
 loom:
   extra_passes: 1
 cgpm:
-  iterations: 1
-  minutes: 1
+  iterations_sub: 1
+  iterations_full: 1
   #dependence:
-  #  # While the CrossCat implementation in CGPM takes dependence constraints, doing so
-  #  # throws a not-implemented-error. Hence, we apply a workaround:
-  #  #   - Supply a map from a target column name to a list of column names.
-  #  #   - Each column in said list gets moved to the target column's view.
-  #  Users:
-  #    - Purpose
+  # While the CrossCat implementation in CGPM takes dependence constraints, doing so
+  # throws a not-implemented-error. Hence, we apply a workaround:
+  #   - Supply a map from a target column name to a list of column names.
+  #   - Each column in said list gets moved to the target column's view.
+  #Home_Est_Current_Value:
+  #  - Home_Purchase_Price
   #  Launch_Site:
   #    - Type_of_Orbit
   ## Independence is un-directional. For two columns foo and bar, setting `foo: - bar`
@@ -52,7 +62,9 @@ clojurecat:
   iterations: 150
 qc:
   # Set this to the number of synthetic samples desired in QC plots.
-  sample_count: 1000
+  # When not set, the plots will display the same number of virual samples as
+  # observed data points.
+  sample_count: null
   # Set this to specify the columns visualized in QC plots.
   # When not set, up to 8 columns--taken from the schema--will be visualized.
   # e.g. columns: ["foo", "bar", "baz"]
@@ -67,7 +79,7 @@ mi:
     # health_status: ["c) Average", "b) Below average"]
 synthetic_data_evaluation:
   # If target is not specified, a random target is chosen for prediction.
-  #target: Apogee_km
+  target: Home_Est_Current_Value
   predictor: Random_forest # One of "Random_forest" or "GLM"
     #N: 10000 # Subsample held-out dataframe with 1000 samples
 database:
