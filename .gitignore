@@ -20,3 +20,7 @@
 pom.xml
 pom.xml.asc
 sum-product-dsl/
+
+data/cgpm/
+data/sppl/
+data/xcat/
