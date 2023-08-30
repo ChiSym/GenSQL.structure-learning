@@ -1,2 +1,5 @@
 [core]
     analytics = false
+    remote = jp-hh-s3-remote
+['remote "jp-hh-s3-remote"']
+    url = s3://lpm-research/jp-hh
