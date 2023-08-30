@@ -66,30 +66,91 @@ stages:
       - data/numericalized.csv
       - data/mapping-table.edn
 
-  cgpm-generate-metadata:
+  loom-schema:
     cmd: >
+      clojure -X inferenceql.auto-modeling.main/loom-schema
+      < data/schema.edn
+      > data/loom-schema.json
+    deps:
+      - data/schema.edn
+    outs:
+      - data/loom-schema.json
+
+  loom-ingest:
+    cmd: ./bin/loom_task ingest loom data/loom-schema.json data/numericalized.csv
+    deps:
+      - data/loom-schema.json
+      - data/numericalized.csv
+    outs:
+      - loom/ingest
+      - loom/query
+
+  loom-infer-config:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.main/infer-config
+      < params.yaml
+      > data/infer-config.json
+    params:
+      - loom.extra_passes
+      - seed
+    outs:
+      - data/infer-config.json
+
+  loom-infer:
+    cmd: ./bin/loom_task infer loom ${sample_count} data/infer-config.json
+    deps:
+      - loom/ingest
+      - loom/query
+      - data/infer-config.json
+    params:
+      - sample_count
+    outs:
+      - loom/samples
+
+  loom-dump-metadata:
+    cmd: >
+      mkdir -p data/cgpm/raw &&
+      find loom/samples -mindepth 1 -maxdepth 1 -type d |
+      parallel ${parallel.flags}
+      ./bin/loom python scripts/loom_dump.py {}
+      --output data/cgpm/raw/{/}.json
+    params:
+      - parallel.flags
+    deps:
+      - loom/samples
+      - scripts/loom_dump.py
+    outs:
+      - data/cgpm/raw
+
+  cgpm-hydrate-metadata:
+    cmd: >
+      find data/cgpm/raw -type f |
+      parallel jsonschema --instance {} schemas/cgpm.json &&
       mkdir -p data/cgpm/hydrated &&
       rm -f data/cgpm/inf.log &&
-      seq 0 $(($(bin/param sample_count) - 1)) |
-      parallel $(bin/param parallel.flags)
+      find data/cgpm/raw -type f |
+      sort |
+      parallel ${parallel.flags}
       'python scripts/cgpm_hydrate.py
-      --output data/cgpm/hydrated/sample.{}.json
+      --metadata {}
+      --output data/cgpm/hydrated/{/}
       --data data/numericalized.csv
       --schema data/cgpm-schema.edn
       --mapping-table data/mapping-table.edn
-      --seed $(($(bin/param seed) + {#} - 1))'
+      --seed $((${seed} + {#} - 1))'
     params:
       - parallel.flags
-      - sample_count
       - seed
     deps:
       - data/cgpm-schema.edn
+      - data/cgpm/raw
       - data/mapping-table.edn
       - data/numericalized.csv
       - schemas/cgpm.json
       - scripts/cgpm_hydrate.py
     outs:
       - data/cgpm/hydrated
+
 
   cgpm-infer-hyperparameters:
     cmd: >
