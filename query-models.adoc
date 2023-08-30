@@ -1,0 +1,31 @@
+== Query this sub model
+
+Below are a few test queries.
+
+Start this notebook via running:
+`java -jar inferenceql.publish-8abacdc-DIRTY.jar --language permissive --path query-models.adoc --db data/db.edn --schema data/schema.edn`
+
+[source,iql]
+----
+SELECT * FROM data LIMIT 10
+----
+
+[source,iql]
+----
+SELECT * FROM (GENERATE * UNDER baseline_model) LIMIT 10
+----
+
+[source,iql]
+----
+SELECT
+    PROBABILITY OF income
+        UNDER baseline_model
+        GIVEN
+            age AND gender
+         AS prob,
+    income
+FROM data
+LIMIT 1000
+----
+
+
