@@ -1,5 +1,6 @@
 from cgpm.crosscat.state import State
 from inferenceql_auto_modeling.utils import distarg, replace, _proportion_done
+from inferenceql_auto_modeling.grid_refinement import refine_grid
 import cgpm.utils.general as general
 import numpy as np
 import math
@@ -31,8 +32,11 @@ class CGPMModel:
         seed=0,
         model="CrossCat",
         cgpm_params={},
-        additional_metadata={"hooked_cgpms": {}},
+        additional_metadata={},
     ):
+        if "hooked_cgpms" not in additional_metadata.keys():
+            additional_metadata["hooked_cgpms"] = {}
+
         cctypes = [schema[column] for column in df.columns]
         distargs = [distarg(column, mapping_table, schema) for column in df.columns]
         column_mapping = {c: i for i, c in enumerate(df.columns)}
@@ -51,6 +55,7 @@ class CGPMModel:
                     ].items():
                         for column_to_move in columns_to_move:
                             if "Zv" in additional_metadata.keys():
+                                Zv = additional_metadata["Zv"]
                                 if (
                                     Zv[column_mapping[column_to_move]]
                                     != Zv[column_mapping[target_column]]
@@ -132,9 +137,7 @@ class CGPMModel:
         self.cgpm.crp.hyper_grids["alpha"] = np.array(hyper_grids["alpha"])
 
         for idx, view in self.cgpm.views.items():
-            self.cgpm.views[idx].crp.hyper_grids["alpha"] = np.array(
-                hyper_grids["view_alphas"][idx]
-            )
+            view.crp.hyper_grids["alpha"] = np.array(hyper_grids["view_alphas"][idx])
 
         n_cols = len(self.cgpm.X)
         for col in range(n_cols):
@@ -171,6 +174,8 @@ class CGPMModel:
             case "view_alphas":
                 self.cgpm.transition_view_alphas()
             case "column_hypers":
+                new_grid = refine_grid(self.cgpm, n=30)
+                self.set_hyper_grids(new_grid)
                 self.cgpm.transition_dim_hypers()
             case "rows":
                 self.cgpm.transition_view_rows()
