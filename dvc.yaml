@@ -150,7 +150,6 @@ stages:
       sort |
       parallel ${parallel.flags}
       'python scripts/cgpm_hydrate.py
-      --metadata {}
       --output data/cgpm/hydrated/{/}
       --data data/numericalized.csv
       --schema data/cgpm-schema.edn
@@ -185,8 +184,6 @@ stages:
       --kernel rows
       --kernel columns
       --output data/cgpm/complete/{/}
-      --data data/numericalized.csv
-      --params params.yaml
       --seed $((${seed} + {#} - 1))
       --minutes ${cgpm.minutes}'
       #--iterations ${cgpm.iterations}
@@ -406,7 +403,7 @@ stages:
 
   ctgan-train-sample:
     cmd: >
-      python scripts/train_baselines.py
+      python inferenceql_auto_modeling/train_baselines.py
       --model ctgan
       --data data/ignored.csv
     deps:
@@ -416,7 +413,7 @@ stages:
 
   copula-train-sample:
     cmd: >
-      python scripts/train_baselines.py
+      python inferenceql_auto_modeling/train_baselines.py
       --model copula
       --data data/ignored.csv
     deps:

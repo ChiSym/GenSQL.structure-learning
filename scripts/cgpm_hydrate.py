@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import argparse
 from inferenceql_auto_modeling.cgpm import CGPMModel
 import edn_format
@@ -53,11 +51,7 @@ def main():
     df = pandas.read_csv(args.data)
     schema = edn_format.loads(args.schema.read(), write_ply_tables=False)
     mapping_table = edn_format.loads(args.mapping_table.read(), write_ply_tables=False)
-    additional_metadata = (
-        {"hooked_cgpms": {}} if args.metadata is None else json.load(args.metadata)
-    )
     model = args.model
-    cgpm_params = yaml.safe_load(args.params)["cgpm"]
 
     cgpm = CGPMModel.from_data(
         df,
@@ -65,8 +59,6 @@ def main():
         mapping_table,
         args.seed,
         model=model,
-        cgpm_params=cgpm_params,
-        additional_metadata=additional_metadata,
     )
 
     cgpm.to_metadata(args.output)
