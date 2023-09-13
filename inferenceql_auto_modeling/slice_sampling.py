@@ -7,9 +7,9 @@ def get_lower_upper(name):
     match name:
         # notation abuse here, since both bernoulli and categorical use an alpha parameter
         case "alpha" | "beta" | "r" | "s" | "nu":
-            return np.array([1e-10, 1e10])
+            return np.array([1e-10, 1e15])
         case "m":
-            return np.array([-1e10, 1e10])
+            return np.array([-1e10, 1e15])
         case _:
             raise NotImplementedError(f"Hyperparameter name {name} not found")
 
@@ -41,23 +41,28 @@ def kernel_column_hypers(state):
         hyper_names = list(x0_dict.keys())
         bounds = np.array([get_lower_upper(hyper) for hyper in hyper_names])
         x0 = [x for x in x0_dict.values()]
-        res = least_squares(opt_fn, x0, bounds=bounds.T)
+
+        try:
+            res = least_squares(opt_fn, x0, bounds=bounds.T)
+        except ValueError:
+            print(x0)
+            raise ValueError("ValueError in least_squares")
 
         # set the MAP
         [set_hyper(dim, hyper, val) for hyper, val in zip(hyper_names, res.x)]
 
         # then do slice sampling
-        random.shuffle(hyper_names)
-        for name in hyper_names:
-            val = dim.hypers[name]
-            new_col_hyper = slice_sampling(
-                state.dim_for(col), name, val, *get_lower_upper(name)
-            )
-            set_hyper(state.dim_for(col), name, new_col_hyper)
+        # random.shuffle(hyper_names)
+        # for name in hyper_names:
+        #     val = dim.hypers[name]
+        #     new_col_hyper = slice_sampling(
+        #         state.dim_for(col), name, val, *get_lower_upper(name)
+        #     )
+        #     set_hyper(state.dim_for(col), name, new_col_hyper)
 
 
-def logp_normalgamma(dim, mu, r, s, nu):
-    hyper_dict = {"mu": mu, "r": r, "s": s, "nu": nu}
+def logp_normalgamma(dim, m, r, s, nu):
+    hyper_dict = {"m": m, "r": r, "s": s, "nu": nu}
     [set_hyper(dim, hyper, x0) for hyper, x0 in hyper_dict.items()]
 
     return get_logp(dim)
@@ -116,13 +121,31 @@ def slice_sampling(dim, hyper, x0, lower, upper, tol=0.1):
         x_low = brentq(opt_fn, lower, x0)
     except ValueError:
         x_low = lower
+    except RuntimeError:
+        import ipdb
+
+        idpb.set_trace()
+        raise RuntimeError("RuntimeError in brentq")
 
     try:
         x_high = brentq(opt_fn, x0, upper)
     except ValueError:
         x_high = upper
+    except RuntimeError:
+        import ipdb
+
+        idpb.set_trace()
+        raise RuntimeError("RuntimeError in brentq")
 
     if x_low == lower and x_high == upper:
+        import ipdb
+
+        ipdb.set_trace()
         raise ValueError("Slice sampling failed to find a valid interval")
+
+    if dim.cctype == "categorical":
+        import ipdb
+
+        ipdb.set_trace()
 
     return np.random.uniform(x_low, x_high)
