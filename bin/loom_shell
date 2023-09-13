@@ -10,4 +10,4 @@ exec docker run \
   --volume "$PWD":"$WORKDIR" \
   --workdir $WORKDIR \
   --env LOOM_STORE=$WORKDIR \
-  inferenceql.loom /bin/bash
+  probcomp/inferenceql.loom /bin/bash

@@ -1,12 +1,4 @@
 stages:
-  data-cleaning:
-    cmd: python pds_data_cleaning/scripts/merge_studies.py
-    deps:
-      - pds_data_cleaning/data
-      - pds_data_cleaning/processed_data
-    outs:
-      - data/data.csv
-
   subsample:
     cmd: >
       mkdir -p data/test &&
@@ -92,83 +84,24 @@ stages:
       - data/numericalized.csv
       - data/mapping-table.edn
 
-  loom-schema:
+  cgpm-generate-metadata:
     cmd: >
-      clojure -X inferenceql.auto-modeling.main/loom-schema
-      < data/schema.edn
-      > data/loom-schema.json
-    deps:
-      - data/schema.edn
-    outs:
-      - data/loom-schema.json
-
-  loom-ingest:
-    cmd: ./bin/loom_task ingest loom data/loom-schema.json data/numericalized.csv
-    deps:
-      - data/loom-schema.json
-      - data/numericalized.csv
-    outs:
-      - loom/ingest
-      - loom/query
-
-  loom-infer-config:
-    cmd: >
-      clojure -X inferenceql.auto-modeling.main/infer-config
-      < params.yaml
-      > data/infer-config.json
-    params:
-      - loom.extra_passes
-      - seed
-    outs:
-      - data/infer-config.json
-
-  loom-infer:
-    cmd: ./bin/loom_task infer loom ${sample_count} data/infer-config.json
-    deps:
-      - loom/ingest
-      - loom/query
-      - data/infer-config.json
-    params:
-      - sample_count
-    outs:
-      - loom/samples
-
-  loom-dump-metadata:
-    cmd: >
-      mkdir -p data/cgpm/raw &&
-      find loom/samples -mindepth 1 -maxdepth 1 -type d |
-      parallel ${parallel.flags}
-      ./bin/loom python scripts/loom_dump.py {}
-      --output data/cgpm/raw/{/}.json
-    params:
-      - parallel.flags
-    deps:
-      - loom/samples
-      - scripts/loom_dump.py
-    outs:
-      - data/cgpm/raw
-
-  cgpm-hydrate-metadata:
-    cmd: >
-      find data/cgpm/raw -type f |
-      parallel jsonschema --instance {} schemas/cgpm.json &&
       mkdir -p data/cgpm/hydrated &&
       rm -f data/cgpm/inf.log &&
-      find data/cgpm/raw -type f |
-      sort |
-      parallel ${parallel.flags}
+      seq 0 $(($(bin/param sample_count) - 1)) |
+      parallel $(bin/param parallel.flags)
       'python scripts/cgpm_hydrate.py
-      --output data/cgpm/hydrated/{/}
+      --output data/cgpm/hydrated/sample.{}.json
       --data data/numericalized.csv
       --schema data/cgpm-schema.edn
       --mapping-table data/mapping-table.edn
-      --seed $((${seed} + {#} - 1))'
+      --seed $(($(bin/param seed) + {#} - 1))'
     params:
       - parallel.flags
+      - sample_count
       - seed
     deps:
       - data/cgpm-schema.edn
-      - data/cgpm/raw
       - data/mapping-table.edn
       - data/numericalized.csv
       - schemas/cgpm.json
@@ -181,10 +114,10 @@ stages:
       find data/cgpm/hydrated -type f |
       parallel jsonschema --instance {} schemas/cgpm.json &&
       mkdir -p data/cgpm/complete &&
-      echo ${cgpm.minutes} >> data/cgpm/inf.log &&
+      echo $(bin/param cgpm.minutes) >> data/cgpm/inf.log &&
       find data/cgpm/hydrated -type f |
       sort |
-      parallel ${parallel.flags}
+      parallel $(bin/param parallel.flags)
       'python scripts/cgpm_infer.py {}
       --kernel alpha
       --kernel view_alphas
@@ -192,16 +125,20 @@ stages:
       --kernel rows
       --kernel columns
       --output data/cgpm/complete/{/}
-      --seed $((${seed} + {#} - 1))
-      --minutes ${cgpm.minutes}'
-      #--iterations ${cgpm.iterations}
+      --data data/numericalized.csv
+      --params params.yaml
+      --seed $(($(bin/param seed) + {#} - 1))
+      --minutes $(bin/param cgpm.minutes)'
+      #--iterations $(bin/param cgpm.iterations)
     params:
       - parallel.flags
       - seed
       - cgpm
     deps:
       - data/cgpm/hydrated
+      - schemas/cgpm.json
       - scripts/cgpm_infer.py
+      - data/numericalized.csv
     outs:
       - data/cgpm/complete
 
@@ -238,7 +175,7 @@ stages:
       > data/dep-prob.vl.json
     deps:
       - data/dep-prob.json
-      - src/clojure/inferenceql/auto_modeling/heatmap.clj
+      - src/inferenceql/auto_modeling/heatmap.clj
     outs:
       - data/dep-prob.vl.json
 
@@ -289,7 +226,7 @@ stages:
     deps:
       - data/linear-stats.json
       - data/dep-prob.json
-      - src/clojure/inferenceql/auto_modeling/heatmap.clj
+      - src/inferenceql/auto_modeling/heatmap.clj
     outs:
       - data/linear-stats.vl.json
 
@@ -312,6 +249,7 @@ stages:
       - data/linear-stats.vg.json
     outs:
       - data/linear-stats.svg
+
   compare-dep-prob-with-linear:
     desc: "Compares results from dependency probability with standard statistical tests"
     cmd: >
@@ -385,6 +323,7 @@ stages:
       - data/sppl/unmerged
 
   sppl-merge:
+    desc: "Merges sum-product networks into a single network."
     cmd: >
       find data/sppl/unmerged -type f |
       sort |
@@ -400,34 +339,14 @@ stages:
       python scripts/sppl_sample.py
       --model data/sppl/merged.json
       --data data/ignored.csv
+      --sample_count $(bin/param qc.sample_count)
       > data/synthetic-data-iql.csv
-      # --sample_count ${qc.sample_count}
     deps:
       - scripts/sppl_sample.py
       - data/sppl/merged.json
       - data/ignored.csv
     outs:
       - data/synthetic-data-iql.csv
-
-  ctgan-train-sample:
-    cmd: >
-      python inferenceql_auto_modeling/train_baselines.py
-      --model ctgan
-      --data data/ignored.csv
-    deps:
-      - data/ignored.csv
-    outs:
-      - data/synthetic-data-ctgan.csv
-
-  copula-train-sample:
-    cmd: >
-      python inferenceql_auto_modeling/train_baselines.py
-      --model copula
-      --data data/ignored.csv
-    deps:
-      - data/ignored.csv
-    outs:
-      - data/synthetic-data-copula.csv
 
   qc-tag-samples:
     cmd: >
@@ -438,54 +357,9 @@ stages:
     deps:
       - data/ignored.csv
       - data/synthetic-data-iql.csv
-      - src/clojure/inferenceql/auto_modeling/qc/samples.clj
+      - src/inferenceql/auto_modeling/qc/samples.clj
     outs:
       - qc/samples/samples.edn
-
-  marginal-fits-iql:
-    cmd: >
-      mkdir -p qc/marginals &&
-      python scripts/marginal_fit_metrics.py
-      --model iql
-      --real_data data/ignored.csv
-    deps:
-      - data/ignored.csv
-      - data/synthetic-data-iql.csv
-    outs:
-      - qc/marginals/iql_1d_fits.csv
-      - qc/marginals/iql_2d_fits.csv
-      - qc/marginals/iql_worst_1d_fit.png
-      - qc/marginals/iql_worst_2d_fit.png
-
-  marginal-fits-ctgan:
-    cmd: >
-      mkdir -p qc/marginals &&
-      python scripts/marginal_fit_metrics.py
-      --model ctgan
-      --real_data data/ignored.csv
-    deps:
-      - data/ignored.csv
-      - data/synthetic-data-ctgan.csv
-    outs:
-      - qc/marginals/ctgan_1d_fits.csv
-      - qc/marginals/ctgan_2d_fits.csv
-      - qc/marginals/ctgan_worst_1d_fit.png
-      - qc/marginals/ctgan_worst_2d_fit.png
-
-  marginal-fits-copula:
-    cmd: >
-      mkdir -p qc/marginals &&
-      python scripts/marginal_fit_metrics.py
-      --model copula
-      --real_data data/ignored.csv
-    deps:
-      - data/ignored.csv
-      - data/synthetic-data-copula.csv
-    outs:
-      - qc/marginals/copula_1d_fits.csv
-      - qc/marginals/copula_2d_fits.csv
-      - qc/marginals/copula_worst_1d_fit.png
-      - qc/marginals/copula_worst_2d_fit.png
 
   xcat-complete-import:
     desc: "Imports the final CGPM Crosscat samples as XCat records."
@@ -509,9 +383,29 @@ stages:
       - data/ignored.csv
       - data/numericalized.csv
       - data/schema.edn
-      - src/clojure/inferenceql/auto_modeling/xcat.clj
+      - src/inferenceql/auto_modeling/xcat.clj
     outs:
       - data/xcat/complete/
+
+  assemble-database:
+    cmd: >
+      clojure -M:exec inferenceql.auto-modeling.main assemble-database
+      --table-name $(bin/param database.table_name)
+      --table-path $(bin/param database.table_path)
+      --model-name $(bin/param database.model_name)
+      --model-path $(bin/param database.model_path)
+      > data/db.edn
+    params:
+      - database.table_name
+      - database.table_path
+      - database.model_name
+      - database.model_path
+    deps:
+      - data/nullified.csv
+      - data/cgpm
+      - data/xcat
+    outs:
+      - data/db.edn
 
   qc-dashboard-spec:
     cmd: >
@@ -526,8 +420,8 @@ stages:
       - qc/samples/samples.edn
       - data/schema.edn
       - data/linear-stats.json
-      - src/clojure/inferenceql/auto_modeling/qc/dashboard.clj
-      - src/clojure/inferenceql/auto_modeling/qc/util.clj
+      - src/inferenceql/auto_modeling/qc/dashboard.clj
+      - src/inferenceql/auto_modeling/qc/util.clj
     outs:
       - qc/specs/qc-dashboard.vl.json
 
@@ -542,7 +436,7 @@ stages:
     deps:
       - qc/templates/index.html
       - qc/specs/qc-dashboard.vl.json
-      - src/clojure/inferenceql/auto_modeling/qc/app.clj
+      - src/inferenceql/auto_modeling/qc/app.clj
     outs:
       - qc/app/qc-dashboard.html
 
@@ -559,8 +453,8 @@ stages:
       - qc/samples/samples.edn
       - data/schema.edn
       - data/linear-stats.json
-      - src/clojure/inferenceql/auto_modeling/qc/splom.clj
-      - src/clojure/inferenceql/auto_modeling/qc/util.clj
+      - src/inferenceql/auto_modeling/qc/splom.clj
+      - src/inferenceql/auto_modeling/qc/util.clj
     outs:
       - qc/specs/qc-splom.vl.json
 
@@ -575,7 +469,7 @@ stages:
     deps:
       - qc/templates/index.html
       - qc/specs/qc-splom.vl.json
-      - src/clojure/inferenceql/auto_modeling/qc/app.clj
+      - src/inferenceql/auto_modeling/qc/app.clj
     outs:
       - qc/app/qc-splom.html
 
@@ -599,3 +493,27 @@ stages:
         #- data/test/test-shifted.csv
       outs:
         - data/predictions.csv
+
+  prepare-publish:
+    cmd: >
+      rm -rf publish-analysis-output/ &&
+      git clone https://github.com/OpenIQL/inferenceql.analyses.git publish-analysis-output &&
+      mkdir publish-analysis-output/analyses/${dataset_name}/ &&
+      mkdir publish-analysis-output/html-pages/${dataset_name}/ &&
+      cp params.yaml publish-analysis-output/analyses/${dataset_name}/params.yaml &&
+      cp data/data.csv publish-analysis-output/analyses/${dataset_name}/data.csv &&
+      cp data/schema.edn publish-analysis-output/analyses/${dataset_name}/schema.edn &&
+      cp data/sppl/merged.json publish-analysis-output/analyses/${dataset_name}/merged.json &&
+      touch publish-analysis-output/analyses/${dataset_name}/queries.iql &&
+      cp qc/app/qc-dashboard.html publish-analysis-output/html-pages/${dataset_name}/qc-dashboard.html &&
+      cp qc/app/qc-splom.html publish-analysis-output/html-pages/${dataset_name}/qc-splom.html &&
+      cd publish-analysis-output && git checkout -b ${dataset_name}-to-publish && git add ./analyses/* && git add ./html-pages/* && git commit -m "automatic initial commit"
+    deps:
+      - data/data.csv
+      - data/schema.edn
+      - data/sppl/merged.json
+      - qc/app/qc-splom.html
+      - qc/app/qc-dashboard.html
+    outs:
+      - publish-analysis-output/analyses/${dataset_name}/
+      - publish-analysis-output/html-pages/${dataset_name}/

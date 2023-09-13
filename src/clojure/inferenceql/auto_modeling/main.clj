@@ -106,15 +106,6 @@
                            :seed seed}}]
     (json/generate-stream config *out*)))
 
-(defn param
-  [{:keys [key]}]
-  (if-let [result (get-in (dvc/yaml)
-                          (into []
-                                (map (comp keyword name))
-                                (string/split (str key) #"\.")))]
-    (print result)
-    (System/exit 1)))
-
 (defmulti read-model fs/extension)
 
 (defmethod read-model "json"
