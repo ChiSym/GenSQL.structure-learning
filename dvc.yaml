@@ -135,9 +135,7 @@ stages:
       - cgpm
     deps:
       - data/cgpm/hydrated
-      - schemas/cgpm.json
       - scripts/cgpm_infer.py
-      - data/numericalized.csv
     outs:
       - data/cgpm/complete
 
