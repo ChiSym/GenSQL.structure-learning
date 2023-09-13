@@ -23,6 +23,7 @@ torch = [
 jinja2 = "^3.1.2" # constraint only here because otherwise poetry tries and fails to read a wildcard constraint
 botocore = "^1.30"  # constraint only here to make poetry solving faster
 sdv = {url = "https://files.pythonhosted.org/packages/67/54/f324c074538f57b564790512f08571dd7efc850123afb76b29bd43c7bf89/sdv-1.3.0-py2.py3-none-any.whl"}
+kaleido = "0.2.1"
 
 [build-system]
 requires = ["poetry-core"]

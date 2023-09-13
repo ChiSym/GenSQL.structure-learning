@@ -437,6 +437,51 @@ stages:
     outs:
       - qc/samples/samples.edn
 
+  marginal-fits-iql:
+    cmd: >
+      mkdir -p qc/marginals &&
+      python scripts/marginal_fit_metrics.py
+      --model iql
+      --real_data data/ignored.csv
+    deps:
+      - data/ignored.csv
+      - data/synthetic-data-iql.csv
+    outs:
+      - qc/marginals/iql_1d_fits.csv
+      - qc/marginals/iql_2d_fits.csv
+      - qc/marginals/iql_worst_1d_fit.png
+      - qc/marginals/iql_worst_2d_fit.png
+
+  marginal-fits-ctgan:
+    cmd: >
+      mkdir -p qc/marginals &&
+      python scripts/marginal_fit_metrics.py
+      --model ctgan
+      --real_data data/ignored.csv
+    deps:
+      - data/ignored.csv
+      - data/synthetic-data-ctgan.csv
+    outs:
+      - qc/marginals/ctgan_1d_fits.csv
+      - qc/marginals/ctgan_2d_fits.csv
+      - qc/marginals/ctgan_worst_1d_fit.png
+      - qc/marginals/ctgan_worst_2d_fit.png
+
+  marginal-fits-copula:
+    cmd: >
+      mkdir -p qc/marginals &&
+      python scripts/marginal_fit_metrics.py
+      --model copula
+      --real_data data/ignored.csv
+    deps:
+      - data/ignored.csv
+      - data/synthetic-data-copula.csv
+    outs:
+      - qc/marginals/copula_1d_fits.csv
+      - qc/marginals/copula_2d_fits.csv
+      - qc/marginals/copula_worst_1d_fit.png
+      - qc/marginals/copula_worst_2d_fit.png
+
   xcat-complete-import:
     desc: "Imports the final CGPM Crosscat samples as XCat records."
     cmd:
