@@ -6,6 +6,7 @@
     system-packages = with pkgs; [
       clj-kondo
       parallel
+      gcc-unwrapped
       xsv
     ];
     python-packages = with config.languages.python.package.pkgs; [
@@ -37,4 +38,7 @@
       activate.enable = true;
     };
   };
+
+  # https://devenv.sh/pre-commit-hooks/
+  pre-commit.hooks.black.enable = true;
 }

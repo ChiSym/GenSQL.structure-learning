@@ -10,17 +10,15 @@ readme = "README.md"
 python = "3.10.12"
 cgpm = {git = "https://github.com/probcomp/cgpm", branch = "zane/hardcode-version"}
 dvc = "^3.13.3"
-sppl = {git = "https://github.com/probsys/sppl"}
+sppl = {git = "https://github.com/joaoloula/sppl", branch = "permissive_versions"}
 edn-format = "^0.7.5"
 jsonschema = "^4.19.0"
 matplotlib = "^3.7.2"
 catboost = "^1.2"
 scikit-learn = "^1.3.0"
-pytest = "^6.2"
-dvc-s3= "^2.23"
-
-[tool.poetry.group.dev.dependencies]
-black = "^23.7.0"
+ipdb = "^0.13.13"
+pytest = "^7.4.0"
+jupyter = "^1.0.0"
 
 [build-system]
 requires = ["poetry-core"]
