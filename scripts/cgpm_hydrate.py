@@ -1,13 +1,10 @@
-#!/usr/bin/env python
-
 import argparse
-import cgpm.utils.general as general
+from inferenceql_auto_modeling.cgpm import CGPMModel
 import edn_format
 import json
 import pandas
 import sys
-
-from cgpm.crosscat.state import State
+import yaml
 
 
 def main():
@@ -17,7 +14,7 @@ def main():
     parser.add_argument(
         "-o",
         "--output",
-        type=argparse.FileType("w+"),
+        type=str,
         help="Path to CGPM metadata.",
         default=sys.stdout,
     )
@@ -33,14 +30,15 @@ def main():
         help="Path to Loom mapping table.",
         dest="mapping_table",
     )
-    parser.add_argument(
-        "--metadata", type=argparse.FileType("r"), help="Path to input CGPM metadata."
-    )
+    parser.add_argument("--metadata", type=str, help="Path to input CGPM metadata.")
     parser.add_argument(
         "--model",
         type=str,
         help="Prior, can be one of 'CrossCat', 'DPMM', 'Independent'; currently not compatible with Loom.",
         default="CrossCat",
+    )
+    parser.add_argument(
+        "--params", type=argparse.FileType("r"), help="Path to params.yaml"
     )
     parser.add_argument("--seed", type=int, default=1, help="CGPM seed.")
 
@@ -53,44 +51,17 @@ def main():
     df = pandas.read_csv(args.data)
     schema = edn_format.loads(args.schema.read(), write_ply_tables=False)
     mapping_table = edn_format.loads(args.mapping_table.read(), write_ply_tables=False)
+    model = args.model
 
-    def n_categories(column):
-        return len(mapping_table[column])
-
-    def distarg(column):
-        return {"k": n_categories(column)} if schema[column] == "categorical" else None
-
-    cctypes = [schema[column] for column in df.columns]
-    distargs = [distarg(column) for column in df.columns]
-
-    if args.metadata is not None:
-        additional_metadata = json.load(args.metadata)
-    else:
-        additional_metadata = {}
-
-    base_metadata = dict(
-        X=df.values, cctypes=cctypes, distargs=distargs, outputs=range(df.shape[1])
+    cgpm = CGPMModel.from_data(
+        df,
+        schema,
+        mapping_table,
+        args.seed,
+        model=model,
     )
-    if args.model == "CrossCat":
-        pass  # don't constrain the model space further.
-    elif args.model == "DPMM":
-        base_metadata["Zv"] = {i: 0 for i in range(len(cctypes))}
-    elif args.model == "Independent":
-        base_metadata["Zv"] = {i: i for i in range(len(cctypes))}
-        cluster_idx = [0] * df.shape[0]
-        base_metadata["Zrv"] = {i: cluster_idx for i in range(df.shape[1])}
-    else:
-        raise ValueError(f"Model '{args.model}' not definied")
 
-    metadata = {**base_metadata, **additional_metadata}
-    rng = general.gen_rng(args.seed)
-
-    if args.metadata is not None:
-        state = State.from_metadata(metadata, rng=rng)
-    else:
-        state = State(**metadata, rng=rng)
-
-    json.dump(state.to_metadata(), args.output)
+    cgpm.to_metadata(args.output)
 
 
 if __name__ == "__main__":

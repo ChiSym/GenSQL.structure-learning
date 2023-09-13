@@ -56,7 +56,6 @@ def view_assignments_to_view_partition(view_assignments):
 
 
 def export_primitive(output, cctype, hypers, suffstats, distargs, categorical_mapping):
-
     if cctype == "bernoulli":
         alpha = hypers["alpha"]
         beta = hypers["beta"]

@@ -123,7 +123,7 @@ stages:
       - data/infer-config.json
 
   loom-infer:
-    cmd: ./bin/loom_task infer loom $(bin/param sample_count) data/infer-config.json
+    cmd: ./bin/loom_task infer loom ${sample_count} data/infer-config.json
     deps:
       - loom/ingest
       - loom/query
@@ -137,7 +137,7 @@ stages:
     cmd: >
       mkdir -p data/cgpm/raw &&
       find loom/samples -mindepth 1 -maxdepth 1 -type d |
-      parallel $(bin/param parallel.flags)
+      parallel ${parallel.flags}
       ./bin/loom python scripts/loom_dump.py {}
       --output data/cgpm/raw/{/}.json
     params:
@@ -156,14 +156,13 @@ stages:
       rm -f data/cgpm/inf.log &&
       find data/cgpm/raw -type f |
       sort |
-      parallel $(bin/param parallel.flags)
+      parallel ${parallel.flags}
       'python scripts/cgpm_hydrate.py
-      --metadata {}
       --output data/cgpm/hydrated/{/}
       --data data/numericalized.csv
       --schema data/cgpm-schema.edn
       --mapping-table data/mapping-table.edn
-      --seed $(($(bin/param seed) + {#} - 1))'
+      --seed $((${seed} + {#} - 1))'
     params:
       - parallel.flags
       - seed
@@ -182,10 +181,10 @@ stages:
       find data/cgpm/hydrated -type f |
       parallel jsonschema --instance {} schemas/cgpm.json &&
       mkdir -p data/cgpm/complete &&
-      echo $(bin/param cgpm.minutes) >> data/cgpm/inf.log &&
+      echo ${cgpm.minutes} >> data/cgpm/inf.log &&
       find data/cgpm/hydrated -type f |
       sort |
-      parallel $(bin/param parallel.flags)
+      parallel ${parallel.flags}
       'python scripts/cgpm_infer.py {}
       --kernel alpha
       --kernel view_alphas
@@ -193,20 +192,16 @@ stages:
       --kernel rows
       --kernel columns
       --output data/cgpm/complete/{/}
-      --data data/numericalized.csv
-      --params params.yaml
-      --seed $(($(bin/param seed) + {#} - 1))
-      --minutes $(bin/param cgpm.minutes)'
-      #--iterations $(bin/param cgpm.iterations)
+      --seed $((${seed} + {#} - 1))
+      --minutes ${cgpm.minutes}'
+      #--iterations ${cgpm.iterations}
     params:
       - parallel.flags
       - seed
       - cgpm
     deps:
       - data/cgpm/hydrated
-      - schemas/cgpm.json
       - scripts/cgpm_infer.py
-      - data/numericalized.csv
     outs:
       - data/cgpm/complete
 
@@ -243,7 +238,7 @@ stages:
       > data/dep-prob.vl.json
     deps:
       - data/dep-prob.json
-      - src/inferenceql/auto_modeling/heatmap.clj
+      - src/clojure/inferenceql/auto_modeling/heatmap.clj
     outs:
       - data/dep-prob.vl.json
 
@@ -294,7 +289,7 @@ stages:
     deps:
       - data/linear-stats.json
       - data/dep-prob.json
-      - src/inferenceql/auto_modeling/heatmap.clj
+      - src/clojure/inferenceql/auto_modeling/heatmap.clj
     outs:
       - data/linear-stats.vl.json
 
@@ -405,14 +400,34 @@ stages:
       python scripts/sppl_sample.py
       --model data/sppl/merged.json
       --data data/ignored.csv
-      --sample_count $(bin/param qc.sample_count)
       > data/synthetic-data-iql.csv
+      # --sample_count ${qc.sample_count}
     deps:
       - scripts/sppl_sample.py
       - data/sppl/merged.json
       - data/ignored.csv
     outs:
       - data/synthetic-data-iql.csv
+
+  ctgan-train-sample:
+    cmd: >
+      python inferenceql_auto_modeling/train_baselines.py
+      --model ctgan
+      --data data/ignored.csv
+    deps:
+      - data/ignored.csv
+    outs:
+      - data/synthetic-data-ctgan.csv
+
+  copula-train-sample:
+    cmd: >
+      python inferenceql_auto_modeling/train_baselines.py
+      --model copula
+      --data data/ignored.csv
+    deps:
+      - data/ignored.csv
+    outs:
+      - data/synthetic-data-copula.csv
 
   qc-tag-samples:
     cmd: >
@@ -423,9 +438,54 @@ stages:
     deps:
       - data/ignored.csv
       - data/synthetic-data-iql.csv
-      - src/inferenceql/auto_modeling/qc/samples.clj
+      - src/clojure/inferenceql/auto_modeling/qc/samples.clj
     outs:
       - qc/samples/samples.edn
+
+  marginal-fits-iql:
+    cmd: >
+      mkdir -p qc/marginals &&
+      python scripts/marginal_fit_metrics.py
+      --model iql
+      --real_data data/ignored.csv
+    deps:
+      - data/ignored.csv
+      - data/synthetic-data-iql.csv
+    outs:
+      - qc/marginals/iql_1d_fits.csv
+      - qc/marginals/iql_2d_fits.csv
+      - qc/marginals/iql_worst_1d_fit.png
+      - qc/marginals/iql_worst_2d_fit.png
+
+  marginal-fits-ctgan:
+    cmd: >
+      mkdir -p qc/marginals &&
+      python scripts/marginal_fit_metrics.py
+      --model ctgan
+      --real_data data/ignored.csv
+    deps:
+      - data/ignored.csv
+      - data/synthetic-data-ctgan.csv
+    outs:
+      - qc/marginals/ctgan_1d_fits.csv
+      - qc/marginals/ctgan_2d_fits.csv
+      - qc/marginals/ctgan_worst_1d_fit.png
+      - qc/marginals/ctgan_worst_2d_fit.png
+
+  marginal-fits-copula:
+    cmd: >
+      mkdir -p qc/marginals &&
+      python scripts/marginal_fit_metrics.py
+      --model copula
+      --real_data data/ignored.csv
+    deps:
+      - data/ignored.csv
+      - data/synthetic-data-copula.csv
+    outs:
+      - qc/marginals/copula_1d_fits.csv
+      - qc/marginals/copula_2d_fits.csv
+      - qc/marginals/copula_worst_1d_fit.png
+      - qc/marginals/copula_worst_2d_fit.png
 
   xcat-complete-import:
     desc: "Imports the final CGPM Crosscat samples as XCat records."
@@ -449,7 +509,7 @@ stages:
       - data/ignored.csv
       - data/numericalized.csv
       - data/schema.edn
-      - src/inferenceql/auto_modeling/xcat.clj
+      - src/clojure/inferenceql/auto_modeling/xcat.clj
     outs:
       - data/xcat/complete/
 
@@ -466,8 +526,8 @@ stages:
       - qc/samples/samples.edn
       - data/schema.edn
       - data/linear-stats.json
-      - src/inferenceql/auto_modeling/qc/dashboard.clj
-      - src/inferenceql/auto_modeling/qc/util.clj
+      - src/clojure/inferenceql/auto_modeling/qc/dashboard.clj
+      - src/clojure/inferenceql/auto_modeling/qc/util.clj
     outs:
       - qc/specs/qc-dashboard.vl.json
 
@@ -482,7 +542,7 @@ stages:
     deps:
       - qc/templates/index.html
       - qc/specs/qc-dashboard.vl.json
-      - src/inferenceql/auto_modeling/qc/app.clj
+      - src/clojure/inferenceql/auto_modeling/qc/app.clj
     outs:
       - qc/app/qc-dashboard.html
 
@@ -499,8 +559,8 @@ stages:
       - qc/samples/samples.edn
       - data/schema.edn
       - data/linear-stats.json
-      - src/inferenceql/auto_modeling/qc/splom.clj
-      - src/inferenceql/auto_modeling/qc/util.clj
+      - src/clojure/inferenceql/auto_modeling/qc/splom.clj
+      - src/clojure/inferenceql/auto_modeling/qc/util.clj
     outs:
       - qc/specs/qc-splom.vl.json
 
@@ -515,43 +575,27 @@ stages:
     deps:
       - qc/templates/index.html
       - qc/specs/qc-splom.vl.json
-      - src/inferenceql/auto_modeling/qc/app.clj
+      - src/clojure/inferenceql/auto_modeling/qc/app.clj
     outs:
       - qc/app/qc-splom.html
 
-  # train-ctgan:
-  #   cmd: >
-  #     baselines/.venv/bin/python baselines/train_baseline.py --model ctgan
-  #   deps:
-  #     - data/subsampled.csv
-  #   outs:
-  #     - data/synthetic-data-ctgan.csv
-
-  # train-copula:
-  #   cmd: >
-  #     baselines/.venv/bin/python baselines/train_baseline.py --model copula
-  #   deps:
-  #     - data/subsampled.csv
-  #   outs:
-  #     - data/synthetic-data-copula.csv
-
-  # predict:
-  #     cmd: >
-  #       python scripts/predict.py
-  #       --schema data/schema.edn
-  #       --training data/ignored.csv
-  #       --training data/synthetic-data-iql.csv
-  #       --test data/test/test.csv
-  #       --output data/predictions.csv
-  #       #--test data/test/test-shifted.csv
-  #     params:
-  #       - synthetic_data_evaluation
-  #     deps:
-  #       - scripts/predict.py
-  #       - data/schema.edn
-  #       - data/ignored.csv
-  #       - data/synthetic-data-iql.csv
-  #       - data/test/test.csv
-  #       #- data/test/test-shifted.csv
-  #     outs:
-  #       - data/predictions.csv
+  predict:
+      cmd: >
+        python scripts/predict.py
+        --schema data/schema.edn
+        --training data/ignored.csv
+        --training data/synthetic-data-iql.csv
+        --test data/test/test.csv
+        --output data/predictions.csv
+        #--test data/test/test-shifted.csv
+      params:
+        - synthetic_data_evaluation
+      deps:
+        - scripts/predict.py
+        - data/schema.edn
+        - data/ignored.csv
+        - data/synthetic-data-iql.csv
+        - data/test/test.csv
+        #- data/test/test-shifted.csv
+      outs:
+        - data/predictions.csv
