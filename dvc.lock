@@ -346,16 +346,16 @@ stages:
       \ > data/db.edn\n"
     deps:
     - path: data/cgpm
-      md5: 9fa85625999ab11580a5c289941451d6.dir
-      size: 65010242
-      nfiles: 38
+      md5: 18fb1d0736c7c98a943c84e49ea3522b.dir
+      size: 65010215
+      nfiles: 36
     - path: data/nullified.csv
       md5: 822b2f5e43380ebd06fb3cf5c823971b
       size: 3856161
     - path: data/xcat
-      md5: d22a7a463197afaa0c7aa0a26e66e90d.dir
-      size: 274915330
-      nfiles: 13
+      md5: dbb866cc35efeb1d40925c5774b8e026.dir
+      size: 274915320
+      nfiles: 12
     params:
       params.yaml:
         database.model_name: baseline_model
