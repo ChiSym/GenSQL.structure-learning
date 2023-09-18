@@ -1,10 +1,10 @@
 dataset_name: stack
 seed: 42
-sample_count: 60
+sample_count: 6
 sub_sample:
   according_to_columns:
     Org_size: ["10,000 or more employees"]
-  N: 6000
+  N: 1000
 parallel:
   # To limit the number of jobs GNU Parallel spawns use add the flag `--jobs n`.
   flags: >-
@@ -26,10 +26,10 @@ schema:
   Years_coding_professionally: numerical
   Org_size: ignore
 loom:
-  extra_passes: 100
+  extra_passes: 1
 cgpm:
   #iterations: 1
-  minutes: 1440
+  minutes: 1
   #dependence:
   #  # While the CrossCat implementation in CGPM takes dependence constraints, doing so
   #  # throws a not-implemented-error. Hence, we apply a workaround:
