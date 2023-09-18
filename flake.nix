@@ -145,11 +145,15 @@
           edn-format
           sppl
           pypkgs.black
+          pypkgs.boto3
+          pypkgs.catboost
           pypkgs.jsonschema
           pypkgs.matplotlib
           pypkgs.numpy
           pypkgs.pandas
           pypkgs.pytest
+          pypkgs.pyyaml
+          pypkgs.s3fs
         ]);
       in {
         devShell = pkgs.mkShell {
