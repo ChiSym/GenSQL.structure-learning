@@ -1,0 +1,34 @@
+== Query this sub model
+
+Below are a few test queries on a single model in the ensemble - unlike
+http://44.200.189.145:8082/demo-DEIJ-stackoverflow-developer-survey-SPPL.adoc[here].
+
+Start this notebook via running:
+`java -jar inferenceql.publish-8abacdc-DIRTY.jar --language permissive --path query-models.adoc --db data/db.edn --schema data/schema.edn`
+
+[source,iql]
+----
+SELECT * FROM data LIMIT 10
+----
+
+[source,iql]
+----
+SELECT * FROM (GENERATE * UNDER baseline_model) LIMIT 10
+----
+
+[source,iql]
+----
+SELECT
+    PROBABILITY OF Salary_USD
+        UNDER baseline_model
+        GIVEN
+            Age
+         AS prob,
+    Salary_USD,
+    Age
+FROM data
+WHERE Salary_USD < 500000
+LIMIT 1000
+----
+
+
