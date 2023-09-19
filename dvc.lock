@@ -605,3 +605,65 @@ stages:
     - path: qc/app/qc-splom.html
       md5: 35e726ffc151bb36d9355836ae58113e
       size: 68986859
+  xcat-complete-import:
+    cmd:
+    - mkdir -p data/xcat/complete/
+    - "parallel --verbose 'clojure -X inferenceql.auto-modeling.xcat/import :cgpm-json\
+      \ {} :data-csv data/ignored.csv :mapping-table data/mapping-table.edn :numericalized-csv\
+      \ data/numericalized.csv :schema-edn data/schema.edn > data/xcat/complete/{/.}.edn'\
+      \ :::: <(find data/cgpm/complete -type f)"
+    deps:
+    - path: data/cgpm/complete
+      md5: 8f18855c72418e27f856675830c9c316.dir
+      size: 440105624
+      nfiles: 60
+    - path: data/ignored.csv
+      md5: 3c70752fa37400ff1c47fd32479b1ff6
+      size: 5682141
+    - path: data/mapping-table.edn
+      md5: 4c4d79065bc45fdfd25bad1987827129
+      size: 10274
+    - path: data/numericalized.csv
+      md5: 34d3a8cf4fd9a8b24cdec00afdb5b620
+      size: 2790707
+    - path: data/schema.edn
+      md5: 1809ada97d5d44e44f62a975adbdcb2d
+      size: 5527
+    - path: src/inferenceql/auto_modeling/xcat.clj
+      md5: dc5d691d8f3cd744340cb3c2168a7050
+      size: 4629
+    params:
+      params.yaml:
+        parallel.flags: --verbose
+    outs:
+    - path: data/xcat/complete/
+      md5: bcba6e1c64f35ad4f17cdf0a3b156701.dir
+      size: 2227946477
+      nfiles: 60
+  assemble-database:
+    cmd: "clojure -M:exec inferenceql.auto-modeling.main assemble-database --table-name\
+      \ $(bin/param database.table_name) --table-path $(bin/param database.table_path)\
+      \ --model-name $(bin/param database.model_name) --model-path $(bin/param database.model_path)\
+      \ > data/db.edn\n"
+    deps:
+    - path: data/cgpm
+      md5: c248ca134c3ac391c373358b587966e4.dir
+      size: 901618208
+      nfiles: 180
+    - path: data/nullified.csv
+      md5: 104756a17b05fcae61db02a7acfdba39
+      size: 5810128
+    - path: data/xcat
+      md5: f330a04466e4d621ea126fcc0c5abcc9.dir
+      size: 2227946487
+      nfiles: 61
+    params:
+      params.yaml:
+        database.model_name: baseline_model
+        database.model_path: data/xcat/complete/sample.0.edn
+        database.table_name: data
+        database.table_path: data/nullified.csv
+    outs:
+    - path: data/db.edn
+      md5: bffa15cdac4ad757e4627c89ee53af13
+      size: 60923364

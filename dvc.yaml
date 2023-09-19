@@ -491,3 +491,50 @@ stages:
         #- data/test/test-shifted.csv
       outs:
         - data/predictions.csv
+
+  xcat-complete-import:
+    desc: "Imports the final CGPM Crosscat samples as XCat records."
+    cmd:
+      - mkdir -p data/xcat/complete/
+      - >-
+        parallel ${parallel.flags}
+        'clojure -X inferenceql.auto-modeling.xcat/import
+        :cgpm-json {}
+        :data-csv data/ignored.csv
+        :mapping-table data/mapping-table.edn
+        :numericalized-csv data/numericalized.csv
+        :schema-edn data/schema.edn
+        > data/xcat/complete/{/.}.edn'
+        :::: <(find data/cgpm/complete -type f)
+    params:
+      - parallel.flags
+    deps:
+      - data/cgpm/complete
+      - data/mapping-table.edn
+      - data/ignored.csv
+      - data/numericalized.csv
+      - data/schema.edn
+      - src/inferenceql/auto_modeling/xcat.clj
+    outs:
+      - data/xcat/complete/
+
+  assemble-database:
+    cmd: >
+      clojure -M:exec inferenceql.auto-modeling.main assemble-database
+      --table-name $(bin/param database.table_name)
+      --table-path $(bin/param database.table_path)
+      --model-name $(bin/param database.model_name)
+      --model-path $(bin/param database.model_path)
+      > data/db.edn
+    params:
+      - database.table_name
+      - database.table_path
+      - database.model_name
+      - database.model_path
+    deps:
+      - data/nullified.csv
+      - data/cgpm
+      - data/xcat
+    outs:
+      - data/db.edn
+
