@@ -1,0 +1,4 @@
+outs:
+- md5: 5a4d91b35d3f986eaf52e683e4656526
+  size: 134675438
+  path: inferenceql.publish-8abacdc-DIRTY.jar
