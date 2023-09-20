@@ -1,4 +1,5 @@
 from cgpm.crosscat.state import State
+from copy import deepcopy
 from inferenceql_auto_modeling.utils import distarg, replace, _proportion_done
 from inferenceql_auto_modeling.slice_sampling import (
     kernel_alpha,
@@ -20,6 +21,13 @@ class CGPMModel:
         self.columns_to_transition = [
             i for i in range(len(cgpm.outputs)) if i not in columns_to_not_transition
         ]
+        self.diagnostics = {
+            "logscore": [],
+            "column_crp_alpha": [],
+            "column_partition": [],
+            "view_clusters": [],
+            "column_hypers": [],
+        }
 
     @classmethod
     def from_data(
@@ -117,17 +125,23 @@ class CGPMModel:
 
         json.dump(cgpm_metadata, open(path, "w", encoding="utf8"))
 
-    def kernel_lookup(self, kernel):
-        match kernel:
-            case "alpha":
+    def kernel_lookup(self, kernel, implementation):
+        match (kernel, implementation):
+            case ("alpha", "cgpm"):
+                self.cgpm.transition_crp_alpha()
+            case ("view_alphas", "cgpm"):
+                self.cgpm.transition_view_alphas()
+            case ("column_hypers", "cgpm"):
+                self.cgpm.transition_dim_hypers()
+            case ("alpha", "slice_sampling"):
                 kernel_alpha(self.cgpm)
-            case "view_alphas":
+            case ("view_alphas", "slice_sampling"):
                 kernel_view_alphas(self.cgpm)
-            case "column_hypers":
+            case ("column_hypers", "slice_sampling"):
                 kernel_column_hypers(self.cgpm)
-            case "rows":
+            case ("rows", imp):
                 self.cgpm.transition_view_rows()
-            case "columns":
+            case ("columns", imp):
                 self.cgpm.transition_dims(cols=self.columns_to_transition)
             case _:
                 raise NotImplementedError("kernel not found")
@@ -138,7 +152,8 @@ class CGPMModel:
         S=None,
         kernels=["alpha", "view_alphas", "column_hypers", "rows", "columns"],
         progress=True,
-        checkpoint=None,
+        implementation="cgpm",
+        checkpoint=1,
     ):
         iters = 0
         start = time.time()
@@ -153,11 +168,11 @@ class CGPMModel:
                     self.cgpm._progress(p)
                 if p >= 1.0:
                     break
-                self.kernel_lookup(kernel)
+                self.kernel_lookup(kernel, implementation)
             else:
                 iters += 1
                 if checkpoint and (iters % checkpoint == 0):
-                    self.cgpm._increment_diagnostics()
+                    self._increment_diagnostics()
                 continue
             break
 
@@ -166,3 +181,28 @@ class CGPMModel:
                 "\rCompleted: %d iterations in %f minutes."
                 % (iters, (time.time() - start) / 60)
             )
+
+    def _increment_diagnostics(self):
+        self.diagnostics["logscore"].append(self.cgpm.logpdf_score())
+        self.diagnostics["column_crp_alpha"].append(self.cgpm.alpha())
+        self.diagnostics["column_partition"].append(
+            {
+                view_idx: list(view.dims.keys())
+                for view_idx, view in self.cgpm.views.items()
+            }
+        )
+
+        view_dict = {}
+        for view_idx, view in self.cgpm.views.items():
+            dims = view.dims
+            dim_idxs = dims.keys()
+
+            n_rows = view.n_rows()
+
+            zr = np.array([view.Zr()[i] for i in range(n_rows)])
+            view_dict[view_idx] = zr
+
+        self.diagnostics["view_clusters"].append(view_dict)
+
+        hypers = [deepcopy(dim.hypers) for dim in self.cgpm.dims()][:]
+        self.diagnostics["column_hypers"].append(hypers)
