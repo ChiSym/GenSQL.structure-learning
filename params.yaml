@@ -2,7 +2,7 @@
 # [o] change minutes to 1440
 dataset_name: l2large
 seed: 42
-sample_count: 1
+sample_count: 60
 subcols: 15
 sub_sample:
   #according_to_columns:
@@ -37,9 +37,9 @@ schema:
   Home_Est_Current_Value: numerical
   Home_Mortgage_Amount: numerical
 loom:
-  extra_passes: 1
+  extra_passes: 50
 cgpm:
-  iterations_sub: 1
+  iterations_sub: 10
   iterations_full: 1
   #dependence:
   # While the CrossCat implementation in CGPM takes dependence constraints, doing so

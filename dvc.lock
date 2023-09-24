@@ -195,20 +195,20 @@ stages:
     cmd: "clojure -X inferenceql.auto-modeling.main/infer-config < params.yaml > data/infer-config.json\n"
     params:
       params.yaml:
-        loom.extra_passes: 1
+        loom.extra_passes: 50
         seed: 42
     outs:
     - path: data/infer-config.json
       hash: md5
-      md5: a6f3bae27a7411595395461ec94b17ff
-      size: 41
+      md5: 10702555e9a00da2129bc02e87991235
+      size: 42
   loom-infer:
-    cmd: ./bin/loom_task infer loom 1 data/infer-config.json
+    cmd: ./bin/loom_task infer loom 60 data/infer-config.json
     deps:
     - path: data/infer-config.json
       hash: md5
-      md5: a6f3bae27a7411595395461ec94b17ff
-      size: 41
+      md5: 10702555e9a00da2129bc02e87991235
+      size: 42
     - path: loom/ingest
       hash: md5
       md5: a9906fa82749e964713226a7363b4965.dir
@@ -221,22 +221,22 @@ stages:
       nfiles: 1
     params:
       params.yaml:
-        sample_count: 1
+        sample_count: 60
     outs:
     - path: loom/samples
       hash: md5
-      md5: 78d27b94ea0ce70402a386dc5223a8cb.dir
-      size: 235717
-      nfiles: 11
+      md5: eca04ca4d22039f8439f0707f5a796c0.dir
+      size: 18176856
+      nfiles: 613
   loom-dump-metadata:
     cmd: "mkdir -p data/cgpm/raw && find loom/samples -mindepth 1 -maxdepth 1 -type
       d | parallel --verbose ./bin/loom python scripts/loom_dump.py {} --output data/cgpm/raw/{/}.json\n"
     deps:
     - path: loom/samples
       hash: md5
-      md5: 78d27b94ea0ce70402a386dc5223a8cb.dir
-      size: 235717
-      nfiles: 11
+      md5: eca04ca4d22039f8439f0707f5a796c0.dir
+      size: 18176856
+      nfiles: 613
     - path: scripts/loom_dump.py
       hash: md5
       md5: c43616fe12258e9314fe1b481a6971e8
@@ -247,9 +247,9 @@ stages:
     outs:
     - path: data/cgpm/raw
       hash: md5
-      md5: 4f2ebac4127bf1c6bc7629aed161a1b3.dir
-      size: 152565
-      nfiles: 1
+      md5: 2d3cea21302b683372fb6b022c89e5e8.dir
+      size: 7697009
+      nfiles: 60
   cgpm-hydrate-metadata:
     cmd: "find data/cgpm/raw -type f | parallel jsonschema --instance {} schemas/cgpm.json
       && mkdir -p data/cgpm/hydrated && rm -f data/cgpm/inf.log && find data/cgpm/raw
@@ -264,9 +264,9 @@ stages:
       size: 1643
     - path: data/cgpm/raw
       hash: md5
-      md5: 4f2ebac4127bf1c6bc7629aed161a1b3.dir
-      size: 152565
-      nfiles: 1
+      md5: 2d3cea21302b683372fb6b022c89e5e8.dir
+      size: 7697009
+      nfiles: 60
     - path: data/mapping-table.edn
       hash: md5
       md5: bc424cb47650d6b4526e91f0d79d9a75
@@ -290,22 +290,22 @@ stages:
     outs:
     - path: data/cgpm/hydrated
       hash: md5
-      md5: 31c058aa5f7e5d1d48fc2d351d9ea276.dir
-      size: 848223
-      nfiles: 1
+      md5: 7949103ba688cd1ea63dbb87e3ce8e1e.dir
+      size: 46767244
+      nfiles: 60
   cgpm-infer-subset-cols:
     cmd: "find data/cgpm/hydrated -type f | parallel jsonschema --instance {} schemas/cgpm.json
-      && mkdir -p data/cgpm/init && echo 1 >> data/cgpm/inf.log && find data/cgpm/hydrated
+      && mkdir -p data/cgpm/init && echo 10 >> data/cgpm/inf.log && find data/cgpm/hydrated
       -type f | sort | parallel --verbose 'python scripts/cgpm_infer.py {} --kernel
       alpha --kernel view_alphas --kernel column_hypers --kernel rows --kernel columns
       --output data/cgpm/init/{/} --data data/numericalized-subsample.csv --params
-      params.yaml --seed $((42 + {#} - 1)) --iterations 1'\n"
+      params.yaml --seed $((42 + {#} - 1)) --iterations 10'\n"
     deps:
     - path: data/cgpm/hydrated
       hash: md5
-      md5: 31c058aa5f7e5d1d48fc2d351d9ea276.dir
-      size: 848223
-      nfiles: 1
+      md5: 7949103ba688cd1ea63dbb87e3ce8e1e.dir
+      size: 46767244
+      nfiles: 60
     - path: data/numericalized-subsample.csv
       hash: md5
       md5: b2106c2cd23b86ee9b86765524fa36b7
@@ -320,15 +320,15 @@ stages:
       size: 4523
     params:
       params.yaml:
-        cgpm.iterations_sub: 1
+        cgpm.iterations_sub: 10
         parallel.flags: --verbose
         seed: 42
     outs:
     - path: data/cgpm/init
       hash: md5
-      md5: 35ac314804b14a7314826c508ea26007.dir
-      size: 823116
-      nfiles: 1
+      md5: bacbb6fb8e6d04795286f5298a78759d.dir
+      size: 48411086
+      nfiles: 60
   cgpm-grow:
     cmd: "find data/cgpm/init -type f | parallel jsonschema --instance {} schemas/cgpm.json
       && mkdir -p data/cgpm/grown && rm -f data/cgpm/inf.log && find data/cgpm/init
@@ -342,9 +342,9 @@ stages:
       size: 1643
     - path: data/cgpm/init
       hash: md5
-      md5: 35ac314804b14a7314826c508ea26007.dir
-      size: 823116
-      nfiles: 1
+      md5: bacbb6fb8e6d04795286f5298a78759d.dir
+      size: 48411086
+      nfiles: 60
     - path: data/mapping-table.edn
       hash: md5
       md5: bc424cb47650d6b4526e91f0d79d9a75
@@ -364,14 +364,14 @@ stages:
     params:
       params.yaml:
         parallel.flags: --verbose
-        sample_count: 1
+        sample_count: 60
         seed: 42
     outs:
     - path: data/cgpm/grown
       hash: md5
-      md5: 8f3c3cd08e35ea499d6acfa158fa835f.dir
-      size: 2660461
-      nfiles: 1
+      md5: 4f1ab8f4902a3cc3712b0e9012335bf8.dir
+      size: 161950248
+      nfiles: 60
   cgpm-infer-all-cols:
     cmd: "find data/cgpm/grown -type f | parallel jsonschema --instance {} schemas/cgpm.json
       && mkdir -p data/cgpm/complete && echo 1 >> data/cgpm/inf.log && find data/cgpm/grown
@@ -382,9 +382,9 @@ stages:
     deps:
     - path: data/cgpm/grown
       hash: md5
-      md5: 8f3c3cd08e35ea499d6acfa158fa835f.dir
-      size: 2660461
-      nfiles: 1
+      md5: 4f1ab8f4902a3cc3712b0e9012335bf8.dir
+      size: 161950248
+      nfiles: 60
     - path: data/numericalized.csv
       hash: md5
       md5: 1930167912cad0c90f45343a5ad739ae
@@ -405,36 +405,36 @@ stages:
     outs:
     - path: data/cgpm/complete
       hash: md5
-      md5: 583be55406e098919a5cf1265b7a4d4f.dir
-      size: 2734404
-      nfiles: 1
+      md5: d053faa04384620b1636a02b4a13719b.dir
+      size: 164501046
+      nfiles: 60
   save-dependencies:
     cmd: "find data/cgpm/complete -type f | sort | xargs python scripts/dep_prob.py
       --data data/numericalized.csv --output data/dep-prob.json\n"
     deps:
     - path: data/cgpm/complete
       hash: md5
-      md5: 583be55406e098919a5cf1265b7a4d4f.dir
-      size: 2734404
-      nfiles: 1
+      md5: d053faa04384620b1636a02b4a13719b.dir
+      size: 164501046
+      nfiles: 60
     outs:
     - path: data/dep-prob.json
       hash: md5
-      md5: 150423f94117555e82fb7a712c521e7a
-      size: 58006
+      md5: 0bec7ed94e90639c10082e50a56d72c9
+      size: 78206
   save-max-number-views:
     cmd: "find data/cgpm/complete -type f | xargs python scripts/save_n_views.py >>
       data/max-number-views.txt\n"
     deps:
     - path: data/cgpm/complete
       hash: md5
-      md5: 583be55406e098919a5cf1265b7a4d4f.dir
-      size: 2734404
-      nfiles: 1
+      md5: d053faa04384620b1636a02b4a13719b.dir
+      size: 164501046
+      nfiles: 60
     outs:
     - path: data/max-number-views.txt
       hash: md5
-      md5: e4da3b7fbbce2345d7772b0674a318d5
+      md5: 45c48cce2e2d7fbdea1afc51c7c6ad26
       size: 1
   dep-prob-vl:
     cmd: "clojure -X inferenceql.auto-modeling.heatmap/vega-lite :stats-path '\"data/dep-prob.json\"\
@@ -443,8 +443,8 @@ stages:
     deps:
     - path: data/dep-prob.json
       hash: md5
-      md5: 150423f94117555e82fb7a712c521e7a
-      size: 58006
+      md5: 0bec7ed94e90639c10082e50a56d72c9
+      size: 78206
     - path: src/clojure/inferenceql/auto_modeling/heatmap.clj
       hash: md5
       md5: f4f14b20f34f2f09c76dff87a7e908ee
@@ -452,32 +452,32 @@ stages:
     outs:
     - path: data/dep-prob.vl.json
       hash: md5
-      md5: 0fcd624617a077b62d43e68fd6291743
-      size: 158860
+      md5: b65ee811930a15594e35cd86d6da1ca8
+      size: 179060
   dep-prob-vg:
     cmd: "pnpm vl2vg < data/dep-prob.vl.json > data/dep-prob.vg.json\n"
     deps:
     - path: data/dep-prob.vl.json
       hash: md5
-      md5: 0fcd624617a077b62d43e68fd6291743
-      size: 158860
+      md5: b65ee811930a15594e35cd86d6da1ca8
+      size: 179060
     outs:
     - path: data/dep-prob.vg.json
       hash: md5
-      md5: eb319394dd8af66c12e40fc30706b8ec
-      size: 158677
+      md5: 01adb41257c75d677090fa4b5aa7c317
+      size: 182381
   dep-prob-svg:
     cmd: "pnpm vg2svg < data/dep-prob.vg.json > data/dep-prob.svg\n"
     deps:
     - path: data/dep-prob.vg.json
       hash: md5
-      md5: eb319394dd8af66c12e40fc30706b8ec
-      size: 158677
+      md5: 01adb41257c75d677090fa4b5aa7c317
+      size: 182381
     outs:
     - path: data/dep-prob.svg
       hash: md5
-      md5: 577adc33f774437c4c676979c520d97f
-      size: 430536
+      md5: da6db6cdb8358d6eac77b19ef427f83a
+      size: 448776
   save-linear-stats:
     cmd: "python scripts/linear_stats.py --data data/ignored.csv --schema data/schema.edn
       --output data/linear-stats.json\n"
@@ -506,8 +506,8 @@ stages:
     deps:
     - path: data/dep-prob.json
       hash: md5
-      md5: 150423f94117555e82fb7a712c521e7a
-      size: 58006
+      md5: 0bec7ed94e90639c10082e50a56d72c9
+      size: 78206
     - path: data/linear-stats.json
       hash: md5
       md5: abb1715015deb02a35ebcce4522a27ca
@@ -519,40 +519,40 @@ stages:
     outs:
     - path: data/linear-stats.vl.json
       hash: md5
-      md5: f77e71ffde212c3d19e4e11fae138098
+      md5: 10c52cd5ad3afdbfe0814e1aff1ae9f0
       size: 186289
   linear-stats-vg:
     cmd: "pnpm vl2vg < data/linear-stats.vl.json > data/linear-stats.vg.json\n"
     deps:
     - path: data/linear-stats.vl.json
       hash: md5
-      md5: f77e71ffde212c3d19e4e11fae138098
+      md5: 10c52cd5ad3afdbfe0814e1aff1ae9f0
       size: 186289
     outs:
     - path: data/linear-stats.vg.json
       hash: md5
-      md5: af52ddc57ff3587f2cf9028b5ee26ff9
+      md5: bee2fc7a8848d50d350ddb9dcd34aee3
       size: 190315
   linear-stats-svg:
     cmd: "pnpm vg2svg < data/linear-stats.vg.json > data/linear-stats.svg\n"
     deps:
     - path: data/linear-stats.vg.json
       hash: md5
-      md5: af52ddc57ff3587f2cf9028b5ee26ff9
+      md5: bee2fc7a8848d50d350ddb9dcd34aee3
       size: 190315
     outs:
     - path: data/linear-stats.svg
       hash: md5
-      md5: 8f29fc8a1de729b474bd8dd86837d18f
-      size: 453287
+      md5: 4d68da6cd37fa1eb02c9d8ffa23cd5d3
+      size: 453241
   compare-dep-prob-with-linear:
     cmd: "python scripts/compare_deps.py --deps data/dep-prob.json --linear data/linear-stats.json
       >> data/qc-statistical-tests.txt\n"
     deps:
     - path: data/dep-prob.json
       hash: md5
-      md5: 150423f94117555e82fb7a712c521e7a
-      size: 58006
+      md5: 0bec7ed94e90639c10082e50a56d72c9
+      size: 78206
     - path: data/linear-stats.json
       hash: md5
       md5: abb1715015deb02a35ebcce4522a27ca
@@ -560,8 +560,8 @@ stages:
     outs:
     - path: data/qc-statistical-tests.txt
       hash: md5
-      md5: a06119ac090e3f91c708b7ef9c703c7b
-      size: 34923
+      md5: 5dd47ff5842dda9ae7345f5bcb225934
+      size: 18449
   ast-export:
     cmd:
     - 'parallel --verbose jsonschema --instance {} schemas/cgpm.json :::: <(find data/cgpm/complete
