@@ -4,6 +4,7 @@
   # https://devenv.sh/packages/
   packages = let
     system-packages = with pkgs; [
+      awscli2
       clj-kondo
       parallel
       xsv
