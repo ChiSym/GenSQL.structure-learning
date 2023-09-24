@@ -39,8 +39,8 @@ schema:
 loom:
   extra_passes: 50
 cgpm:
-  iterations_sub: 10
-  iterations_full: 1
+  iterations_sub: 100
+  iterations_full: 5
   #dependence:
   # While the CrossCat implementation in CGPM takes dependence constraints, doing so
   # throws a not-implemented-error. Hence, we apply a workaround:
