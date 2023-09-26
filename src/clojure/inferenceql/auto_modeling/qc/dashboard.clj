@@ -8,7 +8,8 @@
             [inferenceql.auto-modeling.qc.util :refer [filtering-summary should-bin? bind-to-element
                                                        obs-data-color synthetic-data-color
                                                        unselected-color vega-type-fn
-                                                       vl5-schema]]))
+                                                       vl5-schema bar-plots-1-d
+                                                       most-frequent]]))
 
 (defn histogram-quant
   "Generates a vega-lite spec for a histogram.
@@ -56,11 +57,12 @@
                                         :legend {:orient "top"
                                                  :title nil}}}}]}}))
 
-(defn histogram-nom
-  "Generates a vega-lite spec for a histogram.
-  `selections` is a collection of maps representing data in selected rows and columns.
+
+(defn histogram-wih-point-indicators
+  "Generates a vega-lite spec for showing histograms with points indicating frequencies.
   `col` is the key within each map in `selections` that is used to extract data for the histogram.
-  `vega-type` is a function that takes a column name and returns an vega datatype."
+  `vega-type` is a function that takes a column name and returns an vega datatype.
+  `samples` is a collection of maps representing data in selected rows and columns."
   [col vega-type samples]
   (let [col-type (vega-type col)
         bin-flag (should-bin? col-type)
@@ -96,6 +98,64 @@
                                     :legend {:orient "top"
                                              :title nil
                                              :offset 10}}}}}))
+
+(defn histogram-wih-barplots
+  "Generates a vega-lite spec for showing histograms comparing two bar plots.
+  `col` is the key within each map in `selections` that is used to extract data for the histogram.
+  `vega-type` is a function that takes a column name and returns an vega datatype.
+  `samples` is a collection of maps representing data in selected rows and columns."
+  [col vega-type samples]
+  (let [col-type (vega-type col)
+        bin-flag (should-bin? col-type)
+        f-sum (filtering-summary [col] vega-type nil samples)
+        col-vals (map col samples)
+        max-freq (most-frequent col-vals)
+        col-domain (remove nil? (set col-vals))
+        bar-plot-template (fn
+                           [source color numPoints]
+                           {:mark {:type "bar"
+                                   :color unselected-color
+                                   :tooltip {:content "data"}}
+                            :transform [
+                                        {:filter {:field col :oneOf col-domain}}
+                                        {:window [{:op "row_number", :as "row_number_subplot"}]
+                                         :groupby ["collection"]}
+                                        {:filter {:and [{:field "collection" :equal source}
+                                                        {:field "row_number_subplot" :lte (:num-valid f-sum)}
+                                                        {:field "row_number_subplot" :lte {:expr numPoints}}]}}
+                                        ]
+                            :params [{:name "brush-all"
+                                      :select {:type "point"
+                                               :nearest true
+                                               :toggle "true"
+                                               :on "click[!event.shiftKey]"
+                                               :fields [col "collection"]
+                                               :clear "dblclick[!event.shiftKey]"}}]
+                            :encoding {:y {:bin bin-flag
+                                           :field col
+                                           :type col-type
+                                           :axis {:titleAnchor "start" :titleAlign "right" :titlePadding 1}}
+                                       :x {:aggregate "count"
+                                           :type "quantitative"
+                                           ; Next, ensure a shared the scale.
+                                           :scale {:domain [0, (* 1.1 (/ max-freq 2))]}
+                                           :axis {:orient "top"}}
+                                       :color {:value color}}})
+        ]
+    {:concat [
+              (bar-plot-template "observed" obs-data-color "numObservedPoints")
+              (bar-plot-template "synthetic" synthetic-data-color "numVirtualPoints")]}))
+
+(defn histogram-nom
+  "Generates a vega-lite spec for showing histograms comparing synthetic and observed data
+  for univariate, nominal distributions.
+  `col` is the key within each map in `selections` that is used to extract data for the histogram.
+  `vega-type` is a function that takes a column name and returns an vega datatype.
+  `samples` is a collection of maps representing data in selected rows and columns."
+  [col vega-type samples]
+  (if bar-plots-1-d
+    (histogram-wih-barplots col vega-type samples)
+    (histogram-wih-point-indicators col vega-type samples)))
 
 (defn- scatter-plot
   "Generates vega-lite spec for a scatter plot.

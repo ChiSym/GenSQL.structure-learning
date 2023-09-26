@@ -3,7 +3,7 @@
   (:require [medley.core :as medley]))
 
 (def vl5-schema "https://vega.github.io/schema/vega-lite/v5.json")
-
+(def bar-plots-1-d true)
 (def obs-data-color "#000000") ;; black
 (def synthetic-data-color "#f28e2b") ;; Tableau-10 Orange
 (def unselected-color "lightgrey")
@@ -96,3 +96,11 @@
   [params css-selector]
   (for [param params]
     (medley/update-existing param :bind assoc :element css-selector)))
+
+(defn most-frequent [items]
+  (->> items
+       frequencies
+       (sort-by val)
+       reverse
+       first
+       second))
