@@ -4,7 +4,7 @@
 
 (def vl5-schema "https://vega.github.io/schema/vega-lite/v5.json")
 
-(def obs-data-color "#4e79a7") ;; Tableau-10 Blue
+(def obs-data-color "#000000") ;; black
 (def synthetic-data-color "#f28e2b") ;; Tableau-10 Orange
 (def unselected-color "lightgrey")
 (def regression-color "black")
