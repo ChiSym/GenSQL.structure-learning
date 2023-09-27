@@ -7,11 +7,13 @@
       clj-kondo
       parallel
       xsv
+      duckdb
     ];
     python-packages = with config.languages.python.package.pkgs; [
       numpy
       pandas
       scipy
+      duckdb
     ];
   in system-packages ++ python-packages;
 
