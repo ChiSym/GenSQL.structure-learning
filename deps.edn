@@ -1,13 +1,14 @@
 {:paths ["src/clojure"]
  :deps {babashka/fs {:mvn/version "0.4.19"}
         cheshire/cheshire {:mvn/version "5.10.0"}
+        net.clojars.wkok/openai-clojure {:mvn/version "0.11.0"}
         clj-commons/clj-yaml {:mvn/version "0.7.106"}
         cljstache/cljstache {:mvn/version "2.0.6"}
         com.cognitect/transit-clj {:mvn/version "1.0.324"}
         com.github.haifengl/smile-core {:mvn/version "3.0.1"}
         io.github.inferenceql/inferenceql.gpm.sppl {:git/sha "52f8316e094b3644709dccde8f0a935f9b55f187"}
         io.github.inferenceql/inferenceql.inference {:git/sha "f8b864bffeb4b11913414796c2af0f0f0cd665cc"}
-        io.github.inferenceql/inferenceql.query {:git/sha "9f601603a47b9dfcfb7c38441af2d279f1764031"}
+        io.github.inferenceql/inferenceql.query {:git/sha "49890a5a5dc3fd70069bff3a4c96ade8683251e5"}
         lambdaisland/regal {:mvn/version "0.0.143"}
         medley/medley {:mvn/version "1.4.0"}
         org.babashka/cli {:mvn/version "0.3.34"}
