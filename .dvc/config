@@ -1,2 +1,5 @@
 [core]
     analytics = false
+    remote = ces-s3-remote
+['remote "ces-s3-remote"']
+    url = s3://lpm-research/CES
