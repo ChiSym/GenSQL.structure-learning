@@ -1,6 +1,6 @@
 dataset_name: test-pub
 seed: 0
-sample_count: 3
+sample_count: 59
 sub_sample:
   #according_to_columns:
   #  Class_of_Orbit:
@@ -8,7 +8,7 @@ sub_sample:
   #    - GEO
   #  Users:
   #    - Commercial
-  N: 1000
+  N: 20000
 parallel:
   # To limit the number of jobs GNU Parallel spawns use add the flag `--jobs n`.
   flags: >-
@@ -18,6 +18,30 @@ nullify:
   # "missing" as null uncomment the following two lines:
   # - NaN
   # - missing
+cols_to_keep:
+  - year
+  - state
+  - gender
+  - age
+  - educ
+  - race_h
+  - religion
+  - relig_imp
+  - marstat
+  - ownhome
+  - has_child
+  - no_milstat
+  - vv_turnout_gvm
+  - pid7
+  - ideo5
+  - faminc
+  - employ
+  - no_healthins
+  - union
+  - economy_retro
+  - newsint
+  - approval_pres
+  - voted_pres_party
 schema:
   # Key/value pairs can be added here to explicitly override the inferred schema
   # for each column. The available types are as follows: numerical, nominal, and ignore.
@@ -27,10 +51,10 @@ schema:
   # Apogee_km: numerical
   # Perigee_km: numerical
 loom:
-  extra_passes: 1
+  extra_passes: 500
 cgpm:
   #iterations: 1
-  minutes: 1
+  minutes: 500
   #dependence:
   #  # While the CrossCat implementation in CGPM takes dependence constraints, doing so
   #  # throws a not-implemented-error. Hence, we apply a workaround:
@@ -76,6 +100,6 @@ database:
   table_name: data
   table_path: data/nullified.csv
   model_name: baseline_model
-  model_path: data/xcat/complete/sample.0.edn
+  # model_path: data/xcat/complete/sample.0.edn
   # model_path: data/xcat/merged.edn
-  # model_path: data/sppl/merged.json
+  model_path: data/sppl/merged.json
