@@ -26,6 +26,7 @@ sdv = {url = "https://files.pythonhosted.org/packages/67/54/f324c074538f57b56479
 kaleido = "0.2.1"
 pytest = "^7.4.2"
 ipdb = "^0.13.13"
+dvc-s3 = "^2.23.0"
 
 [build-system]
 requires = ["poetry-core"]

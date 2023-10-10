@@ -454,8 +454,8 @@ stages:
     outs:
       - qc/marginals/iql_1d_fits.csv
       - qc/marginals/iql_2d_fits.csv
-      - qc/marginals/iql_worst_1d_fit.png
-      - qc/marginals/iql_worst_2d_fit.png
+      - qc/marginals/iql_worst_1d_fit.html
+      - qc/marginals/iql_worst_2d_fit.html
 
   marginal-fits-ctgan:
     cmd: >
@@ -469,8 +469,8 @@ stages:
     outs:
       - qc/marginals/ctgan_1d_fits.csv
       - qc/marginals/ctgan_2d_fits.csv
-      - qc/marginals/ctgan_worst_1d_fit.png
-      - qc/marginals/ctgan_worst_2d_fit.png
+      - qc/marginals/ctgan_worst_1d_fit.html
+      - qc/marginals/ctgan_worst_2d_fit.html
 
   marginal-fits-copula:
     cmd: >
@@ -484,8 +484,8 @@ stages:
     outs:
       - qc/marginals/copula_1d_fits.csv
       - qc/marginals/copula_2d_fits.csv
-      - qc/marginals/copula_worst_1d_fit.png
-      - qc/marginals/copula_worst_2d_fit.png
+      - qc/marginals/copula_worst_1d_fit.html
+      - qc/marginals/copula_worst_2d_fit.html
 
   xcat-complete-import:
     desc: "Imports the final CGPM Crosscat samples as XCat records."

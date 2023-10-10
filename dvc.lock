@@ -303,65 +303,57 @@ stages:
       nfiles: 59
   cgpm-infer-hyperparameters:
     cmd: "find data/cgpm/hydrated -type f | parallel jsonschema --instance {} schemas/cgpm.json
-      && mkdir -p data/cgpm/complete && echo $(bin/param cgpm.minutes) >> data/cgpm/inf.log
-      && find data/cgpm/hydrated -type f | sort | parallel $(bin/param parallel.flags)
-      'python scripts/cgpm_infer.py {} --kernel alpha --kernel view_alphas --kernel
-      column_hypers --kernel rows --kernel columns --output data/cgpm/complete/{/}
-      --data data/numericalized.csv --params params.yaml --seed $(($(bin/param seed)
-      + {#} - 1)) --minutes $(bin/param cgpm.minutes)' #--iterations $(bin/param cgpm.iterations)\n"
+      && mkdir -p data/cgpm/complete && echo 500 >> data/cgpm/inf.log && find data/cgpm/hydrated
+      -type f | sort | parallel --verbose 'python scripts/cgpm_infer.py {} --kernel
+      alpha --kernel view_alphas --kernel column_hypers --kernel rows --kernel columns
+      --output data/cgpm/complete/{/} --seed $((0 + {#} - 1)) --minutes 500' #--iterations
+      1\n"
     deps:
     - path: data/cgpm/hydrated
       hash: md5
-      md5: f3b2b3deabf888868889017b41e78107.dir
-      size: 229968525
+      md5: 9ae62ecd6b978237795499e906da8748.dir
+      size: 328176554
       nfiles: 59
-    - path: data/numericalized.csv
-      hash: md5
-      md5: d16870b327bfdcc6a3285a3af8386dd9
-      size: 1906974
-    - path: schemas/cgpm.json
-      hash: md5
-      md5: 75fb21013e98a73e03fbe1ace14426f2
-      size: 4039
     - path: scripts/cgpm_infer.py
       hash: md5
-      md5: 8c953870a8ac391bb77deeb105403131
-      size: 4523
+      md5: 4c417b51a9098752c5ab3ebd6ca541cb
+      size: 1525
     params:
       params.yaml:
         cgpm:
+          iterations: 1
           minutes: 500
         parallel.flags: --verbose
         seed: 0
     outs:
     - path: data/cgpm/complete
       hash: md5
-      md5: 374cbe8d7b117b7dd3b2629ec1bab689.dir
-      size: 219226291
-      nfiles: 59
+      md5: b2c3d988796db9f66494ed23857881e2.dir
+      size: 100158286
+      nfiles: 18
   save-dependencies:
     cmd: "find data/cgpm/complete -type f | sort | xargs python scripts/dep_prob.py
       --data data/numericalized.csv --output data/dep-prob.json\n"
     deps:
     - path: data/cgpm/complete
       hash: md5
-      md5: 374cbe8d7b117b7dd3b2629ec1bab689.dir
-      size: 219226291
-      nfiles: 59
+      md5: b2c3d988796db9f66494ed23857881e2.dir
+      size: 100158286
+      nfiles: 18
     outs:
     - path: data/dep-prob.json
       hash: md5
-      md5: dcf90f680301a4d7854a01d5af789d04
-      size: 18084
+      md5: 7a26d07c75b9f8873c0e2a2245d70c2f
+      size: 18178
   save-max-number-views:
     cmd: "find data/cgpm/complete -type f | xargs python scripts/save_n_views.py >>
       data/max-number-views.txt\n"
     deps:
     - path: data/cgpm/complete
       hash: md5
-      md5: 374cbe8d7b117b7dd3b2629ec1bab689.dir
-      size: 219226291
-      nfiles: 59
+      md5: b2c3d988796db9f66494ed23857881e2.dir
+      size: 100158286
+      nfiles: 18
     outs:
     - path: data/max-number-views.txt
       hash: md5
@@ -374,41 +366,41 @@ stages:
     deps:
     - path: data/dep-prob.json
       hash: md5
-      md5: dcf90f680301a4d7854a01d5af789d04
-      size: 18084
-    - path: src/inferenceql/auto_modeling/heatmap.clj
+      md5: 7a26d07c75b9f8873c0e2a2245d70c2f
+      size: 18178
+    - path: src/clojure/inferenceql/auto_modeling/heatmap.clj
       hash: md5
-      md5: 6413cddd3b16a428a008cc88375fac36
-      size: 7369
+      md5: f4f14b20f34f2f09c76dff87a7e908ee
+      size: 7364
     outs:
     - path: data/dep-prob.vl.json
       hash: md5
-      md5: 764ef6a1bf34eb995f2efde5c06573b9
-      size: 41892
+      md5: 9d64a5ff4b218e9d0688c5b0d182824a
+      size: 41986
   dep-prob-vg:
     cmd: "pnpm vl2vg < data/dep-prob.vl.json > data/dep-prob.vg.json\n"
     deps:
     - path: data/dep-prob.vl.json
       hash: md5
-      md5: 764ef6a1bf34eb995f2efde5c06573b9
-      size: 41892
+      md5: 9d64a5ff4b218e9d0688c5b0d182824a
+      size: 41986
     outs:
     - path: data/dep-prob.vg.json
       hash: md5
-      md5: 470cf944bbc01ae31cc6d8b9960aa576
-      size: 44453
+      md5: 18243a5fd90c64bedfdfe0311976d865
+      size: 44559
   dep-prob-svg:
     cmd: "pnpm vg2svg < data/dep-prob.vg.json > data/dep-prob.svg\n"
     deps:
     - path: data/dep-prob.vg.json
       hash: md5
-      md5: 470cf944bbc01ae31cc6d8b9960aa576
-      size: 44453
+      md5: 18243a5fd90c64bedfdfe0311976d865
+      size: 44559
     outs:
     - path: data/dep-prob.svg
       hash: md5
-      md5: 068bd5ce40a88ee69b9821147b4dfc45
-      size: 123696
+      md5: a2356f8f48187cb8dfe133fd3ba70d78
+      size: 123778
   save-linear-stats:
     cmd: "python scripts/linear_stats.py --data data/ignored.csv --schema data/schema.edn
       --output data/linear-stats.json\n"
@@ -423,8 +415,8 @@ stages:
       size: 641
     - path: scripts/linear_stats.py
       hash: md5
-      md5: 151c1783cd21f6222faad836cb0849d4
-      size: 4458
+      md5: dbb69c751cf77f4f57efa0ee8e74830d
+      size: 4448
     outs:
     - path: data/linear-stats.json
       hash: md5
@@ -437,44 +429,44 @@ stages:
     deps:
     - path: data/dep-prob.json
       hash: md5
-      md5: dcf90f680301a4d7854a01d5af789d04
-      size: 18084
+      md5: 7a26d07c75b9f8873c0e2a2245d70c2f
+      size: 18178
     - path: data/linear-stats.json
       hash: md5
       md5: 0b4e678f6b451adbe5efd0c682c6774d
       size: 63779
-    - path: src/inferenceql/auto_modeling/heatmap.clj
+    - path: src/clojure/inferenceql/auto_modeling/heatmap.clj
       hash: md5
-      md5: 6413cddd3b16a428a008cc88375fac36
-      size: 7369
+      md5: f4f14b20f34f2f09c76dff87a7e908ee
+      size: 7364
     outs:
     - path: data/linear-stats.vl.json
       hash: md5
-      md5: 5e8c2f6ce94d69c634047f70478978ae
+      md5: 30e09bfed6ca83215079175edf161f61
       size: 45744
   linear-stats-vg:
     cmd: "pnpm vl2vg < data/linear-stats.vl.json > data/linear-stats.vg.json\n"
     deps:
     - path: data/linear-stats.vl.json
       hash: md5
-      md5: 5e8c2f6ce94d69c634047f70478978ae
+      md5: 30e09bfed6ca83215079175edf161f61
       size: 45744
     outs:
     - path: data/linear-stats.vg.json
       hash: md5
-      md5: bd03a2d31573c5cbed4323d7220211f6
+      md5: 1046e97ccf6de12c262f5cc9499d5040
       size: 48626
   linear-stats-svg:
     cmd: "pnpm vg2svg < data/linear-stats.vg.json > data/linear-stats.svg\n"
     deps:
     - path: data/linear-stats.vg.json
       hash: md5
-      md5: bd03a2d31573c5cbed4323d7220211f6
+      md5: 1046e97ccf6de12c262f5cc9499d5040
       size: 48626
     outs:
     - path: data/linear-stats.svg
       hash: md5
-      md5: e5ddea2f40944f899a145c833315331e
+      md5: 5fb3e10059abcc130ad4d1ac044840f4
       size: 126073
   compare-dep-prob-with-linear:
     cmd: "python scripts/compare_deps.py --deps data/dep-prob.json --linear data/linear-stats.json
@@ -482,8 +474,8 @@ stages:
     deps:
     - path: data/dep-prob.json
       hash: md5
-      md5: dcf90f680301a4d7854a01d5af789d04
-      size: 18084
+      md5: 7a26d07c75b9f8873c0e2a2245d70c2f
+      size: 18178
     - path: data/linear-stats.json
       hash: md5
       md5: 0b4e678f6b451adbe5efd0c682c6774d
@@ -491,8 +483,8 @@ stages:
     outs:
     - path: data/qc-statistical-tests.txt
       hash: md5
-      md5: 4de9ac8b36b1ab12e748609610080476
-      size: 6273
+      md5: c13306d98a1426c3795fe94db3bfe1b8
+      size: 6275
   ast-export:
     cmd:
     - 'parallel --verbose jsonschema --instance {} schemas/cgpm.json :::: <(find data/cgpm/complete
@@ -504,25 +496,25 @@ stages:
     deps:
     - path: data/cgpm/complete
       hash: md5
-      md5: 374cbe8d7b117b7dd3b2629ec1bab689.dir
-      size: 219226291
-      nfiles: 59
+      md5: b2c3d988796db9f66494ed23857881e2.dir
+      size: 100158286
+      nfiles: 18
     - path: data/ignored.csv
       hash: md5
       md5: a4e7a799adcb44f3a6c46438713ab5ee
       size: 2500723
     - path: scripts/ast_export.py
       hash: md5
-      md5: 573cc404efd53361edc764e5c517ee8e
-      size: 11046
+      md5: 301e377deb0aaf75b1a961a6d91153a8
+      size: 11045
     params:
       params.yaml:
         parallel.flags: --verbose
     outs:
     - path: data/ast
       hash: md5
-      md5: fa113c4b862fe09f6f1784d8483ecb56.dir
-      size: 43668387
+      md5: 8ee8776731ebe6f31230976e6d371911.dir
+      size: 43587906
       nfiles: 59
   write-gen-programs:
     cmd:
@@ -532,14 +524,14 @@ stages:
     deps:
     - path: data/ast
       hash: md5
-      md5: fa113c4b862fe09f6f1784d8483ecb56.dir
-      size: 43668387
+      md5: 8ee8776731ebe6f31230976e6d371911.dir
+      size: 43587906
       nfiles: 59
     outs:
     - path: data/code
       hash: md5
-      md5: 2c6599f0ed7554570b65b35a4273b7a2.dir
-      size: 22136711
+      md5: 9b324334de114bad6c06fdd68fdd69d5.dir
+      size: 22093921
       nfiles: 59
   sppl-import:
     cmd:
@@ -550,8 +542,8 @@ stages:
     deps:
     - path: data/ast
       hash: md5
-      md5: fa113c4b862fe09f6f1784d8483ecb56.dir
-      size: 43668387
+      md5: 8ee8776731ebe6f31230976e6d371911.dir
+      size: 43587906
       nfiles: 59
     - path: data/max-number-views.txt
       hash: md5
@@ -567,8 +559,8 @@ stages:
     outs:
     - path: data/sppl/unmerged
       hash: md5
-      md5: 9a591f0e3877b305ad476c8bb6141b7b.dir
-      size: 33702103
+      md5: 2ffef0670e90cd53062df77f3d2a40d1.dir
+      size: 33635075
       nfiles: 59
   sppl-merge:
     cmd: "find data/sppl/unmerged -type f | sort | xargs python scripts/sppl_merge.py
@@ -576,17 +568,17 @@ stages:
     deps:
     - path: data/sppl/unmerged
       hash: md5
-      md5: 9a591f0e3877b305ad476c8bb6141b7b.dir
-      size: 33702103
+      md5: 2ffef0670e90cd53062df77f3d2a40d1.dir
+      size: 33635075
       nfiles: 59
     outs:
     - path: data/sppl/merged.json
       hash: md5
-      md5: 26341add88ace093dd082af9c8269aed
-      size: 33708334
+      md5: a671f5ed45ae4eed278c4f0e0077e1de
+      size: 33641306
   sppl-sample:
     cmd: "python scripts/sppl_sample.py --model data/sppl/merged.json --data data/ignored.csv
-      --sample_count $(bin/param qc.sample_count) > data/synthetic-data-iql.csv\n"
+      > data/synthetic-data-iql.csv # --sample_count 1000\n"
     deps:
     - path: data/ignored.csv
       hash: md5
@@ -594,8 +586,8 @@ stages:
       size: 2500723
     - path: data/sppl/merged.json
       hash: md5
-      md5: 26341add88ace093dd082af9c8269aed
-      size: 33708334
+      md5: a671f5ed45ae4eed278c4f0e0077e1de
+      size: 33641306
     - path: scripts/sppl_sample.py
       hash: md5
       md5: 65c711874e0eda0e7d79b4a4a3eb6076
@@ -603,8 +595,8 @@ stages:
     outs:
     - path: data/synthetic-data-iql.csv
       hash: md5
-      md5: cc6ff422b041f379e8e2daf5fdad34ec
-      size: 7588434
+      md5: 31f9ad9882c599560ffec83ad458b5c4
+      size: 7587702
   qc-tag-samples:
     cmd: "clojure -X inferenceql.auto-modeling.qc.samples/tag :data data/ignored.csv
       :samples-synthetic data/synthetic-data-iql.csv > qc/samples/samples.edn\n"
@@ -615,17 +607,17 @@ stages:
       size: 2500723
     - path: data/synthetic-data-iql.csv
       hash: md5
-      md5: cc6ff422b041f379e8e2daf5fdad34ec
-      size: 7588434
-    - path: src/inferenceql/auto_modeling/qc/samples.clj
+      md5: 31f9ad9882c599560ffec83ad458b5c4
+      size: 7587702
+    - path: src/clojure/inferenceql/auto_modeling/qc/samples.clj
       hash: md5
       md5: 5c0fcc265aabd819c96ae861bdff7587
       size: 1100
     outs:
     - path: qc/samples/samples.edn
       hash: md5
-      md5: ed451562fcd5cdcf9ce09b7930d04ece
-      size: 24609884
+      md5: 6b4f025ed8d3b87692adf0a91b3ea098
+      size: 24609152
   xcat-complete-import:
     cmd:
     - mkdir -p data/xcat/complete/
@@ -776,3 +768,58 @@ stages:
       hash: md5
       md5: 0c5591e886e05ddfbf3e311d1af3d966
       size: 27425071
+  ctgan-train-sample:
+    cmd: "python inferenceql_auto_modeling/train_baselines.py --model ctgan --data
+      data/ignored.csv\n"
+    deps:
+    - path: data/ignored.csv
+      hash: md5
+      md5: a4e7a799adcb44f3a6c46438713ab5ee
+      size: 2500723
+    outs:
+    - path: data/synthetic-data-ctgan.csv
+      hash: md5
+      md5: 4b113775ea928fe4e4e41cb44a0fbe25
+      size: 5032710
+  copula-train-sample:
+    cmd: "python inferenceql_auto_modeling/train_baselines.py --model copula --data
+      data/ignored.csv\n"
+    deps:
+    - path: data/ignored.csv
+      hash: md5
+      md5: a4e7a799adcb44f3a6c46438713ab5ee
+      size: 2500723
+    outs:
+    - path: data/synthetic-data-copula.csv
+      hash: md5
+      md5: 54de98144c675eac8309688205c62eac
+      size: 5050882
+  marginal-fits-iql:
+    cmd: "mkdir -p qc/marginals && python scripts/marginal_fit_metrics.py --model
+      iql --real_data data/ignored.csv\n"
+    deps:
+    - path: data/ignored.csv
+      hash: md5
+      md5: a4e7a799adcb44f3a6c46438713ab5ee
+      size: 2500723
+    - path: data/synthetic-data-iql.csv
+      hash: md5
+      md5: 31f9ad9882c599560ffec83ad458b5c4
+      size: 7587702
+    outs:
+    - path: qc/marginals/iql_1d_fits.csv
+      hash: md5
+      md5: 96d32f9bb6d3b2515cfd91f6d591ec09
+      size: 1057
+    - path: qc/marginals/iql_2d_fits.csv
+      hash: md5
+      md5: 51072997362203ba2f48d11a4020817b
+      size: 24617
+    - path: qc/marginals/iql_worst_1d_fit.html
+      hash: md5
+      md5: 44f657d944f0e1fa5967e37721a62778
+      size: 3636601
+    - path: qc/marginals/iql_worst_2d_fit.html
+      hash: md5
+      md5: da470f357bed9aae8a986bcc3af58c23
+      size: 4539686

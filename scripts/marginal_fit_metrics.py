@@ -1,5 +1,6 @@
 import pandas as pd
 import argparse
+import plotly
 from sdv.metadata import SingleTableMetadata
 from sdmetrics.reports.single_table import QualityReport
 from sdmetrics.reports import utils
@@ -48,7 +49,8 @@ def make_marginal_fit_metrics():
         metadata=metadata,
     )
 
-    fig_1d.write_image(f"qc/marginals/{model}_worst_1d_fit.png")
+    # fig_1d.write_image(f"qc/marginals/{model}_worst_1d_fit.png", engine="orca")
+    plotly.offline.plot(fig_1d, filename=f"qc/marginals/{model}_worst_1d_fit.html")
 
     fig_2d = utils.get_column_pair_plot(
         real_data=real_data,
@@ -59,8 +61,9 @@ def make_marginal_fit_metrics():
         ],
         metadata=metadata,
     )
+    plotly.offline.plot(fig_2d, filename=f"qc/marginals/{model}_worst_2d_fit.html")
 
-    fig_2d.write_image(f"qc/marginals/{model}_worst_2d_fit.png")
+    # fig_2d.write_image(f"qc/marginals/{model}_worst_2d_fit.png", engine="orca")
 
 
 if __name__ == "__main__":
