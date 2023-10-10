@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from inferenceql_auto_modeling.cgpm import CGPMModel
 import argparse
 import sys

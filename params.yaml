@@ -54,7 +54,7 @@ schema:
 loom:
   extra_passes: 500
 cgpm:
-  #iterations: 1
+  iterations: 1
   minutes: 500
   #dependence:
   #  # While the CrossCat implementation in CGPM takes dependence constraints, doing so

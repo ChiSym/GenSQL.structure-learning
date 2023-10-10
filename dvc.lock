@@ -212,7 +212,7 @@ stages:
       md5: 0c9040c7ed29fd3b3d32e104ae31d196
       size: 42
   loom-infer:
-    cmd: ./bin/loom_task infer loom $(bin/param sample_count) data/infer-config.json
+    cmd: ./bin/loom_task infer loom 59 data/infer-config.json
     deps:
     - path: data/infer-config.json
       hash: md5
@@ -234,18 +234,17 @@ stages:
     outs:
     - path: loom/samples
       hash: md5
-      md5: 05351102e41b4dd74542758d32fcd02e.dir
-      size: 110649235
+      md5: 3b10427558c670f3ed8c703eeb0c27a9.dir
+      size: 110648785
       nfiles: 1110
   loom-dump-metadata:
     cmd: "mkdir -p data/cgpm/raw && find loom/samples -mindepth 1 -maxdepth 1 -type
-      d | parallel $(bin/param parallel.flags) ./bin/loom python scripts/loom_dump.py
-      {} --output data/cgpm/raw/{/}.json\n"
+      d | parallel --verbose ./bin/loom python scripts/loom_dump.py {} --output data/cgpm/raw/{/}.json\n"
     deps:
     - path: loom/samples
       hash: md5
-      md5: 05351102e41b4dd74542758d32fcd02e.dir
-      size: 110649235
+      md5: 3b10427558c670f3ed8c703eeb0c27a9.dir
+      size: 110648785
       nfiles: 1110
     - path: scripts/loom_dump.py
       hash: md5
@@ -263,10 +262,9 @@ stages:
   cgpm-hydrate-metadata:
     cmd: "find data/cgpm/raw -type f | parallel jsonschema --instance {} schemas/cgpm.json
       && mkdir -p data/cgpm/hydrated && rm -f data/cgpm/inf.log && find data/cgpm/raw
-      -type f | sort | parallel $(bin/param parallel.flags) 'python scripts/cgpm_hydrate.py
-      --metadata {} --output data/cgpm/hydrated/{/} --data data/numericalized.csv
-      --schema data/cgpm-schema.edn --mapping-table data/mapping-table.edn --seed
-      $(($(bin/param seed) + {#} - 1))'\n"
+      -type f | sort | parallel --verbose 'python scripts/cgpm_hydrate.py --output
+      data/cgpm/hydrated/{/} --data data/numericalized.csv --schema data/cgpm-schema.edn
+      --mapping-table data/mapping-table.edn --seed $((0 + {#} - 1))'\n"
     deps:
     - path: data/cgpm-schema.edn
       hash: md5
@@ -291,8 +289,8 @@ stages:
       size: 4039
     - path: scripts/cgpm_hydrate.py
       hash: md5
-      md5: 0ad32ff550f8b45a3642bddf279c9664
-      size: 2971
+      md5: 34f2389cbeddde6fbb8d7a35d83a5d25
+      size: 1861
     params:
       params.yaml:
         parallel.flags: --verbose
@@ -300,8 +298,8 @@ stages:
     outs:
     - path: data/cgpm/hydrated
       hash: md5
-      md5: f3b2b3deabf888868889017b41e78107.dir
-      size: 229968525
+      md5: 9ae62ecd6b978237795499e906da8748.dir
+      size: 328176554
       nfiles: 59
   cgpm-infer-hyperparameters:
     cmd: "find data/cgpm/hydrated -type f | parallel jsonschema --instance {} schemas/cgpm.json
