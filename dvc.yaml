@@ -125,6 +125,18 @@ stages:
     outs:
       - loom/samples
 
+  loom-sample:
+    cmd: >
+      ./bin/loom python scripts/loom_sample.py
+      --sample_count $(bin/param qc.sample_count)
+      --output data/synthetic-data-loom.csv
+      --data data/ignored.csv
+    deps:
+    - loom/samples
+    - scripts/loom_sample.py
+    outs:
+    - data/synthetic-data-loom.csv
+
   loom-dump-metadata:
     cmd: >
       mkdir -p data/cgpm/raw &&
