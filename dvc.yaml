@@ -1,26 +1,11 @@
 stages:
-  validate-column-names:
-    cmd: bin/validate.sh
+  create-column-models:
+    cmd: >
+      python scripts/create_column_models.py 
+      --data data/data.csv
+      --output data/column_models.json
     deps:
+      - scripts/create_column_models.py
       - data/data.csv
     outs:
-      - data/validated.csv
-
-  subsample:
-    cmd: >
-      mkdir -p data/test &&
-      python scripts/subsample.py
-      --data data/data.csv
-      --test-data-dir data/test
-      --params params.yaml
-      --output data/subsampled.csv
-    deps:
-      - data/validated.csv
-      - scripts/subsample.py
-    params:
-      - sub_sample
-      - seed
-    outs:
-      - data/subsampled.csv
-      - data/test
-
+      - data/column_models.json
