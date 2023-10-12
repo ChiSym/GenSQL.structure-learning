@@ -1,14 +1,7 @@
 dataset_name: test-pub
 seed: 0
 sample_count: 3
-sub_sample:
-  #according_to_columns:
-  #  Class_of_Orbit:
-  #    - LEO
-  #    - GEO
-  #  Users:
-  #    - Commercial
-  N: 1000
+sql_preprocessing: "SELECT Country_of_Operator, Purpose, Perigee_km FROM data"
 parallel:
   # To limit the number of jobs GNU Parallel spawns use add the flag `--jobs n`.
   flags: >-
@@ -27,7 +20,8 @@ schema:
   # Apogee_km: numerical
   # Perigee_km: numerical
 loom:
-  extra_passes: 1
+  schedule:
+    extra_passes: 0
 cgpm:
   iterations: 1
   minutes: 1

@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-# Move the previously learned models to the directory with initialized models
-# and run inference again.
-mv data/cgpm/complete/* data/cgpm/hydrated/ && dvc repro  --downstream cgpm-infer-hyperparameters

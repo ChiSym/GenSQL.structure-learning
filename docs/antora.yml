@@ -1,6 +1,0 @@
-name: auto-modeling
-title: Auto-modeling
-version: ~
-start_page: quick-start.adoc
-nav:
-- modules/ROOT/nav.adoc

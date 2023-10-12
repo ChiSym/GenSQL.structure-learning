@@ -1,11 +1,58 @@
 stages:
-  create-column-models:
+  preprocess:
     cmd: >
-      python scripts/create_column_models.py 
+      poetry run preprocess
       --data data/data.csv
-      --output data/column_models.json
+      --output data/preprocessed.csv
+      --sql "$(yq '.sql_preprocessing' params.yaml)"
     deps:
-      - scripts/create_column_models.py
       - data/data.csv
     outs:
+      - data/preprocessed.csv
+
+  create-column-models:
+    cmd: >
+      poetry run create-column-models
+      --data data/preprocessed.csv
+      --output data/column_models.json
+    deps:
+      - data/preprocessed.csv
+    outs:
       - data/column_models.json
+
+  loom-schema:
+    cmd: >
+      poetry run loom_schema
+      --column_models data/column_models.json
+      --output data/loom-schema.json
+    deps:
+      - data/column_models.json
+    outs:
+      - data/loom-schema.json
+
+  loom-ingest:
+    cmd: ./bin/loom_task ingest loom data/loom-schema.json data/preprocessed.csv
+    deps:
+      - data/loom-schema.json
+      - data/preprocessed.csv
+    outs:
+      - loom/ingest
+      - loom/query
+
+  loom-infer-config:
+    cmd: >
+      yq -o=json '.loom' params.yaml
+      > data/infer-config.json
+    outs:
+      - data/infer-config.json
+
+  loom-infer:
+    cmd: ./bin/loom_task infer loom ${sample_count} data/infer-config.json
+    deps:
+      - loom/ingest
+      - loom/query
+      - data/infer-config.json
+    params:
+      - sample_count
+    outs:
+      - loom/samples

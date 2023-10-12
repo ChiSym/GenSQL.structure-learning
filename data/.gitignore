@@ -39,3 +39,5 @@
 /predictions.csv
 /synthetic-data-iql.csv
 /db.edn
+/preprocessed.csv
+/column_models.json

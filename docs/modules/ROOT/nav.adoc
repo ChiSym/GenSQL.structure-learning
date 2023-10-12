@@ -1,3 +1,0 @@
-* xref:auto-modeling::quick-start.adoc[Quickstart]
-* xref:auto-modeling::auto-modeling.adoc[Automated data modeling]
-* xref:auto-modeling::population-assembly.adoc[Population assembly - ensure your CSV file can be modelled automatically]

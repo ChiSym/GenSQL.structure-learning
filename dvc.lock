@@ -1,0 +1,95 @@
+schema: '2.0'
+stages:
+  preprocess:
+    cmd: "poetry run preprocess --data data/data.csv --output data/preprocessed.csv
+      --sql \"$(yq '.sql_preprocessing' params.yaml)\"\n"
+    deps:
+    - path: data/data.csv
+      hash: md5
+      md5: 2652c974be9aa49bd50061377d39563d
+      size: 313452
+    outs:
+    - path: data/preprocessed.csv
+      hash: md5
+      md5: 4c64f4a14418f2b3b5b63ea765853dd6
+      size: 37751
+  create-column-models:
+    cmd: "poetry run create-column-models --data data/preprocessed.csv --output data/column_models.json\n"
+    deps:
+    - path: data/preprocessed.csv
+      hash: md5
+      md5: 4c64f4a14418f2b3b5b63ea765853dd6
+      size: 37751
+    outs:
+    - path: data/column_models.json
+      hash: md5
+      md5: af80b6018c9bb7784cc0266a292a9089
+      size: 3367
+  loom-schema:
+    cmd: "poetry run loom_schema --column_models data/column_models.json --output
+      data/loom-schema.json\n"
+    deps:
+    - path: data/column_models.json
+      hash: md5
+      md5: af80b6018c9bb7784cc0266a292a9089
+      size: 3367
+    outs:
+    - path: data/loom-schema.json
+      hash: md5
+      md5: 21f7715d58f11cf8e5b3aeb56cab6b44
+      size: 76
+  loom-ingest:
+    cmd: ./bin/loom_task ingest loom data/loom-schema.json data/preprocessed.csv
+    deps:
+    - path: data/loom-schema.json
+      hash: md5
+      md5: 21f7715d58f11cf8e5b3aeb56cab6b44
+      size: 76
+    - path: data/preprocessed.csv
+      hash: md5
+      md5: 4c64f4a14418f2b3b5b63ea765853dd6
+      size: 37751
+    outs:
+    - path: loom/ingest
+      hash: md5
+      md5: 781a06ca0340dbebc1c27b39e6862656.dir
+      size: 20772
+      nfiles: 7
+    - path: loom/query
+      hash: md5
+      md5: 2dd86c46b71dd4a22bba27197ee5dbe0.dir
+      size: 106
+      nfiles: 1
+  loom-infer-config:
+    cmd: "yq -o=json '.loom' params.yaml > data/infer-config.json\n"
+    outs:
+    - path: data/infer-config.json
+      hash: md5
+      md5: 0647407a26e0a99b69a2a99d7636a82a
+      size: 46
+  loom-infer:
+    cmd: ./bin/loom_task infer loom 3 data/infer-config.json
+    deps:
+    - path: data/infer-config.json
+      hash: md5
+      md5: 0647407a26e0a99b69a2a99d7636a82a
+      size: 46
+    - path: loom/ingest
+      hash: md5
+      md5: 781a06ca0340dbebc1c27b39e6862656.dir
+      size: 20772
+      nfiles: 7
+    - path: loom/query
+      hash: md5
+      md5: 2dd86c46b71dd4a22bba27197ee5dbe0.dir
+      size: 106
+      nfiles: 1
+    params:
+      params.yaml:
+        sample_count: 3
+    outs:
+    - path: loom/samples
+      hash: md5
+      md5: ebf84bfb0d609203fb5bd6b028109bd4.dir
+      size: 54759
+      nfiles: 24
