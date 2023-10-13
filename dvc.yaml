@@ -56,3 +56,29 @@ stages:
       - sample_count
     outs:
       - loom/samples
+
+  loom-sample:
+    cmd: >
+      ./bin/loom python scripts/loom_sample.py
+      --sample_count $(yq '.qc.sample_count' params.yaml)
+      --output data/synthetic-data-loom.csv
+    deps:
+      - loom/samples
+      - scripts/loom_sample.py
+    outs:
+      - data/synthetic-data-loom.csv
+
+  loom-dump-metadata:
+    cmd: >
+      mkdir -p data/cgpm/raw &&
+      find loom/samples -mindepth 1 -maxdepth 1 -type d |
+      parallel ${parallel.flags}
+      ./bin/loom python scripts/loom_dump.py {}
+      --output data/cgpm/raw/{/}.json
+    params:
+      - parallel.flags
+    deps:
+      - loom/samples
+      - scripts/loom_dump.py
+    outs:
+      - data/cgpm/raw

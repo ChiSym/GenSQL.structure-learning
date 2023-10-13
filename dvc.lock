@@ -93,3 +93,43 @@ stages:
       md5: ebf84bfb0d609203fb5bd6b028109bd4.dir
       size: 54759
       nfiles: 24
+  loom-sample:
+    cmd: "./bin/loom python scripts/loom_sample.py --sample_count $(yq '.qc.sample_count'
+      params.yaml) --output data/synthetic-data-loom.csv\n"
+    deps:
+    - path: loom/samples
+      hash: md5
+      md5: ebf84bfb0d609203fb5bd6b028109bd4.dir
+      size: 54759
+      nfiles: 24
+    - path: scripts/loom_sample.py
+      hash: md5
+      md5: d6449af8a6b43427f73f6ff14a87aec7
+      size: 1290
+    outs:
+    - path: data/synthetic-data-loom.csv
+      hash: md5
+      md5: 6a82634f8348ce6b3c5bdeab6583ee9a
+      size: 44985
+  loom-dump-metadata:
+    cmd: "mkdir -p data/cgpm/raw && find loom/samples -mindepth 1 -maxdepth 1 -type
+      d | parallel --verbose ./bin/loom python scripts/loom_dump.py {} --output data/cgpm/raw/{/}.json\n"
+    deps:
+    - path: loom/samples
+      hash: md5
+      md5: ebf84bfb0d609203fb5bd6b028109bd4.dir
+      size: 54759
+      nfiles: 24
+    - path: scripts/loom_dump.py
+      hash: md5
+      md5: c47cf6f05a7b1bcf5430d5dad0ca12b5
+      size: 1977
+    params:
+      params.yaml:
+        parallel.flags: --verbose
+    outs:
+    - path: data/cgpm/raw
+      hash: md5
+      md5: f1fbf2e736cc0f1345ef1adfc0610568.dir
+      size: 21253
+      nfiles: 3

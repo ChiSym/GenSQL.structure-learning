@@ -41,3 +41,4 @@
 /db.edn
 /preprocessed.csv
 /column_models.json
+/synthetic-data-loom.csv
