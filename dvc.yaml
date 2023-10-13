@@ -70,15 +70,10 @@ stages:
 
   loom-dump-metadata:
     cmd: >
-      mkdir -p data/cgpm/raw &&
-      find loom/samples -mindepth 1 -maxdepth 1 -type d |
+      find loom/samples -type f ! -name '*.json' |
       parallel ${parallel.flags}
-      ./bin/loom python scripts/loom_dump.py {}
-      --output data/cgpm/raw/{/}.json
+      "./bin/loom python scripts/loom_to_json.py loom_to_json {}"
     params:
       - parallel.flags
     deps:
       - loom/samples
-      - scripts/loom_dump.py
-    outs:
-      - data/cgpm/raw
