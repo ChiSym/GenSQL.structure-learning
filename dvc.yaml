@@ -77,3 +77,12 @@ stages:
       - parallel.flags
     deps:
       - loom/samples
+
+  loom_to_cgpm:
+    cmd: >
+      poetry run loom_to_cgpm
+      --column_model_filename data/column_models.json
+      --loom_filename loom/samples/sample.0/model.json
+    deps:
+      - loom/samples
+      - data/column_models.json

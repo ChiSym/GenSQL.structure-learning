@@ -117,8 +117,8 @@ stages:
     deps:
     - path: loom/samples
       hash: md5
-      md5: ee30d9fe2d619be2d18a43b538061c30.dir
-      size: 1131886
+      md5: ca9db4e188436ae977154d4178b2a2da.dir
+      size: 1121954
       nfiles: 42
     params:
       params.yaml:

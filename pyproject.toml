@@ -33,6 +33,7 @@ black = "^23.7.0"
 create-column-models = 'structure_learning.create_column_models:create_column_models'
 preprocess = 'structure_learning.preprocess:preprocess'
 loom_schema = 'structure_learning.preprocess:loom_schema'
+loom_to_cgpm = 'structure_learning.loom:loom_to_cgpm'
 
 [build-system]
 requires = ["poetry-core"]
