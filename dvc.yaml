@@ -78,6 +78,23 @@ stages:
     deps:
       - loom/samples
 
+  marginal-fits-loom:
+    cmd: >
+      mkdir -p qc/marginals &&
+      poetry run marginal_fits
+      --real_data data/preprocessed.csv
+      --model loom 
+    deps:
+      - data/preprocessed.csv
+      - data/synthetic-data-loom.csv
+    outs:
+      - qc/marginals/loom_1d_fits.csv
+      - qc/marginals/loom_2d_fits.csv
+      - qc/marginals/loom_worst_1d_fit.png
+      - qc/marginals/loom_worst_2d_fit.png
+      - qc/marginals/loom_worst_1d_fit.html
+      - qc/marginals/loom_worst_2d_fit.html
+
   loom_to_cgpm:
     cmd: >
       poetry run loom_to_cgpm

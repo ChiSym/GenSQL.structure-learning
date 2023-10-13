@@ -23,7 +23,7 @@ stages:
     outs:
     - path: data/column_models.json
       hash: md5
-      md5: af80b6018c9bb7784cc0266a292a9089
+      md5: 586ef82a47f37b4a71cbeee054acccac
       size: 3367
   loom-schema:
     cmd: "poetry run loom_schema --column_models data/column_models.json --output
@@ -31,7 +31,7 @@ stages:
     deps:
     - path: data/column_models.json
       hash: md5
-      md5: af80b6018c9bb7784cc0266a292a9089
+      md5: 586ef82a47f37b4a71cbeee054acccac
       size: 3367
     outs:
     - path: data/loom-schema.json
@@ -52,12 +52,12 @@ stages:
     outs:
     - path: loom/ingest
       hash: md5
-      md5: 781a06ca0340dbebc1c27b39e6862656.dir
+      md5: fffeaab63478eb58417415ecd876881c.dir
       size: 20772
       nfiles: 7
     - path: loom/query
       hash: md5
-      md5: 2dd86c46b71dd4a22bba27197ee5dbe0.dir
+      md5: e2837f7a25ce9fb935338be3f05af3a8.dir
       size: 106
       nfiles: 1
   loom-infer-config:
@@ -76,12 +76,12 @@ stages:
       size: 46
     - path: loom/ingest
       hash: md5
-      md5: 781a06ca0340dbebc1c27b39e6862656.dir
+      md5: fffeaab63478eb58417415ecd876881c.dir
       size: 20772
       nfiles: 7
     - path: loom/query
       hash: md5
-      md5: 2dd86c46b71dd4a22bba27197ee5dbe0.dir
+      md5: e2837f7a25ce9fb935338be3f05af3a8.dir
       size: 106
       nfiles: 1
     params:
@@ -90,7 +90,7 @@ stages:
     outs:
     - path: loom/samples
       hash: md5
-      md5: ebf84bfb0d609203fb5bd6b028109bd4.dir
+      md5: 274eabf11c21cd3ebecd0edfb2962e68.dir
       size: 54759
       nfiles: 24
   loom-sample:
@@ -99,7 +99,7 @@ stages:
     deps:
     - path: loom/samples
       hash: md5
-      md5: ebf84bfb0d609203fb5bd6b028109bd4.dir
+      md5: 274eabf11c21cd3ebecd0edfb2962e68.dir
       size: 54759
       nfiles: 24
     - path: scripts/loom_sample.py
@@ -117,9 +117,59 @@ stages:
     deps:
     - path: loom/samples
       hash: md5
-      md5: ca9db4e188436ae977154d4178b2a2da.dir
-      size: 1121954
+      md5: eda41ef5ea950d8392cd4b1f2643f09f.dir
+      size: 1162419
       nfiles: 42
     params:
       params.yaml:
         parallel.flags: --verbose
+  loom_to_cgpm:
+    cmd: "poetry run loom_to_cgpm --column_model_filename data/column_models.json
+      --loom_filename loom/samples/sample.0/model.json\n"
+    deps:
+    - path: data/column_models.json
+      hash: md5
+      md5: 586ef82a47f37b4a71cbeee054acccac
+      size: 3367
+    - path: loom/samples
+      hash: md5
+      md5: eda41ef5ea950d8392cd4b1f2643f09f.dir
+      size: 1162419
+      nfiles: 42
+  marginal-fits-loom:
+    cmd: "mkdir -p qc/marginals && poetry run marginal_fits --real_data data/preprocessed.csv
+      --model loom \n"
+    deps:
+    - path: data/preprocessed.csv
+      hash: md5
+      md5: 4c64f4a14418f2b3b5b63ea765853dd6
+      size: 37751
+    - path: data/synthetic-data-loom.csv
+      hash: md5
+      md5: 6a82634f8348ce6b3c5bdeab6583ee9a
+      size: 44985
+    outs:
+    - path: qc/marginals/loom_1d_fits.csv
+      hash: md5
+      md5: d96b26db618ffc08d8d1ba14f306e8bb
+      size: 155
+    - path: qc/marginals/loom_2d_fits.csv
+      hash: md5
+      md5: 49784e1203683f452ad64daefcd13c55
+      size: 281
+    - path: qc/marginals/loom_worst_1d_fit.html
+      hash: md5
+      md5: 70d0782f7ff5e99ce9bb1735b429ec03
+      size: 3630830
+    - path: qc/marginals/loom_worst_1d_fit.png
+      hash: md5
+      md5: 33daeed33c6830b0c9be4479d514efb9
+      size: 70199
+    - path: qc/marginals/loom_worst_2d_fit.html
+      hash: md5
+      md5: ae9dde148658e521473a30972070345d
+      size: 3679753
+    - path: qc/marginals/loom_worst_2d_fit.png
+      hash: md5
+      md5: 385627ad24759ce0230dee430bc892f5
+      size: 83539

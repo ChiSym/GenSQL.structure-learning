@@ -7,7 +7,7 @@ license = "Apache-2.0"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.11,<3.13"
+python = ">=3.11,<3.12"
 cgpm = {git = "https://github.com/probcomp/cgpm", branch = "zane/hardcode-version"}
 dvc = "^3.13.3"
 sppl = {git = "https://github.com/joaoloula/sppl", branch = "permissive_versions"}
@@ -25,6 +25,12 @@ setuptools = "^68.2.2"
 duckdb = "^0.9.1"
 pyarrow = "^13.0.0"
 orjson = "^3.9.8"
+torch = [
+    {url = "https://download.pytorch.org/whl/cpu/torch-2.0.1%2Bcpu-cp311-cp311-linux_x86_64.whl", platform = "linux"},
+    {url = "https://download.pytorch.org/whl/cpu/torch-2.0.1-cp311-none-macosx_11_0_arm64.whl", platform = "darwin"}
+]
+kaleido = "0.2.1"
+sdv = {url = "https://files.pythonhosted.org/packages/bf/dc/584e1a86cb553fe4eb58cc04c35af7d37063491e670cc3b5872b8475afc2/sdv-1.4.0-py2.py3-none-any.whl"}
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"
@@ -34,6 +40,7 @@ create-column-models = 'structure_learning.create_column_models:create_column_mo
 preprocess = 'structure_learning.preprocess:preprocess'
 loom_schema = 'structure_learning.preprocess:loom_schema'
 loom_to_cgpm = 'structure_learning.loom:loom_to_cgpm'
+marginal_fits = 'structure_learning.marginal_fits:marginal_fits'
 
 [build-system]
 requires = ["poetry-core"]
