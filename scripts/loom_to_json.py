@@ -1,5 +1,7 @@
+from distributions.io.stream import (
+    open_compressed, protobuf_stream_load)
+from loom.cFormat import assignment_stream_load
 from loom.util import get_message, protobuf_to_dict
-from distributions.io.stream import open_compressed, protobuf_stream_load
 from parsable import parsable
 import json
 import os
@@ -7,39 +9,56 @@ import os
 @parsable
 def loom_to_json(filename):
     ''' Convert a loom file to a json file. '''
-    message = parse_message(filename)
+    name = filename.split("/")[-1].split(".")[0]
+    output_filename = "/".join(filename.split("/")[:-1]) + "/{}.json".format(name)
+
+    parts = os.path.basename(filename).split('.')
+    if parts[-1] in ['gz', 'bz2']:
+        parts.pop()
+
     try:
-        message_dict = protobuf_to_dict(message)
+        if parts[0] == "assign":
+            message_dict = parse_assign(filename)
+        elif parts[-1] == "pb":
+            message_dict = parse_pb(filename)
+        elif parts[-1] == "pbs":
+            message_dict = parse_pbs(filename)
+        else:
+            raise ValueError('Unknown protocol: {}'.format(protocol))
+ 
     except AssertionError:
         # empty message
         return
 
-    # remove characters after the first dot after the last slash
-    name = filename.split("/")[-1].split(".")[0]
-    output_filename = "/".join(filename.split("/")[:-1]) + "/{}.json".format(name)
-
     with open(output_filename, "w") as f:
-        json.dump(message_dict, f, indent=4)
+        json.dump(message_dict, f)
 
-def parse_message(filename):
-    parts = os.path.basename(filename).split('.')
-    if parts[-1] in ['gz', 'bz2']:
-        parts.pop()
-    protocol = parts[-1]
-    if protocol == 'pb':
-        message = get_message(filename)
-        with open_compressed(filename) as f:
-            message.ParseFromString(f.read())
-            return message
-    elif protocol == 'pbs':
-        message = get_message(filename)
-        string_stream = [s for s in protobuf_stream_load(filename)]
-        string = ''.join(string_stream)
-        message.ParseFromString(string)
-        return message
-    else:
-        raise ValueError('Unknown protocol: {}'.format(protocol))
-    
+def parse_assign(filename):
+    stream = assignment_stream_load(filename)
+
+    assignments = {
+        a.rowid: [a.groupids(k) for k in xrange(a.groupids_size())]
+        for a in stream
+    }
+    rowids = sorted(assignments)
+    return {
+        k: [assignments[rowid][k] for rowid in rowids]
+        for k in xrange(len(assignments[0]))
+    }
+
+
+def parse_pb(filename):
+    message = get_message(filename)
+    with open_compressed(filename) as f:
+        message.ParseFromString(f.read())
+        return protobuf_to_dict(message)
+
+def parse_pbs(filename):
+    message = get_message(filename)
+    string_stream = [s for s in protobuf_stream_load(filename)]
+    string = ''.join(string_stream)
+    message.ParseFromString(string)
+    return protobuf_to_dict(message)
 
 
 if __name__ == "__main__":

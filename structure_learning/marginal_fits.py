@@ -45,7 +45,7 @@ def marginal_fits(real_data, model):
         metadata=metadata,
     )
 
-    fig_1d.write_image(f"qc/marginals/{model}_worst_1d_fit.png")
+    fig_1d.write_image(f"qc/marginals/{model}_worst_1d_fit.png", width=1500, height=800)
     plotly.offline.plot(fig_1d, filename=f"qc/marginals/{model}_worst_1d_fit.html")
 
     fig_2d = utils.get_column_pair_plot(
@@ -59,4 +59,4 @@ def marginal_fits(real_data, model):
     )
     plotly.offline.plot(fig_2d, filename=f"qc/marginals/{model}_worst_2d_fit.html")
 
-    fig_2d.write_image(f"qc/marginals/{model}_worst_2d_fit.png")
+    fig_2d.write_image(f"qc/marginals/{model}_worst_2d_fit.png", width=1500, height=800)

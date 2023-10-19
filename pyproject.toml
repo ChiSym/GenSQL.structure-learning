@@ -31,6 +31,8 @@ torch = [
 ]
 kaleido = "0.2.1"
 sdv = {url = "https://files.pythonhosted.org/packages/bf/dc/584e1a86cb553fe4eb58cc04c35af7d37063491e670cc3b5872b8475afc2/sdv-1.4.0-py2.py3-none-any.whl"}
+dacite = "^1.8.1"
+black = "^23.10.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"
@@ -41,6 +43,7 @@ preprocess = 'structure_learning.preprocess:preprocess'
 loom_schema = 'structure_learning.preprocess:loom_schema'
 loom_to_cgpm = 'structure_learning.loom:loom_to_cgpm'
 marginal_fits = 'structure_learning.marginal_fits:marginal_fits'
+cgpm-sample = 'structure_learning.sample:sample_cgpm'
 
 [build-system]
 requires = ["poetry-core"]
