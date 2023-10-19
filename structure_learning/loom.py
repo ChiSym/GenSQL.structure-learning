@@ -45,7 +45,7 @@ def loom_to_cgpm(loom_folder, data_filename, column_model_filename, out_filename
 
     gibbs_alpha(model)
     gibbs_view_alphas(model)
-    [gibbs_column_hypers(model) for _ in range(10)]
+    [gibbs_column_hypers(model) for _ in range(1000)]
 
     metadata = serialize(model)
 

@@ -207,8 +207,8 @@ stages:
     outs:
     - path: data/cgpm/hydrated
       hash: md5
-      md5: 39f6b51392f0fc0f1f7b1456b1fbbebf.dir
-      size: 79345
+      md5: f2d0c531c813874cbd31edb41c5d6bf3.dir
+      size: 79331
       nfiles: 3
   cgpm-hydrated-sample:
     cmd: "poetry run cgpm-sample --sample_count 1000 --output data/synthetic-data-cgpm-raw.csv
@@ -216,14 +216,14 @@ stages:
     deps:
     - path: data/cgpm/hydrated
       hash: md5
-      md5: 39f6b51392f0fc0f1f7b1456b1fbbebf.dir
-      size: 79345
+      md5: f2d0c531c813874cbd31edb41c5d6bf3.dir
+      size: 79331
       nfiles: 3
     outs:
     - path: data/synthetic-data-cgpm-raw.csv
       hash: md5
-      md5: 004b4fd00541b383c4141910f9bd8ee5
-      size: 103015
+      md5: a0d9abe0b4e9594394b63d4714865e6e
+      size: 102947
   marginal-fits-cgpm-raw:
     cmd: "mkdir -p qc/marginals && poetry run marginal_fits --real_data data/preprocessed.csv
       --model cgpm-raw \n"
@@ -234,30 +234,30 @@ stages:
       size: 51991
     - path: data/synthetic-data-cgpm-raw.csv
       hash: md5
-      md5: 004b4fd00541b383c4141910f9bd8ee5
-      size: 103015
+      md5: a0d9abe0b4e9594394b63d4714865e6e
+      size: 102947
     outs:
     - path: qc/marginals/cgpm-raw_1d_fits.csv
       hash: md5
-      md5: 20cf320d2130b0a48e3222bd79700a14
-      size: 291
+      md5: d67f72fe87824735602192b8dda70d98
+      size: 290
     - path: qc/marginals/cgpm-raw_2d_fits.csv
       hash: md5
-      md5: aabb1b84742abb8dcf074eccffdae377
-      size: 1329
+      md5: fb982c9fc8b6fd5b2e1577da3f673912
+      size: 1331
     - path: qc/marginals/cgpm-raw_worst_1d_fit.html
       hash: md5
-      md5: 075ad4f888a380bcb93597a5aa413d8a
-      size: 3626874
+      md5: 079f2bf57f80ed56dc51094bfd6ea51a
+      size: 3626719
     - path: qc/marginals/cgpm-raw_worst_1d_fit.png
       hash: md5
-      md5: 57d92dd76df3dd5c44f6378af81f16ff
-      size: 137091
+      md5: 08e0cbba01c995bb3854dbb688c3a3c1
+      size: 137096
     - path: qc/marginals/cgpm-raw_worst_2d_fit.html
       hash: md5
-      md5: bb79163bfbd8590c3758d2ef4969525e
-      size: 3671738
+      md5: 7939b243c1d98a9aa4244f9a67eb2f60
+      size: 3671585
     - path: qc/marginals/cgpm-raw_worst_2d_fit.png
       hash: md5
-      md5: 84fa20eeeb44800c8da8bfbde29cff59
-      size: 186692
+      md5: d7206439882600bf93d2aa70f2dc0720
+      size: 186491
