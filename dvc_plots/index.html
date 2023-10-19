@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <title>DVC Plot</title>
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/vega@5.20.2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.2.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.18.2"></script>
+    
+    <style>
+        table {
+            border-spacing: 15px;
+        }
+    </style>
+</head>
+<body>
+    
+    <div id = "loom_1d_fits">
+        <script type = "text/javascript">
+            var spec = {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "data": {"values": [{"Column": "Period_minutes", "Metric": "KSComplement", "Score": "0.8080360721442885", "rev": "workspace"}, {"Column": "Apogee_km", "Metric": "KSComplement", "Score": "0.8326176176176177", "rev": "workspace"}, {"Column": "Perigee_km", "Metric": "KSComplement", "Score": "0.835014014014014", "rev": "workspace"}, {"Column": "Country_of_Operator", "Metric": "TVComplement", "Score": "0.9079999999999999", "rev": "workspace"}, {"Column": "Launch_Mass_kg", "Metric": "KSComplement", "Score": "0.9188565310492506", "rev": "workspace"}, {"Column": "Purpose", "Metric": "TVComplement", "Score": "0.9239999999999999", "rev": "workspace"}]}, "title": "loom_1d_fits", "width": 300, "height": 300, "mark": {"type": "bar"}, "encoding": {"x": {"field": "Score", "type": "quantitative", "title": "Score", "scale": {"zero": false}}, "y": {"field": "Column", "type": "nominal", "title": "Column", "sort": "-x"}, "yOffset": {"field": "rev"}, "color": {"field": "rev", "type": "nominal"}}};
+            vegaEmbed('#loom_1d_fits', spec);
+        </script>
+    </div>
+    
+
+    <div id = "qc_marginals_loom_2d_fits_csv">
+        <script type = "text/javascript">
+            var spec = {"$schema": "https://vega.github.io/schema/vega-lite/v5.json", "data": {"values": [{"Column 1": "Country_of_Operator", "Column 2": "Period_minutes", "Metric": "ContingencySimilarity", "Score": "0.0050000000000000044", "Real Correlation": "", "Synthetic Correlation": "", "rev": "workspace"}, {"Column 1": "Purpose", "Column 2": "Period_minutes", "Metric": "ContingencySimilarity", "Score": "0.006999999999999895", "Real Correlation": "", "Synthetic Correlation": "", "rev": "workspace"}, {"Column 1": "Purpose", "Column 2": "Apogee_km", "Metric": "ContingencySimilarity", "Score": "0.016999999999999904", "Real Correlation": "", "Synthetic Correlation": "", "rev": "workspace"}, {"Column 1": "Country_of_Operator", "Column 2": "Apogee_km", "Metric": "ContingencySimilarity", "Score": "0.018999999999999906", "Real Correlation": "", "Synthetic Correlation": "", "rev": "workspace"}, {"Column 1": "Country_of_Operator", "Column 2": "Perigee_km", "Metric": "ContingencySimilarity", "Score": "0.04399999999999993", "Real Correlation": "", "Synthetic Correlation": "", "rev": "workspace"}, {"Column 1": "Purpose", "Column 2": "Perigee_km", "Metric": "ContingencySimilarity", "Score": "0.04899999999999993", "Real Correlation": "", "Synthetic Correlation": "", "rev": "workspace"}, {"Column 1": "Purpose", "Column 2": "Launch_Mass_kg", "Metric": "ContingencySimilarity", "Score": "0.344", "Real Correlation": "", "Synthetic Correlation": "", "rev": "workspace"}, {"Column 1": "Country_of_Operator", "Column 2": "Launch_Mass_kg", "Metric": "ContingencySimilarity", "Score": "0.352", "Real Correlation": "", "Synthetic Correlation": "", "rev": "workspace"}, {"Column 1": "Country_of_Operator", "Column 2": "Purpose", "Metric": "ContingencySimilarity", "Score": "0.6409999999999999", "Real Correlation": "", "Synthetic Correlation": "", "rev": "workspace"}, {"Column 1": "Apogee_km", "Column 2": "Period_minutes", "Metric": "CorrelationSimilarity", "Score": "0.9385564992519189", "Real Correlation": "0.7003844230827656", "Synthetic Correlation": "0.8232714245789279", "rev": "workspace"}, {"Column 1": "Apogee_km", "Column 2": "Launch_Mass_kg", "Metric": "CorrelationSimilarity", "Score": "0.9463913359149365", "Real Correlation": "0.3603156947851983", "Synthetic Correlation": "0.4675330229553253", "rev": "workspace"}, {"Column 1": "Perigee_km", "Column 2": "Apogee_km", "Metric": "CorrelationSimilarity", "Score": "0.9556030335504766", "Real Correlation": "0.6214798346501375", "Synthetic Correlation": "0.7102737675491841", "rev": "workspace"}, {"Column 1": "Period_minutes", "Column 2": "Launch_Mass_kg", "Metric": "CorrelationSimilarity", "Score": "0.9714466458694622", "Real Correlation": "0.5099322758562305", "Synthetic Correlation": "0.5670389841173061", "rev": "workspace"}, {"Column 1": "Perigee_km", "Column 2": "Launch_Mass_kg", "Metric": "CorrelationSimilarity", "Score": "0.9763198716925588", "Real Correlation": "0.5322337695816084", "Synthetic Correlation": "0.5795940261964907", "rev": "workspace"}, {"Column 1": "Perigee_km", "Column 2": "Period_minutes", "Metric": "CorrelationSimilarity", "Score": "0.989142705714902", "Real Correlation": "0.9217400356611344", "Synthetic Correlation": "0.9434546242313302", "rev": "workspace"}]}, "title": "qc/marginals/loom_2d_fits.csv", "width": 300, "height": 300, "mark": {"type": "rect", "tooltip": {"content": "data"}}, "encoding": {"y": {"field": "Column 1", "type": "nominal", "sort": "ascending", "title": "Column 1"}, "x": {"field": "Column 2", "type": "nominal", "sort": "ascending", "title": "Column 2"}, "color": {"field": "Score", "type": "quantitative"}}, "config": {"axis": {"grid": true, "tickBand": "extent"}}};
+            vegaEmbed('#qc_marginals_loom_2d_fits_csv', spec);
+        </script>
+    </div>
+    
+
+        <div
+            id="qc_marginals_loom_worst_1d_fit_png"
+            style="border:1px solid black;text-align:center;
+            white-space: nowrap;overflow-y:hidden;">
+            <p>qc/marginals/loom_worst_1d_fit.png</p>
+
+                <div
+                    style="border:1px dotted black;margin:2px;display:
+                    inline-block;
+                    overflow:hidden;margin-left:8px;">
+                    <p>workspace</p>
+                    <img src="static/workspace_qc_marginals_loom_worst_1d_fit.png">
+                </div>
+                
+        </div>
+
+        <div
+            id="qc_marginals_loom_worst_2d_fit_png"
+            style="border:1px solid black;text-align:center;
+            white-space: nowrap;overflow-y:hidden;">
+            <p>qc/marginals/loom_worst_2d_fit.png</p>
+
+                <div
+                    style="border:1px dotted black;margin:2px;display:
+                    inline-block;
+                    overflow:hidden;margin-left:8px;">
+                    <p>workspace</p>
+                    <img src="static/workspace_qc_marginals_loom_worst_2d_fit.png">
+                </div>
+                
+        </div>
+</body>
+</html>

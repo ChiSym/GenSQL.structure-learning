@@ -2,7 +2,8 @@ schema: '2.0'
 stages:
   preprocess:
     cmd: "poetry run preprocess --data data/data.csv --output data/preprocessed.csv
-      --sql \"$(yq '.sql_preprocessing' params.yaml)\"\n"
+      --sql \"SELECT Country_of_Operator, Purpose, Perigee_km, Apogee_km, Period_minutes,
+      Launch_Mass_kg FROM data LIMIT 1000\"\n"
     deps:
     - path: data/data.csv
       hash: md5
@@ -90,18 +91,17 @@ stages:
     outs:
     - path: loom/samples
       hash: md5
-      md5: 8e6ae5fcb40772170f834f829cc62ee4.dir
-      size: 1287424
-      nfiles: 21
+      md5: 2987aae9203aa6b046e5785ef4ad80e1.dir
+      size: 2757118
+      nfiles: 42
   loom-sample:
-    cmd: "./bin/loom python scripts/loom_sample.py --sample_count $(yq '.qc.sample_count'
-      params.yaml) --output data/synthetic-data-loom.csv\n"
+    cmd: "./bin/loom python scripts/loom_sample.py --sample_count 1000 --output data/synthetic-data-loom.csv\n"
     deps:
     - path: loom/samples
       hash: md5
-      md5: 8e6ae5fcb40772170f834f829cc62ee4.dir
-      size: 1287424
-      nfiles: 21
+      md5: 2987aae9203aa6b046e5785ef4ad80e1.dir
+      size: 2757118
+      nfiles: 42
     - path: scripts/loom_sample.py
       hash: md5
       md5: d6449af8a6b43427f73f6ff14a87aec7
