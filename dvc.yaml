@@ -23,6 +23,11 @@ plots:
   - qc/marginals/cgpm-raw_worst_1d_fit.png
 
 stages:
+  make-synthetic-categorical-data:
+    cmd: poetry run make-synthetic-data
+    outs:
+      - data/data.csv
+
   preprocess:
     cmd: >
       poetry run preprocess
@@ -113,11 +118,8 @@ stages:
       - data/synthetic-data-loom.csv
     outs:
       - qc/marginals/loom_1d_fits.csv
-      - qc/marginals/loom_2d_fits.csv
       - qc/marginals/loom_worst_1d_fit.png
-      - qc/marginals/loom_worst_2d_fit.png
       - qc/marginals/loom_worst_1d_fit.html
-      - qc/marginals/loom_worst_2d_fit.html
 
   loom-to-cgpm:
     cmd: >
@@ -159,9 +161,5 @@ stages:
       - data/synthetic-data-cgpm-raw.csv
     outs:
       - qc/marginals/cgpm-raw_1d_fits.csv
-      - qc/marginals/cgpm-raw_2d_fits.csv
       - qc/marginals/cgpm-raw_worst_1d_fit.png
-      - qc/marginals/cgpm-raw_worst_2d_fit.png
       - qc/marginals/cgpm-raw_worst_1d_fit.html
-      - qc/marginals/cgpm-raw_worst_2d_fit.html
-

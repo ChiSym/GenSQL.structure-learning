@@ -32,6 +32,7 @@ def sample_cgpm(sample_count, model_dir, output, data):
         for wrapper in wrappers]
 
     sample_df = pl.concat(sample_list)
+
     sample_df.write_csv(output)
 
 def get_wrapper(metadata, df):

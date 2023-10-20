@@ -1,7 +1,7 @@
 dataset_name: test-pub
 seed: 0
-sample_count: 3
-sql_preprocessing: "SELECT Country_of_Operator, Purpose, Perigee_km, Apogee_km, Period_minutes, Launch_Mass_kg FROM data LIMIT 1000"
+sample_count: 1
+sql_preprocessing: "SELECT * FROM data"
 parallel:
   # To limit the number of jobs GNU Parallel spawns use add the flag `--jobs n`.
   flags: >-
@@ -22,6 +22,10 @@ schema:
 loom:
   schedule:
     extra_passes: 500
+  kernels:
+    kind: 
+      iterations: 100
+      score_parallel: false
 cgpm:
   iterations: 1
   minutes: 1
