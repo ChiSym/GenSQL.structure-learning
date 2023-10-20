@@ -2,6 +2,7 @@ import orjson
 import click
 import os
 import polars as pl
+import gzip
 
 from structurelearningapi.create_model import create_model
 from structurelearningapi.io import deserialize_column_models, serialize
@@ -17,6 +18,11 @@ def loom_to_cgpm(loom_folder, data_filename, column_model_filename, out_filename
     assign_filename = os.path.join(loom_folder, "assign.json")
 
     df = pl.read_csv(data_filename)
+
+
+    with gzip.open('loom/ingest/encoding.json.gz', 'rb') as f:
+        encoding_str = f.read()
+        encoding = orjson.loads(encoding_str)
 
     with open(model_filename, "rb") as f:
         model_metadata = orjson.loads(f.read())
@@ -36,7 +42,7 @@ def loom_to_cgpm(loom_folder, data_filename, column_model_filename, out_filename
 
     hypers_dict = {
         k: v for kind in kinds
-        for k, v in get_kind_column_hypers(kind).items() }
+        for k, v in get_kind_column_hypers(kind, column_models, encoding).items() }
     hypers_list = [hypers_dict[idx] for idx in range(len(hypers_dict))]
 
     alpha = convert_alpha(model_metadata["topology"])
@@ -60,14 +66,16 @@ def loom_to_cgpm(loom_folder, data_filename, column_model_filename, out_filename
     with open(out_filename, "wb") as f:
         f.write(metadata)
 
-def get_kind_column_hypers(kind):
-    hypers = categorical_dims(kind) + normal_dims(kind)
+def get_kind_column_hypers(kind, column_models, encoding):
+    hypers = categorical_dims(kind, column_models, encoding) + normal_dims(kind)
     
     return {idx: hyper for idx, hyper in zip(kind["featureids"], hypers)}
 
-def categorical_dims(kind):
+def categorical_dims(kind, column_models, encoding):
     return convert_dirichlet_dims(
-        kind['product_model'].get('dd', []))
+        kind['product_model'].get('dd', []),
+        column_models,
+        encoding)
 
 def normal_dims(kind):
     return convert_nich_dims(
@@ -79,12 +87,17 @@ def convert_alpha(hypers: dict[str, float]):
         "discount": hypers["d"]
     }
 
-def convert_dirichlet_dims(hypers: list[dict[str, list[float]]]):
-    return [convert_dirichlet_dim(d) for d in hypers]
+def convert_dirichlet_dims(hypers: list[dict[str, list[float]]], column_models, encoding):
+    return [convert_dirichlet_dim(d, column_models[idx], encoding[idx]) for idx, d in enumerate(hypers)]
 
 
-def convert_dirichlet_dim(hypers: dict[str, list[float]]):
-    return {f'alpha_{i}': v for i, v in enumerate(hypers['alphas'])}
+def convert_dirichlet_dim(hypers: dict[str, list[float]], column_model, encoding):
+    return {f'alpha_{idx_loom_to_column_model(i, column_model, encoding)}': v for i, v in enumerate(hypers['alphas'])}
+
+def idx_loom_to_column_model(idx, column_model, class_encoding):
+    assert class_encoding['name'] == column_model.name
+    class_name = [k for k, v in class_encoding['symbols'].items() if v == idx][0]
+    return column_model.categories.index(class_name)
 
 def convert_nich_dims(hypers: list[dict[str, list[float]]]):
     return [convert_nich_dim(d) for d in hypers]
