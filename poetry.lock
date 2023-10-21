@@ -614,21 +614,22 @@ pycparser = "*"
 
 [[package]]
 name = "cgpm"
-version = "0.1.3"
-description = "GPM Crosscat"
+version = "0.1.0"
+description = ""
 optional = false
-python-versions = "*"
+python-versions = ">=3.11,<3.13"
 files = []
-develop = false
+develop = true
 
 [package.dependencies]
-future = "*"
+future = "^0.18.3"
+numpy = "^1.23.3"
+pytest = "^7.4.2"
+scipy = "^1.11.3"
 
 [package.source]
-type = "git"
-url = "https://github.com/probcomp/cgpm"
-reference = "zane/hardcode-version"
-resolved_reference = "150ba5b83bf0124ddc1d8e4e1f55bc336c491688"
+type = "directory"
+url = "../cgpm"
 
 [[package]]
 name = "charset-normalizer"
@@ -1734,13 +1735,13 @@ files = [
 
 [[package]]
 name = "gitdb"
-version = "4.0.10"
+version = "4.0.11"
 description = "Git Object Database"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "gitdb-4.0.10-py3-none-any.whl", hash = "sha256:c286cf298426064079ed96a9e4a9d39e7f3e9bf15ba60701e95f5492f28415c7"},
-    {file = "gitdb-4.0.10.tar.gz", hash = "sha256:6eb990b69df4e15bad899ea868dc46572c3f75339735663b81de79b06f17eb9a"},
+    {file = "gitdb-4.0.11-py3-none-any.whl", hash = "sha256:81a3407ddd2ee8df444cbacea00e2d038e40150acfa3001696fe0dcf1d3adfa4"},
+    {file = "gitdb-4.0.11.tar.gz", hash = "sha256:bf5421126136d6d0af55bc1e7c1af1c397a34f5b7bd79e776cd3e89785c2b04b"},
 ]
 
 [package.dependencies]
@@ -2466,21 +2467,21 @@ files = [
 
 [[package]]
 name = "networkx"
-version = "3.1"
+version = "3.2"
 description = "Python package for creating and manipulating graphs and networks"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 files = [
-    {file = "networkx-3.1-py3-none-any.whl", hash = "sha256:4f33f68cb2afcf86f28a45f43efc27a9386b535d567d2127f8f61d51dec58d36"},
-    {file = "networkx-3.1.tar.gz", hash = "sha256:de346335408f84de0eada6ff9fafafff9bcda11f0a0dfaa931133debb146ab61"},
+    {file = "networkx-3.2-py3-none-any.whl", hash = "sha256:8b25f564bd28f94ac821c58b04ae1a3109e73b001a7d476e4bb0d00d63706bf8"},
+    {file = "networkx-3.2.tar.gz", hash = "sha256:bda29edf392d9bfa5602034c767d28549214ec45f620081f0b74dc036a1fbbc1"},
 ]
 
 [package.extras]
-default = ["matplotlib (>=3.4)", "numpy (>=1.20)", "pandas (>=1.3)", "scipy (>=1.8)"]
-developer = ["mypy (>=1.1)", "pre-commit (>=3.2)"]
-doc = ["nb2plots (>=0.6)", "numpydoc (>=1.5)", "pillow (>=9.4)", "pydata-sphinx-theme (>=0.13)", "sphinx (>=6.1)", "sphinx-gallery (>=0.12)", "texext (>=0.6.7)"]
-extra = ["lxml (>=4.6)", "pydot (>=1.4.2)", "pygraphviz (>=1.10)", "sympy (>=1.10)"]
-test = ["codecov (>=2.1)", "pytest (>=7.2)", "pytest-cov (>=4.0)"]
+default = ["matplotlib (>=3.5)", "numpy (>=1.22)", "pandas (>=1.4)", "scipy (>=1.9,!=1.11.0,!=1.11.1)"]
+developer = ["changelist (==0.4)", "mypy (>=1.1)", "pre-commit (>=3.2)", "rtoml"]
+doc = ["nb2plots (>=0.7)", "nbconvert (<7.9)", "numpydoc (>=1.6)", "pillow (>=9.4)", "pydata-sphinx-theme (>=0.14)", "sphinx (>=7)", "sphinx-gallery (>=0.14)", "texext (>=0.6.7)"]
+extra = ["lxml (>=4.6)", "pydot (>=1.4.2)", "pygraphviz (>=1.11)", "sympy (>=1.10)"]
+test = ["pytest (>=7.2)", "pytest-cov (>=4.0)"]
 
 [[package]]
 name = "numpy"
@@ -2861,17 +2862,17 @@ files = [
 
 [[package]]
 name = "polars"
-version = "0.19.9"
+version = "0.19.10"
 description = "Blazingly fast DataFrame library"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "polars-0.19.9-cp38-abi3-macosx_10_12_x86_64.whl", hash = "sha256:733525ad608b8668de3749aa21d1c61bd96944b1d88895765b34d8340421a1d2"},
-    {file = "polars-0.19.9-cp38-abi3-macosx_11_0_arm64.whl", hash = "sha256:5091fe78dbf82a2e30380cd6e73a3411b65a1ea9dd55afd07065944534fa5246"},
-    {file = "polars-0.19.9-cp38-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:5b3fc4b2ed02efa29855c8f4dbc26d2e45d2c1a586f6ae692489d3e7786abb27"},
-    {file = "polars-0.19.9-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:02314810dbdd0821645e7ce05a2295102992a229d46938c7f520ccde68625cc9"},
-    {file = "polars-0.19.9-cp38-abi3-win_amd64.whl", hash = "sha256:3c99bbe5ee2a2938fe750c8df429c42967d47e302b2b4b6dcb9b4267c8d42510"},
-    {file = "polars-0.19.9.tar.gz", hash = "sha256:4936b563c609c9def81c2a85ab856ee4b162d2d87566858671fd9f5cba49aa46"},
+    {file = "polars-0.19.10-cp38-abi3-macosx_10_12_x86_64.whl", hash = "sha256:7d3fa7140c1dc9de2268c3c36cd90704181f6cf59d539fd14dc017727293580a"},
+    {file = "polars-0.19.10-cp38-abi3-macosx_11_0_arm64.whl", hash = "sha256:ff90120f74fe49ae9b844422b4e2d9049043242fa4a61cb5130e2a3b74e4f8ee"},
+    {file = "polars-0.19.10-cp38-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:f19a67a44672177be7a7f54daf8916af7edf57c6ed438fa213b39997dd21087a"},
+    {file = "polars-0.19.10-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:56da51e9c826b22af3bb89dae16bc88954b12f646e80bcd44167689599c36068"},
+    {file = "polars-0.19.10-cp38-abi3-win_amd64.whl", hash = "sha256:ba00d3babea6d1dcaa60e3f56e1eb8fb24e506338ad630bff4dd0315a9c1758b"},
+    {file = "polars-0.19.10.tar.gz", hash = "sha256:f6521935dc962b025c924f8b7464f9b3fedfb96e840b955000792c5a110d6f94"},
 ]
 
 [package.extras]
@@ -3566,20 +3567,20 @@ files = [
 
 [[package]]
 name = "ruamel-yaml"
-version = "0.17.35"
+version = "0.17.40"
 description = "ruamel.yaml is a YAML parser/emitter that supports roundtrip preservation of comments, seq/map flow style, and map key order"
 optional = false
 python-versions = ">=3"
 files = [
-    {file = "ruamel.yaml-0.17.35-py3-none-any.whl", hash = "sha256:b105e3e6fc15b41fdb201ba1b95162ae566a4ef792b9f884c46b4ccc5513a87a"},
-    {file = "ruamel.yaml-0.17.35.tar.gz", hash = "sha256:801046a9caacb1b43acc118969b49b96b65e8847f29029563b29ac61d02db61b"},
+    {file = "ruamel.yaml-0.17.40-py3-none-any.whl", hash = "sha256:b16b6c3816dff0a93dca12acf5e70afd089fa5acb80604afd1ffa8b465b7722c"},
+    {file = "ruamel.yaml-0.17.40.tar.gz", hash = "sha256:6024b986f06765d482b5b07e086cc4b4cd05dd22ddcbc758fa23d54873cf313d"},
 ]
 
 [package.dependencies]
 "ruamel.yaml.clib" = {version = ">=0.2.7", markers = "platform_python_implementation == \"CPython\" and python_version < \"3.13\""}
 
 [package.extras]
-docs = ["ryd"]
+docs = ["mercurial (>5.7)", "ryd"]
 jinja2 = ["ruamel.yaml.jinja2 (>=0.2)"]
 
 [[package]]
@@ -4005,7 +4006,7 @@ develop = true
 
 [package.dependencies]
 black = "^23.10.0"
-cgpm = {git = "https://github.com/probcomp/cgpm", branch = "zane/hardcode-version"}
+cgpm = {path = "../cgpm", develop = true}
 dacite = "^1.8.1"
 ipdb = "^0.13.13"
 numpy = "^1.24.0"
@@ -4463,4 +4464,4 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.12"
-content-hash = "3ec2192ec3fd8b9196c1f69c8a836fab9f3caa88b26e46b663000db146b5e6fb"
+content-hash = "6cf3a98abb8c97d229d4c50e2bff124d009f3afdd999a81f1fccaeb060f3ff95"

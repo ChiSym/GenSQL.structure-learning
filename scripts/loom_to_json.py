@@ -24,7 +24,7 @@ def loom_to_json(filename):
         elif parts[-1] == "pbs":
             message_dict = parse_pbs(filename)
         else:
-            raise ValueError('Unknown protocol: {}'.format(protocol))
+            raise ValueError('Unknown protocol: {}'.format(filename))
  
     except AssertionError:
         # empty message

@@ -46,7 +46,7 @@ clojurecat:
   iterations: 150
 qc:
   # Set this to the number of synthetic samples desired in QC plots.
-  sample_count: 1000
+  sample_count: 10000
   # Set this to specify the columns visualized in QC plots.
   # When not set, up to 8 columns--taken from the schema--will be visualized.
   # e.g. columns: ["foo", "bar", "baz"]
