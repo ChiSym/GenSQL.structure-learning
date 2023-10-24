@@ -1,73 +1,10 @@
-dataset_name: test-pub
-seed: 0
 sample_count: 3
-sql_preprocessing: "SELECT Country_of_Operator, Purpose, Perigee_km, Apogee_km, Period_minutes, Launch_Mass_kg FROM data LIMIT 1000"
-parallel:
-  # To limit the number of jobs GNU Parallel spawns use add the flag `--jobs n`.
-  flags: >-
-    --verbose
-nullify:
-  # Entries added here will be treated as null. For example, to treat "NaN" and
-  # "missing" as null uncomment the following two lines:
-  # - NaN
-  # - missing
-schema:
-  # Key/value pairs can be added here to explicitly override the inferred schema
-  # for each column. The available types are as follows: numerical, nominal, and ignore.
-  # For example, to force the "age" column to be treated as a
-  # numerical uncomment the following line:
-  # age: numerical
-  # Apogee_km: numerical
-  # Perigee_km: numerical
+sql_preprocessing: "SELECT * FROM data"
 loom:
+  # loom config, see here for an example:
+  # https://github.com/probcomp/loom/blob/master/loom/config.py
   schedule:
     extra_passes: 500
-cgpm:
-  iterations: 1
-  minutes: 1
-  #dependence:
-  #  # While the CrossCat implementation in CGPM takes dependence constraints, doing so
-  #  # throws a not-implemented-error. Hence, we apply a workaround:
-  #  #   - Supply a map from a target column name to a list of column names.
-  #  #   - Each column in said list gets moved to the target column's view.
-  #  Users:
-  #    - Purpose
-  #  Launch_Site:
-  #    - Type_of_Orbit
-  ## Independence is un-directional. For two columns foo and bar, setting `foo: - bar`
-  ## and `bar: - foo` has the identical effect.
-  #independence:
-  #  Perigee_km:
-  #    - Class_of_Orbit
-  #    - Apogee_km
-  #  Apogee_km:
-  #    - Class_of_Orbit
-clojurecat:
-  iterations: 150
 qc:
   # Set this to the number of synthetic samples desired in QC plots.
   sample_count: 10000
-  # Set this to specify the columns visualized in QC plots.
-  # When not set, up to 8 columns--taken from the schema--will be visualized.
-  # e.g. columns: ["foo", "bar", "baz"]
-  columns: null
-  # This limits the number of categories shown for categorical variables in
-  # 2-dimensional QC plots. Set this to null for no limit.
-  category_limit: 10
-mi:
-  configs:
-    # Set MI configs here. If not set, the configs are chosen at random.
-    # For example, to set the config for health_status.
-    # health_status: ["c) Average", "b) Below average"]
-synthetic_data_evaluation:
-  # If target is not specified, a random target is chosen for prediction.
-  #target: Apogee_km
-  predictor: Random_forest # One of "Random_forest" or "GLM"
-    #N: 10000 # Subsample held-out dataframe with 1000 samples
-database:
-  table_name: data
-  table_path: data/nullified.csv
-  model_name: baseline_model
-  model_path: data/xcat/complete/sample.0.edn
-  # model_path: data/xcat/merged.edn
-  # model_path: data/sppl/merged.json
