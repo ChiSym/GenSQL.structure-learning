@@ -8,7 +8,6 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.12"
-cgpm = {path = "../cgpm", develop=true}
 dvc = "^3.13.3"
 sppl = {git = "https://github.com/joaoloula/sppl", branch = "permissive_versions"}
 edn-format = "^0.7.5"
@@ -18,7 +17,7 @@ catboost = "^1.2"
 scikit-learn = "^1.3.0"
 pytest = "^7.4.2"
 dvc-s3= "^2.23"
-StructureLearningAPI = {path = "../StructureLearningAPI", develop=true}
+StructureLearningAPI = {git = "https://github.com/probcomp/StructureLearningAPI", branch="joaoloula/nightly"}
 click = "^8.1.7"
 polars = "^0.19.8"
 setuptools = "^68.2.2"
