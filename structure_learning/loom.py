@@ -36,9 +36,10 @@ def loom_to_cgpm(loom_folder, data_filename, column_model_filename, out_filename
 
     kinds = model_metadata["kinds"]
 
-    zv = {dim_idx: view_idx for view_idx, view in enumerate(kinds)
-     for dim_idx in view["featureids"]}
-
+    zv = {dim_idx_loom_to_column_model(dim_idx, column_models, encoding): 
+        view_idx for view_idx, view in enumerate(kinds)
+        for dim_idx in view["featureids"]}
+    
     hypers_dict = {
         k: v for kind in kinds
         for k, v in get_kind_column_hypers(kind, column_models, encoding).items() }
