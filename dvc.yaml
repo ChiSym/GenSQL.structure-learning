@@ -1,26 +1,26 @@
 plots:
-  - loom_1d_fits: 
-      template: bar_horizontal_sorted
-      y: 
-        qc/marginals/loom_1d_fits.csv: Column
-      x: Score
-  - qc/marginals/loom_2d_fits.csv:
-      template: resources/heatmap.json
-      y: Column 1
-      x: Column 2
-  - qc/marginals/loom_worst_2d_fit.png
-  - qc/marginals/loom_worst_1d_fit.png
-  - cgpm-raw_1d_fits: 
-      template: bar_horizontal_sorted
-      y: 
-        qc/marginals/cgpm-raw_1d_fits.csv: Column
-      x: Score
-  - qc/marginals/cgpm-raw_2d_fits.csv:
-      template: resources/heatmap.json
-      y: Column 1
-      x: Column 2
-  - qc/marginals/cgpm-raw_worst_2d_fit.png
-  - qc/marginals/cgpm-raw_worst_1d_fit.png
+- loom_1d_fits:
+    template: bar_horizontal_sorted
+    y:
+      qc/marginals/loom_1d_fits.csv: Column
+    x: Score
+- qc/marginals/loom_2d_fits.csv:
+    template: resources/heatmap.json
+    y: Column 1
+    x: Column 2
+- qc/marginals/loom_worst_2d_fit.png
+- qc/marginals/loom_worst_1d_fit.png
+- cgpm-raw_1d_fits:
+    template: bar_horizontal_sorted
+    y:
+      qc/marginals/cgpm-raw_1d_fits.csv: Column
+    x: Score
+- qc/marginals/cgpm-raw_2d_fits.csv:
+    template: resources/heatmap.json
+    y: Column 1
+    x: Column 2
+- qc/marginals/cgpm-raw_worst_2d_fit.png
+- qc/marginals/cgpm-raw_worst_1d_fit.png
 
 stages:
   preprocess:
@@ -28,21 +28,13 @@ stages:
       poetry run preprocess
       --data data/data.csv
       --output data/preprocessed.csv
+      --column_model_output data/column_models.json
       --sql "${sql_preprocessing}"
     deps:
-      - data/data.csv
+    - data/data.csv
     outs:
-      - data/preprocessed.csv
-
-  create-column-models:
-    cmd: >
-      poetry run create-column-models
-      --data data/preprocessed.csv
-      --output data/column_models.json
-    deps:
-      - data/preprocessed.csv
-    outs:
-      - data/column_models.json
+    - data/preprocessed.csv
+    - data/column_models.json
 
   loom-schema:
     cmd: >
@@ -50,36 +42,36 @@ stages:
       --column_models data/column_models.json
       --output data/loom-schema.json
     deps:
-      - data/column_models.json
+    - data/column_models.json
     outs:
-      - data/loom-schema.json
+    - data/loom-schema.json
 
   loom-ingest:
     cmd: ./bin/loom_task ingest loom data/loom-schema.json data/preprocessed.csv
     deps:
-      - data/loom-schema.json
-      - data/preprocessed.csv
+    - data/loom-schema.json
+    - data/preprocessed.csv
     outs:
-      - loom/ingest
-      - loom/query
+    - loom/ingest
+    - loom/query
 
   loom-infer-config:
     cmd: >
       yq -o=json '.loom' params.yaml
       > data/infer-config.json
     outs:
-      - data/infer-config.json
+    - data/infer-config.json
 
   loom-infer:
     cmd: ./bin/loom_task infer loom ${sample_count} data/infer-config.json
     deps:
-      - loom/ingest
-      - loom/query
-      - data/infer-config.json
+    - loom/ingest
+    - loom/query
+    - data/infer-config.json
     params:
-      - sample_count
+    - sample_count
     outs:
-      - loom/samples
+    - loom/samples
 
   loom-sample:
     cmd: >
@@ -87,18 +79,17 @@ stages:
       --sample_count ${qc.sample_count}
       --output data/synthetic-data-loom.csv
     deps:
-      - loom/samples
-      - scripts/loom_sample.py
+    - loom/samples
+    - scripts/loom_sample.py
     outs:
-      - data/synthetic-data-loom.csv
+    - data/synthetic-data-loom.csv
 
   loom-to-json:
     cmd: >
       find loom/samples -type f ! -name '*.json' |
-      parallel 
-      "./bin/loom python scripts/loom_to_json.py loom_to_json {}"
+      parallel  "./bin/loom python scripts/loom_to_json.py loom_to_json {}"
     deps:
-      - loom/samples
+    - loom/samples
 
   marginal-fits-loom:
     cmd: >
@@ -108,32 +99,31 @@ stages:
       --model loom 
       --column_models data/column_models.json
     deps:
-      - data/preprocessed.csv
-      - data/synthetic-data-loom.csv
+    - data/preprocessed.csv
+    - data/synthetic-data-loom.csv
     outs:
-      - qc/marginals/loom_1d_fits.csv
-      - qc/marginals/loom_2d_fits.csv
-      - qc/marginals/loom_worst_1d_fit.png
-      - qc/marginals/loom_worst_2d_fit.png
-      - qc/marginals/loom_worst_1d_fit.html
-      - qc/marginals/loom_worst_2d_fit.html
+    - qc/marginals/loom_1d_fits.csv
+    - qc/marginals/loom_2d_fits.csv
+    - qc/marginals/loom_worst_1d_fit.png
+    - qc/marginals/loom_worst_2d_fit.png
+    - qc/marginals/loom_worst_1d_fit.html
+    - qc/marginals/loom_worst_2d_fit.html
 
   loom-to-cgpm:
     cmd: >
       mkdir -p data/cgpm/hydrated &&
       ls loom/samples |
-      parallel 
-      "poetry run loom_to_cgpm
+      parallel  "poetry run loom_to_cgpm
       --column_model_filename data/column_models.json
       --data_filename data/preprocessed.csv
       --loom_folder loom/samples/{}
       --out_filename data/cgpm/hydrated/{}.json"
     deps:
-      - loom/samples
-      - data/column_models.json
-      - data/preprocessed.csv
+    - loom/samples
+    - data/column_models.json
+    - data/preprocessed.csv
     outs:
-      - data/cgpm/hydrated
+    - data/cgpm/hydrated
 
   cgpm-hydrated-sample:
     cmd: >
@@ -143,9 +133,9 @@ stages:
       --model_dir data/cgpm/hydrated
       --data data/preprocessed.csv
     deps:
-      - data/cgpm/hydrated
+    - data/cgpm/hydrated
     outs:
-      - data/synthetic-data-cgpm-raw.csv
+    - data/synthetic-data-cgpm-raw.csv
 
   marginal-fits-cgpm-raw:
     cmd: >
@@ -155,8 +145,8 @@ stages:
       --model cgpm-raw 
       --column_models data/column_models.json
     deps:
-      - data/preprocessed.csv
-      - data/synthetic-data-cgpm-raw.csv
+    - data/preprocessed.csv
+    - data/synthetic-data-cgpm-raw.csv
     outs:
     - qc/marginals/cgpm-raw_1d_fits.csv
     - qc/marginals/cgpm-raw_2d_fits.csv
