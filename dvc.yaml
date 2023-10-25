@@ -97,8 +97,6 @@ stages:
       find loom/samples -type f ! -name '*.json' |
       parallel 
       "./bin/loom python scripts/loom_to_json.py loom_to_json {}"
-    params:
-      - parallel.flags
     deps:
       - loom/samples
 
