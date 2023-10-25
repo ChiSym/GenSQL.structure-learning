@@ -22,13 +22,13 @@ stages:
     deps:
     - path: data/preprocessed.csv
       hash: md5
-      md5: b853bf59d00f3208387d92747ab15340
-      size: 51991
+      md5: f9d1807da5909d46954d75b49a0c5cb3
+      size: 894443
     outs:
     - path: data/column_models.json
       hash: md5
-      md5: e8b9c31c41b2cb967afc14be76e6b4d6
-      size: 3350
+      md5: be5d354058e6a821095ba59c13391f80
+      size: 121746
   loom-schema:
     cmd: "poetry run loom_schema --column_models data/column_models.json --output
       data/loom-schema.json\n"
