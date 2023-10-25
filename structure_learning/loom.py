@@ -4,6 +4,7 @@ import os
 import polars as pl
 import gzip
 
+from structurelearningapi.numericalize import numericalize
 from structurelearningapi.create_model import create_model
 from structurelearningapi.io import deserialize_column_models, serialize
 
@@ -15,9 +16,6 @@ from structurelearningapi.io import deserialize_column_models, serialize
 def loom_to_cgpm(loom_folder, data_filename, column_model_filename, out_filename):
     model_filename = os.path.join(loom_folder, "model.json")
     assign_filename = os.path.join(loom_folder, "assign.json")
-
-    df = pl.read_csv(data_filename)
-
 
     with gzip.open('loom/ingest/encoding.json.gz', 'rb') as f:
         encoding_str = f.read()
@@ -33,6 +31,14 @@ def loom_to_cgpm(loom_folder, data_filename, column_model_filename, out_filename
     with open(column_model_filename, "rb") as f:
         column_models = orjson.loads(f.read())
         column_models = deserialize_column_models(column_models)
+
+    df = pl.read_csv(
+        data_filename, 
+        dtypes={
+            cm.name: Utf8 if cm.distribution == "categorical" else Float64
+            for cm in column_models
+        }
+    )
 
     kinds = model_metadata["kinds"]
 
@@ -54,6 +60,8 @@ def loom_to_cgpm(loom_folder, data_filename, column_model_filename, out_filename
         idx: convert_alpha(kind["product_model"]["clustering"])
         for idx, kind in enumerate(kinds)
     }
+    
+    X = numericalize(df, column_models)
 
     model = create_model(
         df,

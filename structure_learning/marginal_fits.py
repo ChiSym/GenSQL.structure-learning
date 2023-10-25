@@ -17,8 +17,10 @@ def get_sdv_type(col):
 def marginal_fits(real_data, model):
     synthetic_data_path = f"data/synthetic-data-{model}.csv"
 
-    real_df = pl.read_csv(real_data).to_pandas()
-    synthetic_df = pl.read_csv(synthetic_data_path).to_pandas()
+    synthetic_df = pl.read_csv(synthetic_data_path)
+    real_df = pl.read_csv(real_data, dtypes=synthetic_df.schema)
+
+    synthetic_df, real_df = synthetic_df.to_pandas(), real_df.to_pandas()
 
     # should we be using mapping table instead?
     metadata_obj = SingleTableMetadata()
