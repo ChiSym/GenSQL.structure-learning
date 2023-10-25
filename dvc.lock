@@ -2,63 +2,62 @@ schema: '2.0'
 stages:
   preprocess:
     cmd: "poetry run preprocess --data data/data.csv --output data/preprocessed.csv
-      --sql \"SELECT Country_of_Operator, Purpose, Perigee_km, Apogee_km, Period_minutes,
-      Launch_Mass_kg FROM data LIMIT 1000\"\n"
+      --sql \"SELECT * FROM data LIMIT 1000\"\n"
     deps:
     - path: data/data.csv
       hash: md5
-      md5: 2652c974be9aa49bd50061377d39563d
-      size: 313452
+      md5: 685aa7d722a3f7af15a0dcfe1ca85eab
+      size: 571582165
     outs:
     - path: data/preprocessed.csv
       hash: md5
-      md5: b853bf59d00f3208387d92747ab15340
-      size: 51991
+      md5: f9d1807da5909d46954d75b49a0c5cb3
+      size: 894443
   create-column-models:
     cmd: "poetry run create-column-models --data data/preprocessed.csv --output data/column_models.json\n"
     deps:
     - path: data/preprocessed.csv
       hash: md5
-      md5: b853bf59d00f3208387d92747ab15340
-      size: 51991
+      md5: f9d1807da5909d46954d75b49a0c5cb3
+      size: 894443
     outs:
     - path: data/column_models.json
       hash: md5
-      md5: e8b9c31c41b2cb967afc14be76e6b4d6
-      size: 3350
+      md5: be5d354058e6a821095ba59c13391f80
+      size: 121746
   loom-schema:
     cmd: "poetry run loom_schema --column_models data/column_models.json --output
       data/loom-schema.json\n"
     deps:
     - path: data/column_models.json
       hash: md5
-      md5: e8b9c31c41b2cb967afc14be76e6b4d6
-      size: 3350
+      md5: be5d354058e6a821095ba59c13391f80
+      size: 121746
     outs:
     - path: data/loom-schema.json
       hash: md5
-      md5: d63abada5cf9d93e5ae9f9c5b54969e3
-      size: 155
+      md5: f7ef8de6f9340980068ec9b313578476
+      size: 2331
   loom-ingest:
     cmd: ./bin/loom_task ingest loom data/loom-schema.json data/preprocessed.csv
     deps:
     - path: data/loom-schema.json
       hash: md5
-      md5: d63abada5cf9d93e5ae9f9c5b54969e3
-      size: 155
+      md5: f7ef8de6f9340980068ec9b313578476
+      size: 2331
     - path: data/preprocessed.csv
       hash: md5
-      md5: b853bf59d00f3208387d92747ab15340
-      size: 51991
+      md5: f9d1807da5909d46954d75b49a0c5cb3
+      size: 894443
     outs:
     - path: loom/ingest
       hash: md5
-      md5: 3d37d4ab5e03ec81b2dffd98ebf8bfd2.dir
-      size: 29364
+      md5: 1b18db58dcd1ba326224e598ceefd63e.dir
+      size: 152626
       nfiles: 7
     - path: loom/query
       hash: md5
-      md5: 97fa41fcfcf2150909972ffec14031bd.dir
+      md5: 41eb9e5858b6c6ec0db712420cb7e1c7.dir
       size: 106
       nfiles: 1
   loom-infer-config:
@@ -66,8 +65,8 @@ stages:
     outs:
     - path: data/infer-config.json
       hash: md5
-      md5: 81a0a13b54820e13a2e5cd28b62e360f
-      size: 48
+      md5: 7f928ec52cc41312803872ea38fbf3d2
+      size: 152
   loom-infer:
     cmd: ./bin/loom_task infer loom 3 data/infer-config.json
     deps:
