@@ -35,7 +35,7 @@ def loom_to_cgpm(loom_folder, data_filename, column_model_filename, out_filename
     df = pl.read_csv(
         data_filename, 
         dtypes={
-            cm.name: Utf8 if cm.distribution == "categorical" else Float64
+            cm.name: pl.Utf8 if cm.distribution == "categorical" else pl.Float64
             for cm in column_models
         }
     )
