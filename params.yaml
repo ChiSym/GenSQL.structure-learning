@@ -1,5 +1,5 @@
-sample_count: 3
-sql_preprocessing: "SELECT * FROM data"
+sample_count: 10
+sql_preprocessing: "SELECT * EXCLUDE (Body_Mass_Index) FROM data USING SAMPLE reservoir(20000 ROWS) REPEATABLE (123);"
 loom:
   # loom config, see here for an example:
   # https://github.com/probcomp/loom/blob/master/loom/config.py
@@ -11,4 +11,4 @@ loom:
       empty_group_count: 10
 qc:
   # Set this to the number of synthetic samples desired in QC plots.
-  sample_count: 10000
+  sample_count: 20000

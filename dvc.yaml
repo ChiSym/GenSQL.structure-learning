@@ -23,6 +23,14 @@ plots:
   - qc/marginals/cgpm-raw_worst_1d_fit.png
 
 stages:
+  data-cleaning:
+    cmd: python pds_data_cleaning/scripts/merge_studies.py
+    deps:
+      - pds_data_cleaning/data
+      - pds_data_cleaning/processed_data
+    outs:
+      - data/data.csv
+
   preprocess:
     cmd: >
       poetry run preprocess
