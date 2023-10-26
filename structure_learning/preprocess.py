@@ -18,6 +18,10 @@ def preprocess(data, sql, output, column_model_output):
         pl.col(pl.Utf8).str.replace_all("[^\p{Ascii}]", "")
     )
 
+    preprocessed  = preprocessed.with_columns(
+        pl.col(pl.Utf8).str.replace_all("[^\p{Ascii}]", "")
+    )
+
     model = create_column_model(preprocessed)
 
     with open(column_model_output, 'wb') as f:
