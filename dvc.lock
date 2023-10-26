@@ -2,63 +2,62 @@ schema: '2.0'
 stages:
   preprocess:
     cmd: "poetry run preprocess --data data/data.csv --output data/preprocessed.csv
-      --sql \"SELECT Country_of_Operator, Purpose, Perigee_km, Apogee_km, Period_minutes,
-      Launch_Mass_kg FROM data LIMIT 1000\"\n"
+      --sql \"SELECT * FROM data\"\n"
     deps:
     - path: data/data.csv
       hash: md5
-      md5: 2652c974be9aa49bd50061377d39563d
-      size: 313452
+      md5: f43a7238017f2ad295a5bfec56933248
+      size: 8136977
     outs:
     - path: data/preprocessed.csv
       hash: md5
-      md5: b853bf59d00f3208387d92747ab15340
-      size: 51991
+      md5: f43a7238017f2ad295a5bfec56933248
+      size: 8136977
   create-column-models:
     cmd: "poetry run create-column-models --data data/preprocessed.csv --output data/column_models.json\n"
     deps:
     - path: data/preprocessed.csv
       hash: md5
-      md5: b853bf59d00f3208387d92747ab15340
-      size: 51991
+      md5: f43a7238017f2ad295a5bfec56933248
+      size: 8136977
     outs:
     - path: data/column_models.json
       hash: md5
-      md5: e8b9c31c41b2cb967afc14be76e6b4d6
-      size: 3350
+      md5: f30dc034a8332ea7b01f0e5eb4a55617
+      size: 31023
   loom-schema:
     cmd: "poetry run loom_schema --column_models data/column_models.json --output
       data/loom-schema.json\n"
     deps:
     - path: data/column_models.json
       hash: md5
-      md5: e8b9c31c41b2cb967afc14be76e6b4d6
-      size: 3350
+      md5: f30dc034a8332ea7b01f0e5eb4a55617
+      size: 31023
     outs:
     - path: data/loom-schema.json
       hash: md5
-      md5: d63abada5cf9d93e5ae9f9c5b54969e3
-      size: 155
+      md5: d345348107e5d470bbdc8d8fc8aa9315
+      size: 5300
   loom-ingest:
     cmd: ./bin/loom_task ingest loom data/loom-schema.json data/preprocessed.csv
     deps:
     - path: data/loom-schema.json
       hash: md5
-      md5: d63abada5cf9d93e5ae9f9c5b54969e3
-      size: 155
+      md5: d345348107e5d470bbdc8d8fc8aa9315
+      size: 5300
     - path: data/preprocessed.csv
       hash: md5
-      md5: b853bf59d00f3208387d92747ab15340
-      size: 51991
+      md5: f43a7238017f2ad295a5bfec56933248
+      size: 8136977
     outs:
     - path: loom/ingest
       hash: md5
-      md5: 3d37d4ab5e03ec81b2dffd98ebf8bfd2.dir
-      size: 29364
+      md5: 52a9c5ad14665434f42f9575e0074363.dir
+      size: 1120901
       nfiles: 7
     - path: loom/query
       hash: md5
-      md5: 97fa41fcfcf2150909972ffec14031bd.dir
+      md5: 435dcdc6f447076dd306a991a4399069.dir
       size: 106
       nfiles: 1
   loom-infer-config:
@@ -66,42 +65,42 @@ stages:
     outs:
     - path: data/infer-config.json
       hash: md5
-      md5: 81a0a13b54820e13a2e5cd28b62e360f
-      size: 48
+      md5: 7f928ec52cc41312803872ea38fbf3d2
+      size: 152
   loom-infer:
-    cmd: ./bin/loom_task infer loom 3 data/infer-config.json
+    cmd: ./bin/loom_task infer loom 10 data/infer-config.json
     deps:
     - path: data/infer-config.json
       hash: md5
-      md5: 81a0a13b54820e13a2e5cd28b62e360f
-      size: 48
+      md5: 7f928ec52cc41312803872ea38fbf3d2
+      size: 152
     - path: loom/ingest
       hash: md5
-      md5: 3d37d4ab5e03ec81b2dffd98ebf8bfd2.dir
-      size: 29364
+      md5: 52a9c5ad14665434f42f9575e0074363.dir
+      size: 1120901
       nfiles: 7
     - path: loom/query
       hash: md5
-      md5: 97fa41fcfcf2150909972ffec14031bd.dir
+      md5: 435dcdc6f447076dd306a991a4399069.dir
       size: 106
       nfiles: 1
     params:
       params.yaml:
-        sample_count: 3
+        sample_count: 10
     outs:
     - path: loom/samples
       hash: md5
-      md5: 1cea69528fe55763bbdd1aaac1bcbeaa.dir
-      size: 2769076
-      nfiles: 44
+      md5: 08cc9b90117ef2601c85cea56cf66f2d.dir
+      size: 295760637
+      nfiles: 244
   loom-sample:
     cmd: "./bin/loom python scripts/loom_sample.py --sample_count 10000 --output data/synthetic-data-loom.csv\n"
     deps:
     - path: loom/samples
       hash: md5
-      md5: 1cea69528fe55763bbdd1aaac1bcbeaa.dir
-      size: 2769076
-      nfiles: 44
+      md5: 08cc9b90117ef2601c85cea56cf66f2d.dir
+      size: 295760637
+      nfiles: 244
     - path: scripts/loom_sample.py
       hash: md5
       md5: d6449af8a6b43427f73f6ff14a87aec7
@@ -109,8 +108,8 @@ stages:
     outs:
     - path: data/synthetic-data-loom.csv
       hash: md5
-      md5: 9526a94cc5bd27f24503d5d65d12450c
-      size: 811457
+      md5: d6a4286341de44e6989285e408a4b140
+      size: 10529110
   loom-dump-metadata:
     cmd: "find loom/samples -type f ! -name '*.json' | parallel --verbose \"./bin/loom
       python scripts/loom_to_json.py loom_to_json {}\"\n"
@@ -142,122 +141,119 @@ stages:
     deps:
     - path: data/preprocessed.csv
       hash: md5
-      md5: b853bf59d00f3208387d92747ab15340
-      size: 51991
+      md5: f43a7238017f2ad295a5bfec56933248
+      size: 8136977
     - path: data/synthetic-data-loom.csv
       hash: md5
-      md5: 9526a94cc5bd27f24503d5d65d12450c
-      size: 811457
+      md5: d6a4286341de44e6989285e408a4b140
+      size: 10529110
     outs:
     - path: qc/marginals/loom_1d_fits.csv
       hash: md5
-      md5: 2039eac75337ff8d37ce9aa0bb96769f
-      size: 278
+      md5: 8ff2e0ce7e29f4df9a8f663b4011e82d
+      size: 10085
     - path: qc/marginals/loom_2d_fits.csv
       hash: md5
-      md5: 3e081993b42193730340dbc6a94c5ad0
-      size: 1322
+      md5: 374ecdd9a9bb3f80243837237d4abdc2
+      size: 1751709
     - path: qc/marginals/loom_worst_1d_fit.html
       hash: md5
-      md5: 917a0fc6f2e73494b76e004cff2b1f39
-      size: 3710805
+      md5: 0f9a66bd65fac8032f51de1cdb1d8aa4
+      size: 4024520
     - path: qc/marginals/loom_worst_1d_fit.png
       hash: md5
-      md5: ab79b2dee84f9aed45ffe37e5a093079
-      size: 137772
+      md5: b17b77162d6274d112c670d3b6aa8223
+      size: 191819
     - path: qc/marginals/loom_worst_2d_fit.html
       hash: md5
-      md5: e4d4fec85f56b656b646d2489d5239f0
-      size: 3948204
+      md5: 9bfd094d271a8fd23536eeada17ab11e
+      size: 4917203
     - path: qc/marginals/loom_worst_2d_fit.png
       hash: md5
-      md5: 75c4023e6726484009cec5ae1880d5e1
-      size: 177800
+      md5: 3c4d5f07a4d671bb639765d36d1a73a0
+      size: 159310
   loom-to-json:
-    cmd: "find loom/samples -type f ! -name '*.json' | parallel --verbose \"./bin/loom
-      python scripts/loom_to_json.py loom_to_json {}\"\n"
+    cmd: "find loom/samples -type f ! -name '*.json' | parallel  \"./bin/loom python
+      scripts/loom_to_json.py loom_to_json {}\"\n"
     deps:
     - path: loom/samples
       hash: md5
-      md5: 1cea69528fe55763bbdd1aaac1bcbeaa.dir
-      size: 2769076
-      nfiles: 44
-    params:
-      params.yaml:
-        parallel.flags: --verbose
+      md5: 08cc9b90117ef2601c85cea56cf66f2d.dir
+      size: 295760637
+      nfiles: 244
   loom-to-cgpm:
-    cmd: "mkdir -p data/cgpm/hydrated && ls loom/samples | parallel --verbose \"poetry
-      run loom_to_cgpm --column_model_filename data/column_models.json --data_filename
+    cmd: "mkdir -p data/cgpm/hydrated && ls loom/samples | parallel  \"poetry run
+      loom_to_cgpm --column_model_filename data/column_models.json --data_filename
       data/preprocessed.csv --loom_folder loom/samples/{} --out_filename data/cgpm/hydrated/{}.json\"\
       \n"
     deps:
     - path: data/column_models.json
       hash: md5
-      md5: e8b9c31c41b2cb967afc14be76e6b4d6
-      size: 3350
+      md5: f30dc034a8332ea7b01f0e5eb4a55617
+      size: 31023
     - path: data/preprocessed.csv
       hash: md5
-      md5: b853bf59d00f3208387d92747ab15340
-      size: 51991
+      md5: f43a7238017f2ad295a5bfec56933248
+      size: 8136977
     - path: loom/samples
       hash: md5
-      md5: 1cea69528fe55763bbdd1aaac1bcbeaa.dir
-      size: 2769076
-      nfiles: 44
+      md5: 08cc9b90117ef2601c85cea56cf66f2d.dir
+      size: 295760637
+      nfiles: 244
     outs:
     - path: data/cgpm/hydrated
       hash: md5
-      md5: 90363602ba0bc01430044dab43e750a9.dir
-      size: 94861
-      nfiles: 3
+      md5: 160e80fd0dfee1a44fad8943efbfcf3a.dir
+      size: 20155346
+      nfiles: 10
   cgpm-hydrated-sample:
     cmd: "poetry run cgpm-sample --sample_count 10000 --output data/synthetic-data-cgpm-raw.csv
       --model_dir data/cgpm/hydrated --data data/preprocessed.csv\n"
     deps:
     - path: data/cgpm/hydrated
       hash: md5
-      md5: 90363602ba0bc01430044dab43e750a9.dir
-      size: 94861
-      nfiles: 3
+      md5: 160e80fd0dfee1a44fad8943efbfcf3a.dir
+      size: 20155346
+      nfiles: 10
     outs:
     - path: data/synthetic-data-cgpm-raw.csv
       hash: md5
-      md5: ce97720b9e82589cec7bb6be93387f15
-      size: 991671
+      md5: b2e83051bde882b849ce3b43916c7ab3
+      size: 10728841
   marginal-fits-cgpm-raw:
     cmd: "mkdir -p qc/marginals && poetry run marginal_fits --real_data data/preprocessed.csv
       --model cgpm-raw \n"
     deps:
     - path: data/preprocessed.csv
       hash: md5
-      md5: b853bf59d00f3208387d92747ab15340
-      size: 51991
+      md5: f43a7238017f2ad295a5bfec56933248
+      size: 8136977
     - path: data/synthetic-data-cgpm-raw.csv
       hash: md5
-      md5: ce97720b9e82589cec7bb6be93387f15
-      size: 991671
+      md5: b2e83051bde882b849ce3b43916c7ab3
+      size: 10728841
     outs:
     - path: qc/marginals/cgpm-raw_1d_fits.csv
       hash: md5
-      md5: bbd871231cd82424179ac21a92779b88
-      size: 291
+      md5: 0ecfed3ae1b9da81836be6b21a3d0cfe
+      size: 10084
     - path: qc/marginals/cgpm-raw_2d_fits.csv
       hash: md5
-      md5: fe9ccb613d4aef01680f3f2b35d5b437
-      size: 1330
+      md5: bb07196f85978226f0968e5da2cc35d8
+      size: 1751773
     - path: qc/marginals/cgpm-raw_worst_1d_fit.html
       hash: md5
-      md5: 2bb15cc9d4c7a9f73a25701b41f47ac1
-      size: 3710774
+      md5: ad5614059469053b829e2d933f8e84aa
+      size: 4026910
     - path: qc/marginals/cgpm-raw_worst_1d_fit.png
       hash: md5
-      md5: 60f5641e441940ebb18de52c05bd6c32
-      size: 137633
+      md5: e2a0e431705016dbb841797c4e20b645
+      size: 192594
     - path: qc/marginals/cgpm-raw_worst_2d_fit.html
       hash: md5
-      md5: 0a616dc5255e27eed23cb071809bb091
-      size: 3949042
+      md5: a309f178b88714ea4735e43b93dda66a
+      size: 4919068
     - path: qc/marginals/cgpm-raw_worst_2d_fit.png
       hash: md5
-      md5: 5286b3904dc95cee5ec0f44c185a0224
-      size: 177782
+      md5: f98752299f2e351cbfc346ba9512a7c5
+      size: 158499

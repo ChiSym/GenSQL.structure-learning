@@ -1,5 +1,5 @@
-sample_count: 3
-sql_preprocessing: "SELECT * FROM data"
+sample_count: 10
+sql_preprocessing: SELECT * FROM data
 loom:
   # loom config, see here for an example:
   # https://github.com/probcomp/loom/blob/master/loom/config.py
