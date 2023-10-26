@@ -1,5 +1,6 @@
 import click
 import polars as pl
+import orjson
 import plotly
 from sdv.metadata import SingleTableMetadata
 from sdmetrics.reports.single_table import QualityReport
@@ -13,11 +14,24 @@ def get_sdv_type(col):
 
 @click.command()
 @click.option('--real_data', help='Path to the real data file')
+@click.option('--column_models', help='Path to the column models file')
 @click.option('--model', help='Name of the model to be evaluated')
-def marginal_fits(real_data, model):
+def marginal_fits(real_data, model, column_models):
+    with open(column_models, "rb") as f:
+        column_models = orjson.loads(f.read())
+
     synthetic_data_path = f"data/synthetic-data-{model}.csv"
 
-    synthetic_df = pl.read_csv(synthetic_data_path)
+    synthetic_df = pl.read_csv(
+        synthetic_data_path,
+        dtypes={
+            cm["name"]: pl.Utf8 
+                if cm["distribution"] == "categorical" 
+                else pl.Float64
+            for cm in column_models
+        }
+    )
+
     real_df = pl.read_csv(real_data, dtypes=synthetic_df.schema)
 
     synthetic_df, real_df = synthetic_df.to_pandas(), real_df.to_pandas()

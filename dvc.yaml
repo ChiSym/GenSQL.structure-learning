@@ -106,6 +106,7 @@ stages:
       poetry run marginal_fits
       --real_data data/preprocessed.csv
       --model loom 
+      --column_models data/column_models.json
     deps:
       - data/preprocessed.csv
       - data/synthetic-data-loom.csv
@@ -152,13 +153,14 @@ stages:
       poetry run marginal_fits
       --real_data data/preprocessed.csv
       --model cgpm-raw 
+      --column_models data/column_models.json
     deps:
       - data/preprocessed.csv
       - data/synthetic-data-cgpm-raw.csv
     outs:
-      - qc/marginals/cgpm-raw_1d_fits.csv
-      - qc/marginals/cgpm-raw_2d_fits.csv
-      - qc/marginals/cgpm-raw_worst_1d_fit.png
-      - qc/marginals/cgpm-raw_worst_2d_fit.png
-      - qc/marginals/cgpm-raw_worst_1d_fit.html
-      - qc/marginals/cgpm-raw_worst_2d_fit.html
+    - qc/marginals/cgpm-raw_1d_fits.csv
+    - qc/marginals/cgpm-raw_2d_fits.csv
+    - qc/marginals/cgpm-raw_worst_1d_fit.png
+    - qc/marginals/cgpm-raw_worst_2d_fit.png
+    - qc/marginals/cgpm-raw_worst_1d_fit.html
+    - qc/marginals/cgpm-raw_worst_2d_fit.html
