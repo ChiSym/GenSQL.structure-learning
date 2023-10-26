@@ -90,17 +90,17 @@ stages:
     outs:
     - path: loom/samples
       hash: md5
-      md5: 6bc10e74e7eba64b5ab18cd75d4ce793.dir
-      size: 12284706
-      nfiles: 84
+      md5: beafb6337a09d32224022499b3b9ae4f.dir
+      size: 84973428
+      nfiles: 154
   loom-sample:
     cmd: "./bin/loom python scripts/loom_sample.py --sample_count 10000 --output data/synthetic-data-loom.csv\n"
     deps:
     - path: loom/samples
       hash: md5
-      md5: 6bc10e74e7eba64b5ab18cd75d4ce793.dir
-      size: 12284706
-      nfiles: 84
+      md5: beafb6337a09d32224022499b3b9ae4f.dir
+      size: 84973428
+      nfiles: 154
     - path: scripts/loom_sample.py
       hash: md5
       md5: d6449af8a6b43427f73f6ff14a87aec7
