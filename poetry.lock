@@ -631,7 +631,7 @@ scipy = "^1.11.3"
 type = "git"
 url = "https://github.com/probcomp/cgpm"
 reference = "joaoloula/refactor"
-resolved_reference = "2a7edcfde63aec44df1297626caa5c36bb63bc50"
+resolved_reference = "fa8a2839232ecc7c57bac0c5ad86dfde776bb37c"
 
 [[package]]
 name = "charset-normalizer"
@@ -1801,13 +1801,13 @@ test = ["coverage", "mock (>=4)", "pytest (>=7)", "pytest-cov", "pytest-mock (>=
 
 [[package]]
 name = "gto"
-version = "1.4.0"
+version = "1.5.0"
 description = "Version and deploy your models following GitOps principles"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "gto-1.4.0-py3-none-any.whl", hash = "sha256:b021956c7892992caa341f06f977de613c6379eca823eb51020c2e5cc064d76b"},
-    {file = "gto-1.4.0.tar.gz", hash = "sha256:2bd2f67d172133584a47b2f3db906efb13a24258e094a930c4a1d800310d89d9"},
+    {file = "gto-1.5.0-py3-none-any.whl", hash = "sha256:018dd70a27038f11c30861a9ae0dabe1d69122179667a63889616306b9a07347"},
+    {file = "gto-1.5.0.tar.gz", hash = "sha256:3772716fc978b3a261a24650ddd4cc1d87addb3cdb6b644beba6790b4f06615f"},
 ]
 
 [package.dependencies]
@@ -1816,13 +1816,13 @@ funcy = "*"
 pydantic = ">=1.9.0,<2.0.0 || >2.0.0,<3"
 rich = "*"
 "ruamel.yaml" = "*"
-scmrepo = ">=1.3.1,<2"
+scmrepo = ">=1.4.0,<2"
 semver = ">=3.0.0"
 tabulate = ">=0.8.10"
 typer = ">=0.4.1"
 
 [package.extras]
-tests = ["freezegun", "pylint (==2.17.6)", "pylint-plugin-utils", "pytest", "pytest-cov", "pytest-lazy-fixture (==0.6.3)", "pytest-mock", "pytest-test-utils", "types-freezegun"]
+tests = ["freezegun", "pylint (==3.0.2)", "pylint-plugin-utils", "pytest", "pytest-cov", "pytest-lazy-fixture (==0.6.3)", "pytest-mock", "pytest-test-utils", "types-freezegun"]
 
 [[package]]
 name = "hydra-core"
@@ -2806,13 +2806,13 @@ test = ["appdirs (==1.4.4)", "covdefaults (>=2.3)", "pytest (>=7.4)", "pytest-co
 
 [[package]]
 name = "plotly"
-version = "5.17.0"
+version = "5.18.0"
 description = "An open-source, interactive data visualization library for Python"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "plotly-5.17.0-py2.py3-none-any.whl", hash = "sha256:7c84cdf11da162423da957bb093287134f2d6f170eb9a74f1459f825892247c3"},
-    {file = "plotly-5.17.0.tar.gz", hash = "sha256:290d796bf7bab87aad184fe24b86096234c4c95dcca6ecbca02d02bdf17d3d97"},
+    {file = "plotly-5.18.0-py3-none-any.whl", hash = "sha256:23aa8ea2f4fb364a20d34ad38235524bd9d691bf5299e800bca608c31e8db8de"},
+    {file = "plotly-5.18.0.tar.gz", hash = "sha256:360a31e6fbb49d12b007036eb6929521343d6bee2236f8459915821baefa2cbb"},
 ]
 
 [package.dependencies]
@@ -4022,7 +4022,7 @@ scipy = "^1.11.3"
 type = "git"
 url = "https://github.com/probcomp/StructureLearningAPI"
 reference = "joaoloula/nightly"
-resolved_reference = "69269c8bb351d6ae95a73b8e6edf143a8b42cacb"
+resolved_reference = "49f49e0ad7399bfa3cb490ae97365f00fd0d1b70"
 
 [[package]]
 name = "sympy"
@@ -4158,18 +4158,18 @@ telegram = ["requests"]
 
 [[package]]
 name = "traitlets"
-version = "5.11.2"
+version = "5.12.0"
 description = "Traitlets Python configuration system"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "traitlets-5.11.2-py3-none-any.whl", hash = "sha256:98277f247f18b2c5cabaf4af369187754f4fb0e85911d473f72329db8a7f4fae"},
-    {file = "traitlets-5.11.2.tar.gz", hash = "sha256:7564b5bf8d38c40fa45498072bf4dc5e8346eb087bbf1e2ae2d8774f6a0f078e"},
+    {file = "traitlets-5.12.0-py3-none-any.whl", hash = "sha256:81539f07f7aebcde2e4b5ab76727f53eabf18ad155c6ed7979a681411602fa47"},
+    {file = "traitlets-5.12.0.tar.gz", hash = "sha256:833273bf645d8ce31dcb613c56999e2e055b1ffe6d09168a164bcd91c36d5d35"},
 ]
 
 [package.extras]
 docs = ["myst-parser", "pydata-sphinx-theme", "sphinx"]
-test = ["argcomplete (>=3.0.3)", "mypy (>=1.5.1)", "pre-commit", "pytest (>=7.0,<7.5)", "pytest-mock", "pytest-mypy-testing"]
+test = ["argcomplete (>=3.0.3)", "mypy (>=1.6.0)", "pre-commit", "pytest (>=7.0,<7.5)", "pytest-mock", "pytest-mypy-testing"]
 
 [[package]]
 name = "typer"
