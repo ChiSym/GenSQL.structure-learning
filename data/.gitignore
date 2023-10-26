@@ -40,6 +40,6 @@
 /synthetic-data-iql.csv
 /db.edn
 /preprocessed.csv
-/column_models.json
 /synthetic-data-loom.csv
 /synthetic-data-cgpm-raw.csv
+/column_models.json
