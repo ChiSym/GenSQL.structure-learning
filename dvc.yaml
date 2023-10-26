@@ -97,6 +97,7 @@ stages:
       poetry run marginal_fits
       --real_data data/preprocessed.csv
       --model loom 
+      --column_models data/column_models.json
     deps:
     - data/preprocessed.csv
     - data/synthetic-data-loom.csv
@@ -142,6 +143,7 @@ stages:
       poetry run marginal_fits
       --real_data data/preprocessed.csv
       --model cgpm-raw 
+      --column_models data/column_models.json
     deps:
     - data/preprocessed.csv
     - data/synthetic-data-cgpm-raw.csv
