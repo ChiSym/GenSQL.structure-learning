@@ -46,10 +46,10 @@ def marginal_fits(real_data, model, column_models):
 
     marginal_fits_1d = report.get_details(property_name="Column Shapes").sort_values(
         "Score"
-    )
+    ).reset_index(drop=True)
     marginal_fits_2d = report.get_details(
         property_name="Column Pair Trends"
-    ).sort_values("Score")
+    ).sort_values("Score").reset_index(drop=True)
 
     marginal_fits_1d.to_csv(f"qc/marginals/{model}_1d_fits.csv", index=False)
     marginal_fits_2d.to_csv(f"qc/marginals/{model}_2d_fits.csv", index=False)
