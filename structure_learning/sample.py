@@ -1,7 +1,10 @@
 import click
 import os
 import polars as pl
+import numpy as np
+import json
 
+from scipy.special import logsumexp
 from structurelearningapi.sample import sample
 from structurelearningapi.io import deserialize
 from structurelearningapi.create_model import make_cgpm
@@ -35,11 +38,22 @@ def sample_cgpm(sample_count, model_dir, output, data):
         for metadata in metadatas
     ]
 
+    infer_logs = [
+        json.load(open(os.path.join(f"loom/samples/sample.{i}/infer_log.json")))
+        for i in range(n_models)
+    ]
+    scores = np.array([
+        infer_log["args"]["scores"]["score"] 
+        for infer_log in infer_logs])
+    ps = np.exp(scores - logsumexp(scores))
+
     sample_list = [
-        sample(wrapper, sample_count//n_models)
-        for wrapper in wrappers]
+        sample(wrapper, int(sample_count * ps[i]))
+        for i, wrapper in enumerate(wrappers)
+        if ps[i] > 0]
 
     sample_df = pl.concat(sample_list)
+
     sample_df.write_csv(output)
 
 def get_wrapper(metadata, df):
