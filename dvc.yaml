@@ -142,7 +142,7 @@ stages:
       mkdir -p qc/marginals &&
       poetry run marginal_fits
       --real_data data/preprocessed.csv
-      --model cgpm-raw 
+      --model cgpm-raw
       --column_models data/column_models.json
     deps:
     - data/preprocessed.csv
