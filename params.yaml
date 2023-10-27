@@ -12,6 +12,7 @@ sql_preprocessing: "SELECT
         WHEN '2Anthracycline w/o Taxane' THEN 'Anthracycline'
         WHEN '3Anthracycline and Taxane' THEN 'Anthracycline and Taxane'
         WHEN '4TC and variations' THEN 'TC'
+        WHEN '6None' THEN 'None'
         ELSE NULL
     END as chemotherapy,
     CASE 
@@ -27,7 +28,7 @@ sql_preprocessing: "SELECT
         ELSE 'No'
     END as endocrine_therapy_tam,
     meno as menopausal_status,
-    RS as genetic_recurrence_score,
+    log(1 + RS) as genetic_recurrence_score,
     CASE age
         WHEN 'NA' THEN NULL
         ELSE CAST (age AS FLOAT)
@@ -41,10 +42,10 @@ sql_preprocessing: "SELECT
          WHEN race = 7 THEN 'Multirace'
          ELSE NULL
     END as race_ethnicity,
-    CASE TumorSize
+    log(CASE TumorSize
         WHEN 'NA' THEN NULL
         ELSE CAST (TumorSize AS FLOAT)
-    END as tumor_size,
+    END) as tumor_size,
     CASE Grade
         WHEN 'NA' THEN NULL
         ELSE Grade
@@ -62,7 +63,7 @@ sql_preprocessing: "SELECT
         WHEN 'Tx' THEN 'Breast conservation'
         ELSE NULL
     END as primary_surgical_procedure,
-    dfs as disease_free_survival,
+    log(1 + dfs) as disease_free_survival,
     CASE survstat
         WHEN 1 THEN 'dead'
         WHEN 0 THEN 'alive'
