@@ -1,10 +1,90 @@
-sample_count: 3
-sql_preprocessing: "SELECT * FROM data"
+sample_count: 10
+sql_preprocessing: "SELECT
+  CASE rxarm
+        WHEN 'A' THEN 'Assigned endocrine therapy alone'
+        WHEN 'B' THEN 'Randomized to endocrine therapy alone'
+        WHEN 'C' THEN 'Randomized to chemo + endocrine therapy'
+        WHEN 'D' THEN 'Assigned chemo + endocrine therapy'
+        ELSE NULL 
+    END as treatment_assignment,
+	CASE ChemRegGp
+        WHEN '1CMF' THEN 'CMF'
+        WHEN '2Anthracycline w/o Taxane' THEN 'Anthracycline'
+        WHEN '3Anthracycline and Taxane' THEN 'Anthracycline and Taxane'
+        WHEN '4TC and variations' THEN 'TC'
+        ELSE NULL
+    END as chemotherapy,
+    CASE 
+        WHEN TypeEndocrine IN ('AI', 'OFS & AI', 'Tam & AI') THEN 'Yes'
+        ELSE 'No'
+    END as endocrine_therapy_ai,
+    CASE 
+        WHEN TypeEndocrine IN ('OFS', 'OFS & AI') THEN 'Yes'
+        ELSE 'No'
+    END as endocrine_therapy_ofs,
+    CASE 
+        WHEN TypeEndocrine IN ('Tam', 'Tam & AI') THEN 'Yes'
+        ELSE 'No'
+    END as endocrine_therapy_tam,
+    meno as menopausal_status,
+    RS as genetic_recurrence_score,
+    CASE age
+        WHEN 'NA' THEN NULL
+        ELSE CAST (age AS FLOAT)
+    END as age,    
+    CASE WHEN ethnicity = 1 THEN 'Hispanic'
+         WHEN race = 1 THEN 'White'
+         WHEN race = 3 THEN 'Black'
+         WHEN race = 4 THEN 'Asian'
+         WHEN race = 5 THEN 'Native Hawaiian or Pacific Islander'
+         WHEN race = 6 THEN 'Native American'
+         WHEN race = 7 THEN 'Multirace'
+         ELSE NULL
+    END as race_ethnicity,
+    CASE TumorSize
+        WHEN 'NA' THEN NULL
+        ELSE CAST (TumorSize AS FLOAT)
+    END as tumor_size,
+    CASE Grade
+        WHEN 'NA' THEN NULL
+        ELSE Grade
+    END as tumor_grade,
+    CASE NucGrade
+        WHEN 'NA' THEN NULL
+        ELSE NucGrade
+    END as nuclear_grade,
+    CASE PRStatus
+        WHEN 'NA' THEN NULL
+        ELSE PRStatus
+    END as progesterone_receptor_status,
+    CASE PrimSurg
+        WHEN 'Mx' THEN 'Mastectomy'
+        WHEN 'Tx' THEN 'Breast conservation'
+        ELSE NULL
+    END as primary_surgical_procedure,
+    dfs as disease_free_survival,
+    CASE survstat
+        WHEN 1 THEN 'dead'
+        WHEN 0 THEN 'alive'
+        ELSE NULL
+    END as survival_status,
+    CASE rfiind
+        WHEN 1 THEN 'recurrence'
+        WHEN 0 THEN 'no recurrence'
+        ELSE NULL
+    END as recurrence_indicator,
+    CASE drfiind
+        WHEN 1 THEN 'distant recurrence'
+        WHEN 0 THEN 'no distant recurrence'
+        ELSE NULL
+    END as distant_recurrence_indicator
+FROM data 
+WHERE inel = 0"
 loom:
   # loom config, see here for an example:
   # https://github.com/probcomp/loom/blob/master/loom/config.py
   schedule:
-    extra_passes: 500
+    extra_passes: 2000
     checkpoint_period_sec: 3600
   kernels:
     cat:

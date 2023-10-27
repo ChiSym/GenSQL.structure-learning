@@ -2,6 +2,7 @@ import click
 import orjson
 import duckdb
 import polars as pl
+import duckdb
 from structurelearningapi.column_model import create_column_model
 
 @click.command()
