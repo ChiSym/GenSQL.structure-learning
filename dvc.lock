@@ -2,21 +2,46 @@ schema: '2.0'
 stages:
   preprocess:
     cmd: "poetry run preprocess --data data/data.csv --output data/preprocessed.csv
-      --column_model_output data/column_models.json --sql \"SELECT * FROM data\"\n"
+      --column_model_output data/column_models.json --sql \"SELECT CASE rxarm WHEN
+      'A' THEN 'Assigned endocrine therapy alone' WHEN 'B' THEN 'Randomized to endocrine
+      therapy alone' WHEN 'C' THEN 'Randomized to chemo + endocrine therapy' WHEN
+      'D' THEN 'Assigned chemo + endocrine therapy' ELSE NULL END as treatment_assignment,
+      CASE ChemRegGp WHEN '1CMF' THEN 'CMF' WHEN '2Anthracycline w/o Taxane' THEN
+      'Anthracycline' WHEN '3Anthracycline and Taxane' THEN 'Anthracycline and Taxane'
+      WHEN '4TC and variations' THEN 'TC' ELSE NULL END as chemotherapy, CASE WHEN
+      TypeEndocrine IN ('AI', 'OFS & AI', 'Tam & AI') THEN 'Yes' ELSE 'No' END as
+      endocrine_therapy_ai, CASE WHEN TypeEndocrine IN ('OFS', 'OFS & AI') THEN 'Yes'
+      ELSE 'No' END as endocrine_therapy_ofs, CASE WHEN TypeEndocrine IN ('Tam', 'Tam
+      & AI') THEN 'Yes' ELSE 'No' END as endocrine_therapy_tam, meno as menopausal_status,
+      RS as genetic_recurrence_score, CASE age WHEN 'NA' THEN NULL ELSE CAST (age
+      AS FLOAT) END as age, CASE WHEN ethnicity = 1 THEN 'Hispanic' WHEN race = 1
+      THEN 'White' WHEN race = 3 THEN 'Black' WHEN race = 4 THEN 'Asian' WHEN race
+      = 5 THEN 'Native Hawaiian or Pacific Islander' WHEN race = 6 THEN 'Native American'
+      WHEN race = 7 THEN 'Multirace' ELSE NULL END as race_ethnicity, CASE TumorSize
+      WHEN 'NA' THEN NULL ELSE CAST (TumorSize AS FLOAT) END as tumor_size, CASE Grade
+      WHEN 'NA' THEN NULL ELSE Grade END as tumor_grade, CASE NucGrade WHEN 'NA' THEN
+      NULL ELSE NucGrade END as nuclear_grade, CASE PRStatus WHEN 'NA' THEN NULL ELSE
+      PRStatus END as progesterone_receptor_status, CASE PrimSurg WHEN 'Mx' THEN 'Mastectomy'
+      WHEN 'Tx' THEN 'Breast conservation' ELSE NULL END as primary_surgical_procedure,
+      dfs as disease_free_survival, CASE survstat WHEN 1 THEN 'dead' WHEN 0 THEN 'alive'
+      ELSE NULL END as survival_status, CASE rfiind WHEN 1 THEN 'recurrence' WHEN
+      0 THEN 'no recurrence' ELSE NULL END as recurrence_indicator, CASE drfiind WHEN
+      1 THEN 'distant recurrence' WHEN 0 THEN 'no distant recurrence' ELSE NULL END
+      as distant_recurrence_indicator FROM data WHERE inel = 0\"\n"
     deps:
     - path: data/data.csv
       hash: md5
-      md5: d857eea6862365fb883c29312e6d5b46
-      size: 17933
+      md5: 934f3db330d8af2c7e0e5b136725b09b
+      size: 1852524
     outs:
     - path: data/column_models.json
       hash: md5
-      md5: d63357a222578d883286d7630fdcaf07
-      size: 2531
+      md5: 248068287f48c356472777cc66925702
+      size: 2517
     - path: data/preprocessed.csv
       hash: md5
-      md5: 3925fc60051c23a623f684df372f9663
-      size: 1989484
+      md5: e78dc14ab06b70415d65a81c6c77b473
+      size: 1542279
   create-column-models:
     cmd: "poetry run create-column-models --data data/preprocessed.csv --output data/column_models.json\n"
     deps:
@@ -35,8 +60,8 @@ stages:
     deps:
     - path: data/column_models.json
       hash: md5
-      md5: d63357a222578d883286d7630fdcaf07
-      size: 2531
+      md5: 248068287f48c356472777cc66925702
+      size: 2517
     outs:
     - path: data/loom-schema.json
       hash: md5
@@ -51,17 +76,17 @@ stages:
       size: 550
     - path: data/preprocessed.csv
       hash: md5
-      md5: 3925fc60051c23a623f684df372f9663
-      size: 1989484
+      md5: e78dc14ab06b70415d65a81c6c77b473
+      size: 1542279
     outs:
     - path: loom/ingest
       hash: md5
-      md5: 00a3b2ba4a809f48af1ea790bffb1ab3.dir
-      size: 418198
+      md5: aa89248fa61c2419b94b78cbebf7c492.dir
+      size: 395290
       nfiles: 7
     - path: loom/query
       hash: md5
-      md5: 077ccbaffe78e4585bd316f1285a0a5c.dir
+      md5: 85aed627b5ef0e4c54023dff29295ab3.dir
       size: 106
       nfiles: 1
   loom-infer-config:
@@ -69,42 +94,42 @@ stages:
     outs:
     - path: data/infer-config.json
       hash: md5
-      md5: 635e45f25f5910fb341da47f54770bdf
-      size: 204
+      md5: 7f928ec52cc41312803872ea38fbf3d2
+      size: 152
   loom-infer:
-    cmd: ./bin/loom_task infer loom 3 data/infer-config.json
+    cmd: ./bin/loom_task infer loom 10 data/infer-config.json
     deps:
     - path: data/infer-config.json
       hash: md5
-      md5: 635e45f25f5910fb341da47f54770bdf
-      size: 204
+      md5: 7f928ec52cc41312803872ea38fbf3d2
+      size: 152
     - path: loom/ingest
       hash: md5
-      md5: 00a3b2ba4a809f48af1ea790bffb1ab3.dir
-      size: 418198
+      md5: aa89248fa61c2419b94b78cbebf7c492.dir
+      size: 395290
       nfiles: 7
     - path: loom/query
       hash: md5
-      md5: 077ccbaffe78e4585bd316f1285a0a5c.dir
+      md5: 85aed627b5ef0e4c54023dff29295ab3.dir
       size: 106
       nfiles: 1
     params:
       params.yaml:
-        sample_count: 3
+        sample_count: 10
     outs:
     - path: loom/samples
       hash: md5
-      md5: e6143357995d5dfa0dfd24c13f2eef1b.dir
-      size: 57249648
-      nfiles: 184
+      md5: 88fc75e61ae25311f7baded15625f28e.dir
+      size: 10357748
+      nfiles: 112
   loom-sample:
     cmd: "./bin/loom python scripts/loom_sample.py --sample_count 10000 --output data/synthetic-data-loom.csv\n"
     deps:
     - path: loom/samples
       hash: md5
-      md5: e6143357995d5dfa0dfd24c13f2eef1b.dir
-      size: 57249648
-      nfiles: 184
+      md5: 88fc75e61ae25311f7baded15625f28e.dir
+      size: 10357748
+      nfiles: 112
     - path: scripts/loom_sample.py
       hash: md5
       md5: d6449af8a6b43427f73f6ff14a87aec7
@@ -112,8 +137,8 @@ stages:
     outs:
     - path: data/synthetic-data-loom.csv
       hash: md5
-      md5: 8af2dd438a073a3989331a83ff89d282
-      size: 1906965
+      md5: f0571777f7b9bd01657d12bba3b2c5e8
+      size: 1940396
   loom-dump-metadata:
     cmd: "find loom/samples -type f ! -name '*.json' | parallel --verbose \"./bin/loom
       python scripts/loom_to_json.py loom_to_json {}\"\n"
@@ -139,15 +164,52 @@ stages:
       md5: eda41ef5ea950d8392cd4b1f2643f09f.dir
       size: 1162419
       nfiles: 42
+  marginal-fits-loom:
+    cmd: "mkdir -p qc/marginals && poetry run marginal_fits --real_data data/preprocessed.csv
+      --model loom  --column_models data/column_models.json\n"
+    deps:
+    - path: data/preprocessed.csv
+      hash: md5
+      md5: e78dc14ab06b70415d65a81c6c77b473
+      size: 1542279
+    - path: data/synthetic-data-loom.csv
+      hash: md5
+      md5: f0571777f7b9bd01657d12bba3b2c5e8
+      size: 1940396
+    outs:
+    - path: qc/marginals/loom_1d_fits.csv
+      hash: md5
+      md5: b2c9fcab553d7c5021c5200a11f6a4d8
+      size: 937
+    - path: qc/marginals/loom_2d_fits.csv
+      hash: md5
+      md5: 0bcdcd91d9980a1247b640eea2a8c1c4
+      size: 12685
+    - path: qc/marginals/loom_worst_1d_fit.html
+      hash: md5
+      md5: 1e104ed4cd7a02f4a3b1251958eaa1d5
+      size: 3640161
+    - path: qc/marginals/loom_worst_1d_fit.png
+      hash: md5
+      md5: f5d47286c9e3612c7bf9e97c62434bb5
+      size: 101569
+    - path: qc/marginals/loom_worst_2d_fit.html
+      hash: md5
+      md5: 688e7c784c767580a83b4ea9ca253a24
+      size: 3907198
+    - path: qc/marginals/loom_worst_2d_fit.png
+      hash: md5
+      md5: 0cae8cd23127a4a2ebe6b62cdd893c96
+      size: 96790
   loom-to-json:
     cmd: "find loom/samples -type f ! -name '*.json' | parallel  \"./bin/loom python
       scripts/loom_to_json.py loom_to_json {}\"\n"
     deps:
     - path: loom/samples
       hash: md5
-      md5: e6143357995d5dfa0dfd24c13f2eef1b.dir
-      size: 57249648
-      nfiles: 184
+      md5: 4b161cc9ecf0e70eb46f732847a14dfd.dir
+      size: 52280630
+      nfiles: 182
   loom-to-cgpm:
     cmd: "mkdir -p data/cgpm/hydrated && ls loom/samples | parallel  \"poetry run
       loom_to_cgpm --column_model_filename data/column_models.json --data_filename
@@ -156,22 +218,22 @@ stages:
     deps:
     - path: data/column_models.json
       hash: md5
-      md5: d63357a222578d883286d7630fdcaf07
-      size: 2531
+      md5: 248068287f48c356472777cc66925702
+      size: 2517
     - path: data/preprocessed.csv
       hash: md5
-      md5: 3925fc60051c23a623f684df372f9663
-      size: 1989484
+      md5: e78dc14ab06b70415d65a81c6c77b473
+      size: 1542279
     - path: loom/samples
       hash: md5
-      md5: e6143357995d5dfa0dfd24c13f2eef1b.dir
-      size: 57249648
-      nfiles: 184
+      md5: 4b161cc9ecf0e70eb46f732847a14dfd.dir
+      size: 52280630
+      nfiles: 182
     outs:
     - path: data/cgpm/hydrated
       hash: md5
-      md5: 51970748ea798aa23525e1a6003109d2.dir
-      size: 11211274
+      md5: cdd48e1552a0c1d8e4cf9d42012da4f3.dir
+      size: 10764041
       nfiles: 10
   cgpm-hydrated-sample:
     cmd: "poetry run cgpm-sample --sample_count 10000 --output data/synthetic-data-cgpm-raw.csv
@@ -179,353 +241,48 @@ stages:
     deps:
     - path: data/cgpm/hydrated
       hash: md5
-      md5: 66ac088de57ef99086f016d4404ba7de.dir
-      size: 11185489
+      md5: cdd48e1552a0c1d8e4cf9d42012da4f3.dir
+      size: 10764041
       nfiles: 10
     outs:
     - path: data/synthetic-data-cgpm-raw.csv
       hash: md5
-      md5: df2210c18c98fc74093c77ab102752f8
-      size: 2111766
+      md5: bb50fffe5dc39b26c637dfa252326882
+      size: 2126807
   marginal-fits-cgpm-raw:
     cmd: "mkdir -p qc/marginals && poetry run marginal_fits --real_data data/preprocessed.csv
-      --model cgpm-raw --column_models data/column_models.json\n"
+      --model cgpm-raw  --column_models data/column_models.json\n"
     deps:
     - path: data/preprocessed.csv
       hash: md5
-      md5: 3925fc60051c23a623f684df372f9663
-      size: 1989484
+      md5: e78dc14ab06b70415d65a81c6c77b473
+      size: 1542279
     - path: data/synthetic-data-cgpm-raw.csv
       hash: md5
-      md5: df2210c18c98fc74093c77ab102752f8
-      size: 2111766
+      md5: bb50fffe5dc39b26c637dfa252326882
+      size: 2126807
     outs:
     - path: qc/marginals/cgpm-raw_1d_fits.csv
       hash: md5
-      md5: e9673048c9e37ae244b2019b4b29d928
+      md5: 54b805228a6b8e9bee4c94962392e493
       size: 938
     - path: qc/marginals/cgpm-raw_2d_fits.csv
       hash: md5
-      md5: 7691e2fd4069db13cef477d2810f27a1
-      size: 12666
+      md5: f5765d2bbcbdd5cf4f7598d1c0d79269
+      size: 12679
     - path: qc/marginals/cgpm-raw_worst_1d_fit.html
       hash: md5
-      md5: 87e2e54b3f7053abb9b3eed39847de0a
-      size: 3646626
+      md5: 4be77d9b0b69ba30569012488d956baf
+      size: 4402982
     - path: qc/marginals/cgpm-raw_worst_1d_fit.png
       hash: md5
-      md5: 3d6e9904aa93c4a0c449f978ed5656e2
-      size: 107812
+      md5: 61cb7e802519356e225afa61166df82b
+      size: 218453
     - path: qc/marginals/cgpm-raw_worst_2d_fit.html
       hash: md5
-      md5: 5cb986ce22861cf01f7f426e1a184d76
-      size: 3963136
+      md5: 9405ca191b468568d9309abfa8954d70
+      size: 4583594
     - path: qc/marginals/cgpm-raw_worst_2d_fit.png
       hash: md5
-      md5: a6a5060e3a2fc3248142cb4c9de16511
-      size: 82729
-  dependence-probability:
-    cmd: poetry run dependence-probability --model_dir data/cgpm/hydrated --out_file
-      qc/cgpm-hydrated-dependence-probability.csv
-    deps:
-    - path: data/cgpm/hydrated
-      hash: md5
-      md5: 66ac088de57ef99086f016d4404ba7de.dir
-      size: 11185489
-      nfiles: 10
-    outs:
-    - path: qc/cgpm-hydrated-dependence-probability.csv
-      hash: md5
-      md5: ee59bfed87067e1bc8fd866fb4be4c7a
-      size: 13646
-  marginal-fits-cgpm-raw@0:
-    cmd: "mkdir -p qc/marginals && poetry run marginal_fits --real_data data/preprocessed.csv
-      --model \"cgpm-raw0\"  --column_models data/column_models.json\n"
-    deps:
-    - path: data/preprocessed.csv
-      hash: md5
-      md5: 3925fc60051c23a623f684df372f9663
-      size: 1989484
-    - path: data/synthetic-data-cgpm-raw0.csv
-      hash: md5
-      md5: 3b7e6e5ab69410c68dc5d13514bf41bc
-      size: 2112827
-  marginal-fits-cgpm-raw@1:
-    cmd: "mkdir -p qc/marginals && poetry run marginal_fits --real_data data/preprocessed.csv
-      --model \"cgpm-raw1\"  --column_models data/column_models.json\n"
-    deps:
-    - path: data/preprocessed.csv
-      hash: md5
-      md5: 3925fc60051c23a623f684df372f9663
-      size: 1989484
-    - path: data/synthetic-data-cgpm-raw0.csv
-      hash: md5
-      md5: 3b7e6e5ab69410c68dc5d13514bf41bc
-      size: 2112827
-  marginal-fits-cgpm-raw@2:
-    cmd: "mkdir -p qc/marginals && poetry run marginal_fits --real_data data/preprocessed.csv
-      --model \"cgpm-raw2\"  --column_models data/column_models.json\n"
-    deps:
-    - path: data/preprocessed.csv
-      hash: md5
-      md5: 3925fc60051c23a623f684df372f9663
-      size: 1989484
-    - path: data/synthetic-data-cgpm-raw0.csv
-      hash: md5
-      md5: 3b7e6e5ab69410c68dc5d13514bf41bc
-      size: 2112827
-  marginal-fits-cgpm-raw@3:
-    cmd: "mkdir -p qc/marginals && poetry run marginal_fits --real_data data/preprocessed.csv
-      --model \"cgpm-raw3\"  --column_models data/column_models.json\n"
-    deps:
-    - path: data/preprocessed.csv
-      hash: md5
-      md5: 3925fc60051c23a623f684df372f9663
-      size: 1989484
-    - path: data/synthetic-data-cgpm-raw0.csv
-      hash: md5
-      md5: 3b7e6e5ab69410c68dc5d13514bf41bc
-      size: 2112827
-  marginal-fits-cgpm-raw@4:
-    cmd: "mkdir -p qc/marginals && poetry run marginal_fits --real_data data/preprocessed.csv
-      --model \"cgpm-raw4\"  --column_models data/column_models.json\n"
-    deps:
-    - path: data/preprocessed.csv
-      hash: md5
-      md5: 3925fc60051c23a623f684df372f9663
-      size: 1989484
-    - path: data/synthetic-data-cgpm-raw0.csv
-      hash: md5
-      md5: 3b7e6e5ab69410c68dc5d13514bf41bc
-      size: 2112827
-  marginal-fits-cgpm-raw@5:
-    cmd: "mkdir -p qc/marginals && poetry run marginal_fits --real_data data/preprocessed.csv
-      --model \"cgpm-raw5\"  --column_models data/column_models.json\n"
-    deps:
-    - path: data/preprocessed.csv
-      hash: md5
-      md5: 3925fc60051c23a623f684df372f9663
-      size: 1989484
-    - path: data/synthetic-data-cgpm-raw0.csv
-      hash: md5
-      md5: 3b7e6e5ab69410c68dc5d13514bf41bc
-      size: 2112827
-  marginal-fits-cgpm-raw@6:
-    cmd: "mkdir -p qc/marginals && poetry run marginal_fits --real_data data/preprocessed.csv
-      --model \"cgpm-raw6\"  --column_models data/column_models.json\n"
-    deps:
-    - path: data/preprocessed.csv
-      hash: md5
-      md5: 3925fc60051c23a623f684df372f9663
-      size: 1989484
-    - path: data/synthetic-data-cgpm-raw0.csv
-      hash: md5
-      md5: 3b7e6e5ab69410c68dc5d13514bf41bc
-      size: 2112827
-  marginal-fits-cgpm-raw@7:
-    cmd: "mkdir -p qc/marginals && poetry run marginal_fits --real_data data/preprocessed.csv
-      --model \"cgpm-raw7\"  --column_models data/column_models.json\n"
-    deps:
-    - path: data/preprocessed.csv
-      hash: md5
-      md5: 3925fc60051c23a623f684df372f9663
-      size: 1989484
-    - path: data/synthetic-data-cgpm-raw0.csv
-      hash: md5
-      md5: 3b7e6e5ab69410c68dc5d13514bf41bc
-      size: 2112827
-  marginal-fits-cgpm-raw@8:
-    cmd: "mkdir -p qc/marginals && poetry run marginal_fits --real_data data/preprocessed.csv
-      --model \"cgpm-raw8\"  --column_models data/column_models.json\n"
-    deps:
-    - path: data/preprocessed.csv
-      hash: md5
-      md5: 3925fc60051c23a623f684df372f9663
-      size: 1989484
-    - path: data/synthetic-data-cgpm-raw0.csv
-      hash: md5
-      md5: 3b7e6e5ab69410c68dc5d13514bf41bc
-      size: 2112827
-  marginal-fits-cgpm-raw@9:
-    cmd: "mkdir -p qc/marginals && poetry run marginal_fits --real_data data/preprocessed.csv
-      --model \"cgpm-raw9\"  --column_models data/column_models.json\n"
-    deps:
-    - path: data/preprocessed.csv
-      hash: md5
-      md5: 3925fc60051c23a623f684df372f9663
-      size: 1989484
-    - path: data/synthetic-data-cgpm-raw0.csv
-      hash: md5
-      md5: 3b7e6e5ab69410c68dc5d13514bf41bc
-      size: 2112827
-  cgpm-to-sppl:
-    cmd: "poetry run cgpm-to-sppl --output data/sppl/merged.json --model_dir data/cgpm/hydrated
-      --data data/preprocessed.csv\n"
-    deps:
-    - path: data/cgpm/hydrated
-      hash: md5
-      md5: 51970748ea798aa23525e1a6003109d2.dir
-      size: 11211274
-      nfiles: 10
-    outs:
-    - path: data/sppl/merged.json
-      hash: md5
-      md5: 297180e4db2100cb152d1e69634bed0e
-      size: 781926
-  sample-sppl:
-    cmd: "poetry run sample-sppl --sample_count 10000 --output data/synthetic-data-sppl-hydrated.csv
-      --model data/sppl/merged.json --data data/preprocessed.csv\n"
-    deps:
-    - path: data/sppl/merged.json
-      hash: md5
-      md5: 297180e4db2100cb152d1e69634bed0e
-      size: 781926
-    outs:
-    - path: data/synthetic-data-sppl-hydrated.csv
-      hash: md5
-      md5: 8d2fd494ad84addadf7281780efef21b
-      size: 2111294
-  marginal-fits@loom:
-    cmd: "poetry run marginal_fits --real_data data/preprocessed.csv --model loom
-      --column_models data/column_models.json\n"
-    deps:
-    - path: data/preprocessed.csv
-      hash: md5
-      md5: 3925fc60051c23a623f684df372f9663
-      size: 1989484
-    - path: data/synthetic-data-loom.csv
-      hash: md5
-      md5: 8af2dd438a073a3989331a83ff89d282
-      size: 1906965
-    outs:
-    - path: qc/marginals/loom_1d_fits.csv
-      hash: md5
-      md5: 51e0313a764f03559fc51598249a2d2f
-      size: 938
-    - path: qc/marginals/loom_2d_fits.csv
-      hash: md5
-      md5: e70c9e676b71da7261c9bd07c74fc321
-      size: 12687
-    - path: qc/marginals/loom_worst_1d_fit.html
-      hash: md5
-      md5: c5eb7e9189d33f1ded958c0919310994
-      size: 3646360
-    - path: qc/marginals/loom_worst_1d_fit.png
-      hash: md5
-      md5: 335cb5624f6539bdc502a6a7dd7769d2
-      size: 112897
-    - path: qc/marginals/loom_worst_2d_fit.html
-      hash: md5
-      md5: 396825ef6dff17caa4cc458764db41d7
-      size: 3932177
-    - path: qc/marginals/loom_worst_2d_fit.png
-      hash: md5
-      md5: 406b6189d61eedab7f41cbf1ccf846a3
-      size: 77222
-  cgpm-sample@hydrated:
-    cmd: "poetry run cgpm-sample --sample_count 10000 --output data/synthetic-data-cgpm-hydrated.csv
-      --model_dir data/cgpm/hydrated --data data/preprocessed.csv\n"
-    deps:
-    - path: data/cgpm/hydrated
-      hash: md5
-      md5: 51970748ea798aa23525e1a6003109d2.dir
-      size: 11211274
-      nfiles: 10
-    outs:
-    - path: data/synthetic-data-cgpm-hydrated.csv
-      hash: md5
-      md5: 974ae56feb143f7088189774c9f1209b
-      size: 2113333
-  marginal-fits@cgpm-hydrated:
-    cmd: "poetry run marginal_fits --real_data data/preprocessed.csv --model cgpm-hydrated
-      --column_models data/column_models.json\n"
-    deps:
-    - path: data/preprocessed.csv
-      hash: md5
-      md5: 3925fc60051c23a623f684df372f9663
-      size: 1989484
-    - path: data/synthetic-data-cgpm-hydrated.csv
-      hash: md5
-      md5: 974ae56feb143f7088189774c9f1209b
-      size: 2113333
-    outs:
-    - path: qc/marginals/cgpm-hydrated_1d_fits.csv
-      hash: md5
-      md5: 66a19dd0dc421b9b9ed2c2305d6b95f1
-      size: 938
-    - path: qc/marginals/cgpm-hydrated_2d_fits.csv
-      hash: md5
-      md5: a3cb46d657351da3f63cd301a007455b
-      size: 12688
-    - path: qc/marginals/cgpm-hydrated_worst_1d_fit.html
-      hash: md5
-      md5: c8bbc28c904c2bfde28384200c24d8b4
-      size: 3646676
-    - path: qc/marginals/cgpm-hydrated_worst_1d_fit.png
-      hash: md5
-      md5: dc24b5bfb4ebb52cd648dc04c6d88c1a
-      size: 108895
-    - path: qc/marginals/cgpm-hydrated_worst_2d_fit.html
-      hash: md5
-      md5: 4e7a7d0ea9d090bc3834be68f9deb49d
-      size: 4100156
-    - path: qc/marginals/cgpm-hydrated_worst_2d_fit.png
-      hash: md5
-      md5: 7b21364e9f050cd37d84d430d9fa1dfd
-      size: 94315
-  marginal-fits@sppl-hydrated:
-    cmd: "poetry run marginal_fits --real_data data/preprocessed.csv --model sppl-hydrated
-      --column_models data/column_models.json\n"
-    deps:
-    - path: data/preprocessed.csv
-      hash: md5
-      md5: 3925fc60051c23a623f684df372f9663
-      size: 1989484
-    - path: data/synthetic-data-sppl-hydrated.csv
-      hash: md5
-      md5: 8d2fd494ad84addadf7281780efef21b
-      size: 2111294
-    outs:
-    - path: qc/marginals/sppl-hydrated_1d_fits.csv
-      hash: md5
-      md5: c65ab006f89e1f30e3d193e7ba2cddcf
-      size: 937
-    - path: qc/marginals/sppl-hydrated_2d_fits.csv
-      hash: md5
-      md5: 378dac467777bb968939ad7d3782c196
-      size: 12697
-    - path: qc/marginals/sppl-hydrated_worst_1d_fit.html
-      hash: md5
-      md5: 5513138fbd53e8d7d6141ebaedfb6271
-      size: 3646534
-    - path: qc/marginals/sppl-hydrated_worst_1d_fit.png
-      hash: md5
-      md5: e7d9a7089d1ffc3edab173e69dfa47fe
-      size: 107126
-    - path: qc/marginals/sppl-hydrated_worst_2d_fit.html
-      hash: md5
-      md5: 5cfa4638d65845ac8a9f3b1033e9a8fd
-      size: 4099817
-    - path: qc/marginals/sppl-hydrated_worst_2d_fit.png
-      hash: md5
-      md5: 33f8ec1babdcf8fa89f4e5b838b9f082
-      size: 93984
-  dependence-probability@hydrated:
-    cmd: poetry run dependence-probability --model_dir data/cgpm/hydrated --out_file
-      qc/cgpm-hydrated-dependence-probability.csv
-    deps:
-    - path: data/cgpm/hydrated
-      hash: md5
-      md5: 51970748ea798aa23525e1a6003109d2.dir
-      size: 11211274
-      nfiles: 10
-    outs:
-    - path: qc/cgpm-hydrated-dependence-probability.csv
-      hash: md5
-      md5: 3a3e5ca50453a75c9c686536843aceed
-      size: 13647
-  regression:
-    cmd: "poetry run regression  --data data/preprocessed.csv  --formula \" genetic_recurrence_score
-      ~ age.cut([50, 65]) + chemotherapy + progesterone_receptor_status \" --model_filename
-      data/sppl/merged.json  --column_model_filename data/column_models.json --result_filename
-      data/prediction.csv\n"
+      md5: 977465aee2517bfaebc19bee8c849279
+      size: 156865
