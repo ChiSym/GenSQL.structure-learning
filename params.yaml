@@ -84,11 +84,13 @@ loom:
   # loom config, see here for an example:
   # https://github.com/probcomp/loom/blob/master/loom/config.py
   schedule:
-    extra_passes: 2000
+    extra_passes: 500
     checkpoint_period_sec: 3600
   kernels:
+    kind:
+        empty_kind_count: 100
     cat:
-      empty_group_count: 10
+      empty_group_count: 100
 qc:
   # Set this to the number of synthetic samples desired in QC plots.
   sample_count: 10000
