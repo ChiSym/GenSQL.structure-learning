@@ -16,7 +16,7 @@ def sample_cgpm(sample_count, model_dir, output, data):
     sample_filenames = os.listdir(model_dir)
     n_models = len(sample_filenames)
 
-    metadatas = [get_metadata(
+    metadatas = [deserialize(
             os.path.join(model_dir, sample_filename))
         for sample_filename in sample_filenames]
 
@@ -56,7 +56,3 @@ def get_wrapper(metadata, df):
         metadata.column_models, 
         metadata.constraints
     )
-
-def get_metadata(filename):
-    with open(filename, "rb") as f:
-        return deserialize(f.read())
