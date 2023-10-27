@@ -41,9 +41,10 @@ def parse_assign(filename):
         for a in stream
     }
     rowids = sorted(assignments)
+    n_k = len(next(iter(assignments.values())))
     return {
         k: [assignments[rowid][k] for rowid in rowids]
-        for k in xrange(len(assignments[0]))
+        for k in xrange(n_k)
     }
 
 
