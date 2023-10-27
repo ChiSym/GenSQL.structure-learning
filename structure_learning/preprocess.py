@@ -1,6 +1,7 @@
 import click
 import orjson
 import polars as pl
+import duckdb
 from structurelearningapi.column_model import create_column_model
 
 @click.command()
@@ -10,11 +11,8 @@ from structurelearningapi.column_model import create_column_model
 @click.option('--column_model_output', help='Path to the column models output file')
 def preprocess(data, sql, output, column_model_output):
     data = pl.read_csv(data, infer_schema_length=None)
-    data = data.sample(fraction=1, shuffle=True, seed=123)
-    preprocessed = pl.SQLContext(data=data).execute(
-        sql
-    )
-    preprocessed = preprocessed.collect()
+
+    preprocessed = duckdb.sql(sql).pl()
 
     model = create_column_model(preprocessed)
 
