@@ -84,7 +84,7 @@ loom:
   # loom config, see here for an example:
   # https://github.com/probcomp/loom/blob/master/loom/config.py
   schedule:
-    extra_passes: 500
+    extra_passes: 2000
     checkpoint_period_sec: 3600
   kernels:
     kind:
