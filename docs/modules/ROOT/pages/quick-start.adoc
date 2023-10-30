@@ -70,15 +70,11 @@ TIP: Add columns you are particularly interested in to the `columns` section for
 
 If not, see the section below on editing the schema generation.
 
-== Query the model
-
+== Querying the model
 There are different ways to query automatically built models from Python,
-Clojure and JavaScript. The easiest way to query models is via an https://observablehq.com/[Observable noteook]: Type the following and follow instructions:
-[source,bash]
-----
-iql-query-server
-
-----
+Clojure and JavaScript.
+Checkout the https://github.com/InferenceQL/inferenceql.query[inferenceQL.query repository]
+about how to query models and data.
 
 == Publish your results
 
