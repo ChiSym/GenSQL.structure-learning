@@ -13,34 +13,41 @@ sections go into more detail about different backends for auto-modeling and a nu
 
 === Dependencies
 
-Auto-modeling uses the Nix package manager to manage its dependencies. To install the dependencies, first https://nixos.org/download.html[install Nix], then https://nixos.wiki/wiki/Flakes#Enable_flakes[enable flakes]. (On Windows, you will need to first https://docs.microsoft.com/en-us/windows/wsl/install[install WSL] and then install Nix within WSL's Ubuntu terminal, following the https://nixos.org/download.html#nix-install-windows[Nix installation instructions for WSL].)
+We rely on the Devenv package manager. Please find instructions to install it https://devenv.sh/getting-started/[here]. Devenv takes care of all our dependencies; currently confirmed to be working on Ubuntu and Mac.
+
+Further, we require docker to be installed and to be runnable without `sudo`.
+Installation instructions for Mac or Ubuntu are
+https://docs.docker.com/engine/install/[here]. Then,
+1. if on linux, run postinstall script: https://docs.docker.com/engine/install/linux-postinstall/
+2. login using credentials sufficient for probcomp’s Docker org:
+    1. if on linux run `docker login`
+    2. if on mac, open the Docker app GUI and log in with credentials
+3. Pull the Loom Docker image:
+    1. Confirm you have access to view https://hub.docker.com/r/probcomp/inferenceql.loom
+    2. Run `docker pull probcomp/inferenceql.loom`
 
 === Download Auto-modeling
 
-If you are installing from a zipfile
-[source,bash]
-----
-unzip InferenceQL.v0.zip
-----
-If you are installing from gity
+Install from git
 [source,bash]
 ----
 git clone git@github.com:OpenIQL/inferenceql.auto-modeling.git InferenceQL
 ----
 
-=== Start the Nix development shell
+=== Start the devenv shell
 
 To install modeling capabilities, go to the auto-modeling directory:
 [source,bash]
 ----
 cd InferenceQL
 ----
-and install the dependencies by running:
+and enter a development shell that includes all the dependencies by running:
 [source,bash]
 ----
-nix develop
+devenv shell
 ----
-WARNING: on macOS, this step can take up to an hour. The reason is that certain dependencies get compiled from scratch. It will only be slow once. The second time you run the `nix develop` command, it will succeed instantaneously.
+WARNING: on macOS, this step can take up to an hour. The reason is that certain dependencies get compiled from scratch. It will only be slow once. The second time you run the `devenv shell` command, it will succeed instantaneously.
+
 
 == Building your first model
 
