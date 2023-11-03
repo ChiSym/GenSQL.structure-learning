@@ -1,5 +1,39 @@
-sample_count: 3
-sql_preprocessing: "SELECT * FROM data"
+sample_count: 10
+sql_preprocessing:
+  ALTER TABLE data 
+    RENAME race_h to race;
+  ALTER TABLE data 
+    RENAME marstat to marital_status;
+  ALTER TABLE data 
+    RENAME no_milstat to no_immediate_family_served_military;
+  ALTER TABLE data 
+    RENAME relig_imp to religion_importance;
+  ALTER TABLE data 
+    RENAME relig_church to church_attendance;
+  ALTER TABLE data 
+    RENAME pid7 to partisan_identity;
+  ALTER TABLE data 
+    RENAME ideo5 to ideology;
+  ALTER TABLE data 
+    RENAME faminc to family_income;
+  ALTER TABLE data 
+    RENAME employ to employment_status;
+  ALTER TABLE data 
+    RENAME no_healthins to uninsured;
+  ALTER TABLE data 
+    RENAME union to union_membership;
+  ALTER TABLE data 
+    RENAME newsint to interest_in_news;
+  ALTER TABLE data 
+    RENAME vv_turnout_gvm to voted_general_election;
+  ALTER TABLE data 
+    RENAME approval_pres to approval_president;
+  ALTER TABLE data 
+    RENAME voted_pres_party to voted_president_party;
+ SELECT 
+  year, gender, age, educ, race, citizen, religion, religion_importance, church_attendance, marital_status, ownhome, has_child, no_immediate_family_served_military,
+  partisan_identity, ideology, family_income, employment_status, uninsured, union_membership, economy_retro, interest_in_news, voted_general_election, approval_president,
+  voted_president_party FROM data
 loom:
   # loom config, see here for an example:
   # https://github.com/probcomp/loom/blob/master/loom/config.py
