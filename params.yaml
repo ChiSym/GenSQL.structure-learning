@@ -26,12 +26,11 @@ sql_preprocessing:
   approval_pres as approval_president,
   voted_pres_party as voted_president_party 
   FROM data
-  LIMIT 20000
 loom:
   # loom config, see here for an example:
   # https://github.com/probcomp/loom/blob/master/loom/config.py
   schedule:
-    extra_passes: 500
+    extra_passes: 200
     checkpoint_period_sec: 3600
   kernels:
     cat:
