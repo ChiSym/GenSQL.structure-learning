@@ -1,6 +1,7 @@
 import click
 import polars as pl
 import orjson
+import os
 import plotly
 from sdv.metadata import SingleTableMetadata
 from sdmetrics.reports.single_table import QualityReport
@@ -12,6 +13,9 @@ from sdmetrics.reports import utils
 @click.option('--column_models', help='Path to the column models file')
 @click.option('--model', help='Name of the model to be evaluated')
 def marginal_fits(real_data, model, column_models):
+    if not os.path.exists("qc/marginals"):
+        os.mkdir("qc/marginals") 
+
     with open(column_models, "rb") as f:
         column_models = orjson.loads(f.read())
 

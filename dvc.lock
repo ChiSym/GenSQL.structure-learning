@@ -2,38 +2,12 @@ schema: '2.0'
 stages:
   preprocess:
     cmd: "poetry run preprocess --data data/data.csv --output data/preprocessed.csv
-      --column_model_output data/column_models.json --sql \"SELECT CASE rxarm WHEN
-      'A' THEN 'Assigned endocrine therapy alone' WHEN 'B' THEN 'Randomized to endocrine
-      therapy alone' WHEN 'C' THEN 'Randomized to chemo + endocrine therapy' WHEN
-      'D' THEN 'Assigned chemo + endocrine therapy' ELSE NULL END as treatment_assignment,
-      CASE ChemRegGp WHEN '1CMF' THEN 'CMF' WHEN '2Anthracycline w/o Taxane' THEN
-      'Anthracycline' WHEN '3Anthracycline and Taxane' THEN 'Anthracycline and Taxane'
-      WHEN '4TC and variations' THEN 'TC' WHEN '6None' THEN 'None' ELSE NULL END as
-      chemotherapy, CASE WHEN TypeEndocrine IN ('AI', 'OFS & AI', 'Tam & AI') THEN
-      'Yes' ELSE 'No' END as endocrine_therapy_ai, CASE WHEN TypeEndocrine IN ('OFS',
-      'OFS & AI') THEN 'Yes' ELSE 'No' END as endocrine_therapy_ofs, CASE WHEN TypeEndocrine
-      IN ('Tam', 'Tam & AI') THEN 'Yes' ELSE 'No' END as endocrine_therapy_tam, meno
-      as menopausal_status, log(1 + RS) as genetic_recurrence_score, CASE age WHEN
-      'NA' THEN NULL ELSE CAST (age AS FLOAT) END as age, CASE WHEN ethnicity = 1
-      THEN 'Hispanic' WHEN race = 1 THEN 'White' WHEN race = 3 THEN 'Black' WHEN race
-      = 4 THEN 'Asian' WHEN race = 5 THEN 'Native Hawaiian or Pacific Islander' WHEN
-      race = 6 THEN 'Native American' WHEN race = 7 THEN 'Multirace' ELSE NULL END
-      as race_ethnicity, log(CASE TumorSize WHEN 'NA' THEN NULL ELSE CAST (TumorSize
-      AS FLOAT) END) as tumor_size, CASE Grade WHEN 'NA' THEN NULL ELSE Grade END
-      as tumor_grade, CASE NucGrade WHEN 'NA' THEN NULL ELSE NucGrade END as nuclear_grade,
-      CASE PRStatus WHEN 'NA' THEN NULL ELSE PRStatus END as progesterone_receptor_status,
-      CASE PrimSurg WHEN 'Mx' THEN 'Mastectomy' WHEN 'Tx' THEN 'Breast conservation'
-      ELSE NULL END as primary_surgical_procedure, log(1 + dfs) as disease_free_survival,
-      CASE survstat WHEN 1 THEN 'dead' WHEN 0 THEN 'alive' ELSE NULL END as survival_status,
-      CASE rfiind WHEN 1 THEN 'recurrence' WHEN 0 THEN 'no recurrence' ELSE NULL END
-      as recurrence_indicator, CASE drfiind WHEN 1 THEN 'distant recurrence' WHEN
-      0 THEN 'no distant recurrence' ELSE NULL END as distant_recurrence_indicator
-      FROM data WHERE inel = 0\"\n"
+      --column_model_output data/column_models.json --sql \"SELECT * FROM data\"\n"
     deps:
     - path: data/data.csv
       hash: md5
-      md5: 934f3db330d8af2c7e0e5b136725b09b
-      size: 1852524
+      md5: d857eea6862365fb883c29312e6d5b46
+      size: 17933
     outs:
     - path: data/column_models.json
       hash: md5
@@ -98,7 +72,7 @@ stages:
       md5: 635e45f25f5910fb341da47f54770bdf
       size: 204
   loom-infer:
-    cmd: ./bin/loom_task infer loom 10 data/infer-config.json
+    cmd: ./bin/loom_task infer loom 3 data/infer-config.json
     deps:
     - path: data/infer-config.json
       hash: md5
@@ -116,7 +90,7 @@ stages:
       nfiles: 1
     params:
       params.yaml:
-        sample_count: 10
+        sample_count: 3
     outs:
     - path: loom/samples
       hash: md5
@@ -165,43 +139,6 @@ stages:
       md5: eda41ef5ea950d8392cd4b1f2643f09f.dir
       size: 1162419
       nfiles: 42
-  marginal-fits-loom:
-    cmd: "mkdir -p qc/marginals && poetry run marginal_fits --real_data data/preprocessed.csv
-      --model loom  --column_models data/column_models.json\n"
-    deps:
-    - path: data/preprocessed.csv
-      hash: md5
-      md5: 3925fc60051c23a623f684df372f9663
-      size: 1989484
-    - path: data/synthetic-data-loom.csv
-      hash: md5
-      md5: 8af2dd438a073a3989331a83ff89d282
-      size: 1906965
-    outs:
-    - path: qc/marginals/loom_1d_fits.csv
-      hash: md5
-      md5: 51e0313a764f03559fc51598249a2d2f
-      size: 938
-    - path: qc/marginals/loom_2d_fits.csv
-      hash: md5
-      md5: 3d8b1bd212571067839b1cc6bf909202
-      size: 12683
-    - path: qc/marginals/loom_worst_1d_fit.html
-      hash: md5
-      md5: aad2a61812288507e12b4a482f59e097
-      size: 3646318
-    - path: qc/marginals/loom_worst_1d_fit.png
-      hash: md5
-      md5: be60964abaa4c32756eff60379c3f0ba
-      size: 111057
-    - path: qc/marginals/loom_worst_2d_fit.html
-      hash: md5
-      md5: f95c3efc555f163337ef104734c16db5
-      size: 3932177
-    - path: qc/marginals/loom_worst_2d_fit.png
-      hash: md5
-      md5: 0f7a5823b1ba45bb7d18ce81764fde30
-      size: 74167
   loom-to-json:
     cmd: "find loom/samples -type f ! -name '*.json' | parallel  \"./bin/loom python
       scripts/loom_to_json.py loom_to_json {}\"\n"
@@ -233,8 +170,8 @@ stages:
     outs:
     - path: data/cgpm/hydrated
       hash: md5
-      md5: 66ac088de57ef99086f016d4404ba7de.dir
-      size: 11185489
+      md5: 51970748ea798aa23525e1a6003109d2.dir
+      size: 11211274
       nfiles: 10
   cgpm-hydrated-sample:
     cmd: "poetry run cgpm-sample --sample_count 10000 --output data/synthetic-data-cgpm-raw.csv
@@ -421,3 +358,174 @@ stages:
       hash: md5
       md5: 3b7e6e5ab69410c68dc5d13514bf41bc
       size: 2112827
+  cgpm-to-sppl:
+    cmd: "poetry run cgpm-to-sppl --output data/sppl/merged.json --model_dir data/cgpm/hydrated
+      --data data/preprocessed.csv\n"
+    deps:
+    - path: data/cgpm/hydrated
+      hash: md5
+      md5: 51970748ea798aa23525e1a6003109d2.dir
+      size: 11211274
+      nfiles: 10
+    outs:
+    - path: data/sppl/merged.json
+      hash: md5
+      md5: 297180e4db2100cb152d1e69634bed0e
+      size: 781926
+  sample-sppl:
+    cmd: "poetry run sample-sppl --sample_count 10000 --output data/synthetic-data-sppl-hydrated.csv
+      --model data/sppl/merged.json --data data/preprocessed.csv\n"
+    deps:
+    - path: data/sppl/merged.json
+      hash: md5
+      md5: 297180e4db2100cb152d1e69634bed0e
+      size: 781926
+    outs:
+    - path: data/synthetic-data-sppl-hydrated.csv
+      hash: md5
+      md5: 8d2fd494ad84addadf7281780efef21b
+      size: 2111294
+  marginal-fits@loom:
+    cmd: "poetry run marginal_fits --real_data data/preprocessed.csv --model loom
+      --column_models data/column_models.json\n"
+    deps:
+    - path: data/preprocessed.csv
+      hash: md5
+      md5: 3925fc60051c23a623f684df372f9663
+      size: 1989484
+    - path: data/synthetic-data-loom.csv
+      hash: md5
+      md5: 8af2dd438a073a3989331a83ff89d282
+      size: 1906965
+    outs:
+    - path: qc/marginals/loom_1d_fits.csv
+      hash: md5
+      md5: 51e0313a764f03559fc51598249a2d2f
+      size: 938
+    - path: qc/marginals/loom_2d_fits.csv
+      hash: md5
+      md5: e70c9e676b71da7261c9bd07c74fc321
+      size: 12687
+    - path: qc/marginals/loom_worst_1d_fit.html
+      hash: md5
+      md5: c5eb7e9189d33f1ded958c0919310994
+      size: 3646360
+    - path: qc/marginals/loom_worst_1d_fit.png
+      hash: md5
+      md5: 335cb5624f6539bdc502a6a7dd7769d2
+      size: 112897
+    - path: qc/marginals/loom_worst_2d_fit.html
+      hash: md5
+      md5: 396825ef6dff17caa4cc458764db41d7
+      size: 3932177
+    - path: qc/marginals/loom_worst_2d_fit.png
+      hash: md5
+      md5: 406b6189d61eedab7f41cbf1ccf846a3
+      size: 77222
+  cgpm-sample@hydrated:
+    cmd: "poetry run cgpm-sample --sample_count 10000 --output data/synthetic-data-cgpm-hydrated.csv
+      --model_dir data/cgpm/hydrated --data data/preprocessed.csv\n"
+    deps:
+    - path: data/cgpm/hydrated
+      hash: md5
+      md5: 51970748ea798aa23525e1a6003109d2.dir
+      size: 11211274
+      nfiles: 10
+    outs:
+    - path: data/synthetic-data-cgpm-hydrated.csv
+      hash: md5
+      md5: 974ae56feb143f7088189774c9f1209b
+      size: 2113333
+  marginal-fits@cgpm-hydrated:
+    cmd: "poetry run marginal_fits --real_data data/preprocessed.csv --model cgpm-hydrated
+      --column_models data/column_models.json\n"
+    deps:
+    - path: data/preprocessed.csv
+      hash: md5
+      md5: 3925fc60051c23a623f684df372f9663
+      size: 1989484
+    - path: data/synthetic-data-cgpm-hydrated.csv
+      hash: md5
+      md5: 974ae56feb143f7088189774c9f1209b
+      size: 2113333
+    outs:
+    - path: qc/marginals/cgpm-hydrated_1d_fits.csv
+      hash: md5
+      md5: 66a19dd0dc421b9b9ed2c2305d6b95f1
+      size: 938
+    - path: qc/marginals/cgpm-hydrated_2d_fits.csv
+      hash: md5
+      md5: a3cb46d657351da3f63cd301a007455b
+      size: 12688
+    - path: qc/marginals/cgpm-hydrated_worst_1d_fit.html
+      hash: md5
+      md5: c8bbc28c904c2bfde28384200c24d8b4
+      size: 3646676
+    - path: qc/marginals/cgpm-hydrated_worst_1d_fit.png
+      hash: md5
+      md5: dc24b5bfb4ebb52cd648dc04c6d88c1a
+      size: 108895
+    - path: qc/marginals/cgpm-hydrated_worst_2d_fit.html
+      hash: md5
+      md5: 4e7a7d0ea9d090bc3834be68f9deb49d
+      size: 4100156
+    - path: qc/marginals/cgpm-hydrated_worst_2d_fit.png
+      hash: md5
+      md5: 7b21364e9f050cd37d84d430d9fa1dfd
+      size: 94315
+  marginal-fits@sppl-hydrated:
+    cmd: "poetry run marginal_fits --real_data data/preprocessed.csv --model sppl-hydrated
+      --column_models data/column_models.json\n"
+    deps:
+    - path: data/preprocessed.csv
+      hash: md5
+      md5: 3925fc60051c23a623f684df372f9663
+      size: 1989484
+    - path: data/synthetic-data-sppl-hydrated.csv
+      hash: md5
+      md5: 8d2fd494ad84addadf7281780efef21b
+      size: 2111294
+    outs:
+    - path: qc/marginals/sppl-hydrated_1d_fits.csv
+      hash: md5
+      md5: c65ab006f89e1f30e3d193e7ba2cddcf
+      size: 937
+    - path: qc/marginals/sppl-hydrated_2d_fits.csv
+      hash: md5
+      md5: 378dac467777bb968939ad7d3782c196
+      size: 12697
+    - path: qc/marginals/sppl-hydrated_worst_1d_fit.html
+      hash: md5
+      md5: 5513138fbd53e8d7d6141ebaedfb6271
+      size: 3646534
+    - path: qc/marginals/sppl-hydrated_worst_1d_fit.png
+      hash: md5
+      md5: e7d9a7089d1ffc3edab173e69dfa47fe
+      size: 107126
+    - path: qc/marginals/sppl-hydrated_worst_2d_fit.html
+      hash: md5
+      md5: 5cfa4638d65845ac8a9f3b1033e9a8fd
+      size: 4099817
+    - path: qc/marginals/sppl-hydrated_worst_2d_fit.png
+      hash: md5
+      md5: 33f8ec1babdcf8fa89f4e5b838b9f082
+      size: 93984
+  dependence-probability@hydrated:
+    cmd: poetry run dependence-probability --model_dir data/cgpm/hydrated --out_file
+      qc/cgpm-hydrated-dependence-probability.csv
+    deps:
+    - path: data/cgpm/hydrated
+      hash: md5
+      md5: 51970748ea798aa23525e1a6003109d2.dir
+      size: 11211274
+      nfiles: 10
+    outs:
+    - path: qc/cgpm-hydrated-dependence-probability.csv
+      hash: md5
+      md5: 3a3e5ca50453a75c9c686536843aceed
+      size: 13647
+  regression:
+    cmd: "poetry run regression  --data data/preprocessed.csv  --formula \" genetic_recurrence_score
+      ~ age.cut([50, 65]) + chemotherapy + progesterone_receptor_status \" --model_filename
+      data/sppl/merged.json  --column_model_filename data/column_models.json --result_filename
+      data/prediction.csv\n"
