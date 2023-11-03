@@ -9,7 +9,6 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = ">=3.11,<3.12"
 dvc = "^3.13.3"
-sppl = {git = "https://github.com/joaoloula/sppl", branch = "permissive_versions"}
 edn-format = "^0.7.5"
 jsonschema = "^4.19.0"
 matplotlib = "^3.7.2"
@@ -32,6 +31,9 @@ kaleido = "0.2.1"
 sdv = {url = "https://files.pythonhosted.org/packages/bf/dc/584e1a86cb553fe4eb58cc04c35af7d37063491e670cc3b5872b8475afc2/sdv-1.4.0-py2.py3-none-any.whl"}
 dacite = "^1.8.1"
 black = "^23.10.0"
+statsmodels = "^0.14.0"
+pygit2 = "<1.13.2"
+tqdm = "^4.66.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"
@@ -44,6 +46,10 @@ loom_to_cgpm = 'structure_learning.loom:loom_to_cgpm'
 marginal_fits = 'structure_learning.marginal_fits:marginal_fits'
 cgpm-sample = 'structure_learning.sample:sample_cgpm'
 dependence-probability = 'structure_learning.dependence_probability:save_dependence_probability'
+regression = 'structure_learning.prediction:prediction'
+get-best-model = 'structure_learning.best_model:get_best_model'
+cgpm-to-sppl = 'structure_learning.sppl:cgpm_to_sppl'
+sample-sppl = 'structure_learning.sample:sppl_sample'
 
 [build-system]
 requires = ["poetry-core"]
