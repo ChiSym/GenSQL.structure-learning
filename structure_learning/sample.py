@@ -1,11 +1,14 @@
 import click
 import os
 import polars as pl
+import numpy as np
+import json
 
+from sppl.compilers.spe_to_dict import spe_from_dict
+from scipy.special import logsumexp
 from structurelearningapi.sample import sample
 from structurelearningapi.io import deserialize
-from structurelearningapi.create_model import make_cgpm
-from structurelearningapi.cgpm_wrapper import CGPMWrapper
+from structurelearningapi.create_model import wrapper
 
 @click.command()
 @click.option('--sample_count', type=int, help='Number of samples to draw')
@@ -31,28 +34,32 @@ def sample_cgpm(sample_count, model_dir, output, data):
     )
 
     wrappers = [
-        get_wrapper(metadata, df)
+        wrapper(metadata, df)
         for metadata in metadatas
     ]
 
+    k_list = np.random.multinomial(sample_count, np.ones(len(wrappers))/ len(wrappers))
     sample_list = [
-        sample(wrapper, sample_count//n_models)
-        for wrapper in wrappers]
+        sample(wrapper, k)
+        for k, wrapper in zip(k_list, wrappers)
+    ]
 
     sample_df = pl.concat(sample_list)
+
     sample_df.write_csv(output)
 
-def get_wrapper(metadata, df):
-    cgpm = make_cgpm(
-        df, 
-        metadata.crosscat,
-        metadata.column_models, 
-        metadata.constraints
-    )
+@click.command()
+@click.option('--sample_count', type=int, help='Number of samples to draw')
+@click.option('--model', help='Path to the model')
+@click.option('--data', help='Path to the data directory')
+@click.option('--output', help='Path to the output file')
+def sppl_sample(sample_count, model, output, data):
+    spe = spe_from_dict(json.load(open(model, "r")))
+    spe_samples = spe.sample(sample_count)
+    spe_samples = [sppl_sample_to_dict(sample) for sample in spe_samples]
+    df = pl.from_dicts(spe_samples)
 
-    return CGPMWrapper(
-        cgpm,
-        df,
-        metadata.column_models, 
-        metadata.constraints
-    )
+    df.write_csv(output)
+
+def sppl_sample_to_dict(sample):
+    return {k.token: v for k, v in sample.items()}
