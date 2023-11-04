@@ -1,0 +1,24 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "data": {
+        "values": "<DVC_METRIC_DATA>"
+    },
+    "title": "<DVC_METRIC_TITLE>",
+    "width": 300,
+    "height": 300,
+    "mark": {
+        "type": "rect",
+        "tooltip": {
+        "content": "data"
+        }
+    },
+    "encoding": {
+      "y": {"field": "<DVC_METRIC_Y>", "type": "nominal", "sort": ["voted_president_party", "economy_retro", "race_ethnicity", "ideology", "partisan_identity", "citizen", "year", "approval_president", "church_attendance", "religion", "religion_importance", "voted_general_election", "interest_in_news", "union_membership", "employment_status", "has_child", "age", "educ", "ownhome", "uninsured", "gender", "family_income", "marital_status", "no_immediate_family_served_military"], "title": "<DVC_METRIC_Y_LABEL>"},
+      "x": {"field": "<DVC_METRIC_X>", "type": "nominal", "sort": ["voted_president_party", "economy_retro", "race_ethnicity", "ideology", "partisan_identity", "citizen", "year", "approval_president", "church_attendance", "religion", "religion_importance", "voted_general_election", "interest_in_news", "union_membership", "employment_status", "has_child", "age", "educ", "ownhome", "uninsured", "gender", "family_income", "marital_status", "no_immediate_family_served_military"], "title": "<DVC_METRIC_X_LABEL>"},
+      "color": {"field": "dependence_probability", "type": "quantitative"}
+    },
+    "config": {
+      "axis": {"grid": true, "tickBand": "extent"}
+    }
+  }
+  

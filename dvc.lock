@@ -193,23 +193,23 @@ stages:
     deps:
     - path: data/column_models.json
       hash: md5
-      md5: 764b20a03ecf5d62fe51c5abdc6119d3
-      size: 907
+      md5: 0de858868b5a52df93dfb9068b89767f
+      size: 5173
     - path: data/preprocessed.csv
       hash: md5
-      md5: d857eea6862365fb883c29312e6d5b46
-      size: 17933
+      md5: 89e944af8bc6e62d966fc9d13cf993ef
+      size: 149879237
     - path: loom/samples
       hash: md5
-      md5: c291d74ad7b21b96e05f973a2e14445e.dir
-      size: 2660305
-      nfiles: 48
+      md5: a6e9ab5a8bcb1b9abf6cce678fe49764.dir
+      size: 2092688137
+      nfiles: 150
     outs:
     - path: data/cgpm/hydrated
       hash: md5
-      md5: 1370954619ac056be3dc8eb235e2cc25.dir
-      size: 36691
-      nfiles: 3
+      md5: c9f68bced1021424d7faa9da8f81cf9b.dir
+      size: 269840046
+      nfiles: 10
   cgpm-hydrated-sample:
     cmd: "poetry run cgpm-sample --sample_count 10000 --output data/synthetic-data-cgpm-raw.csv
       --model_dir data/cgpm/hydrated --data data/preprocessed.csv\n"
@@ -275,3 +275,31 @@ stages:
       hash: md5
       md5: bff87934d974d45fae70b8ad9b531429
       size: 3254
+  dependence-probability@hydrated:
+    cmd: poetry run dependence-probability --model_dir data/cgpm/hydrated --out_file
+      qc/cgpm-hydrated-dependence-probability.csv
+    deps:
+    - path: data/cgpm/hydrated
+      hash: md5
+      md5: c9f68bced1021424d7faa9da8f81cf9b.dir
+      size: 269840046
+      nfiles: 10
+    outs:
+    - path: qc/cgpm-hydrated-dependence-probability.csv
+      hash: md5
+      md5: 0340d98ef5c565562c5da22c6f9cf181
+      size: 18711
+  cgpm-to-sppl:
+    cmd: "poetry run cgpm-to-sppl --output data/sppl/merged.json --model_dir data/cgpm/hydrated
+      --data data/preprocessed.csv\n"
+    deps:
+    - path: data/cgpm/hydrated
+      hash: md5
+      md5: c9f68bced1021424d7faa9da8f81cf9b.dir
+      size: 269840046
+      nfiles: 10
+    outs:
+    - path: data/sppl/merged.json
+      hash: md5
+      md5: cf1abfc36cfbb4a7e470d01a57f63119
+      size: 12050198
