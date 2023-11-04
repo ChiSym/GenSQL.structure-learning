@@ -5,7 +5,6 @@ import numpy as np
 import json
 
 from sppl.compilers.spe_to_dict import spe_from_dict
-from scipy.special import logsumexp
 from structurelearningapi.sample import sample
 from structurelearningapi.io import deserialize
 from structurelearningapi.create_model import wrapper

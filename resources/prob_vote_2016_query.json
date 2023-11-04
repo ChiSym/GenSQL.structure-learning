@@ -1,0 +1,34 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "data": {
+        "values": "<DVC_METRIC_DATA>"
+    },
+    "width": 300,
+    "height": 300,
+    "mark": {
+        "type": "line",
+        "tooltip": {
+        "content": "data"
+        }
+    },
+    "encoding": {
+      "y": {"field": "probability of voting", "type": "quantitative", "title": "probability of voting"},
+      "x": {"field": "household income", "type": "nominal", "sort":[
+        "Less than 10k",
+      "10k - 20k",
+      "20k - 30k",
+          "30k - 40k",
+      "40k - 50k",
+        "50k - 60k",
+          "60k - 70k",
+          "70k - 80k",
+          "80k - 100k",
+          "100k - 120k",
+      "120k - 150k",
+        "150k+"],  "title": "household income"},
+      "color": {"field": "presidential candidate", "type": "nominal"}
+    },
+    "config": {
+      "axis": {"grid": true, "tickBand": "extent"}
+    }
+  }
