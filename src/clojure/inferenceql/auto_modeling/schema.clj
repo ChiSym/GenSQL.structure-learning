@@ -83,3 +83,18 @@
           (comp (remove (comp #{:ignore} val))
                 (map (juxt (comp  name key) (comp replacements val))))
           schema)))
+
+(defn print-ignored
+  "Tells at the user which columns were ignored."
+  [schema]
+  (let [ignored  (keys (filter (fn [[_ v]] (= v :ignore)) schema))]
+    (when (not-empty ignored)
+      (binding [*out* *err*]
+        (println "")
+        (println "======== CAVEAT - we ignore the following columns ========")
+        (println "")
+        (mapv println ignored)
+        (println "")
+        (println "- this is fine if it was intended.")
+        (println "==========================================================")
+        (println "")))))
