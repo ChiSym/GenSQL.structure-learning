@@ -52,7 +52,7 @@ get-best-model = 'structure_learning.best_model:get_best_model'
 cgpm-to-sppl = 'structure_learning.sppl:cgpm_to_sppl'
 sample-sppl = 'structure_learning.sample:sppl_sample'
 train-baseline = 'structure_learning.baseline_models:train_baseline'
-sample-baseline = 'structure_learning.baseline_models:sample_baseline'
+sample-baseline = 'structure_learning.sample:sample_baseline'
 marginal-fits-plot = 'structure_learning.marginal_fits:marginal_fits_plot'
 
 [build-system]
