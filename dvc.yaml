@@ -1,8 +1,4 @@
 plots:
-- qc/cgpm-hydrated-dependence-probability.csv:
-    template: resources/dependence_probability.json
-    y: column1
-    x: column2
 - qc/marginals/1d_fits.csv:
     template: resources/marginal_fits.json
     y: Score
@@ -166,8 +162,7 @@ stages:
   marginal-fits:
     foreach:
     - loom
-    - cgpm-hydrated
-    - sppl-hydrated
+    - cgpm-raw
     - ctgan
     do:
       cmd: >
