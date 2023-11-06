@@ -11,6 +11,7 @@ plots:
     template: resources/marginal_fits.json
     y: Score
     x: idx
+- data/roc_endocrine.png
 
 stages:
   preprocess:
