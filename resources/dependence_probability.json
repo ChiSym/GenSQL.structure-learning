@@ -15,7 +15,7 @@
     "encoding": {
       "y": {"field": "<DVC_METRIC_Y>", "type": "nominal", "sort": ["endocrine_therapy_tam", "menopausal_status", "endocrine_therapy_ai", "age", "endocrine_therapy_ofs", "survival_status", "recurrence_indicator", "distant_recurrence_indicator", "disease_free_survival", "race_ethnicity", "genetic_recurrence_score", "progesterone_receptor_status", "chemotherapy", "treatment_assignment", "tumor_grade", "nuclear_grade", "tumor_size", "primary_surgical_procedure"], "title": "<DVC_METRIC_Y_LABEL>"},
       "x": {"field": "<DVC_METRIC_X>", "type": "nominal", "sort": ["endocrine_therapy_tam", "menopausal_status", "endocrine_therapy_ai", "age", "endocrine_therapy_ofs", "survival_status", "recurrence_indicator", "distant_recurrence_indicator", "disease_free_survival", "race_ethnicity", "genetic_recurrence_score", "progesterone_receptor_status", "chemotherapy", "treatment_assignment", "tumor_grade", "nuclear_grade", "tumor_size", "primary_surgical_procedure"], "title": "<DVC_METRIC_X_LABEL>"},
-      "color": {"field": "dependence_probability", "type": "quantitative"}
+      "color": {"field": "dependece_probability", "type": "quantitative"}
     },
     "config": {
       "axis": {"grid": true, "tickBand": "extent"}
