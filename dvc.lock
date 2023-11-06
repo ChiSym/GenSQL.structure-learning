@@ -67,11 +67,15 @@ stages:
       hash: md5
       md5: 7f928ec52cc41312803872ea38fbf3d2
       size: 152
+      md5: 7f928ec52cc41312803872ea38fbf3d2
+      size: 152
   loom-infer:
     cmd: ./bin/loom_task infer loom 10 data/infer-config.json
     deps:
     - path: data/infer-config.json
       hash: md5
+      md5: 7f928ec52cc41312803872ea38fbf3d2
+      size: 152
       md5: 7f928ec52cc41312803872ea38fbf3d2
       size: 152
     - path: loom/ingest
@@ -138,6 +142,7 @@ stages:
   marginal-fits-loom:
     cmd: "mkdir -p qc/marginals && poetry run marginal_fits --real_data data/preprocessed.csv
       --model loom  --column_models data/column_models.json\n"
+      --model loom  --column_models data/column_models.json\n"
     deps:
     - path: data/preprocessed.csv
       hash: md5
@@ -175,6 +180,8 @@ stages:
   loom-to-json:
     cmd: "find loom/samples -type f ! -name '*.json' | parallel  \"./bin/loom python
       scripts/loom_to_json.py loom_to_json {}\"\n"
+    cmd: "find loom/samples -type f ! -name '*.json' | parallel  \"./bin/loom python
+      scripts/loom_to_json.py loom_to_json {}\"\n"
     deps:
     - path: loom/samples
       hash: md5
@@ -182,6 +189,8 @@ stages:
       size: 2092688137
       nfiles: 150
   loom-to-cgpm:
+    cmd: "mkdir -p data/cgpm/hydrated && ls loom/samples | parallel  \"poetry run
+      loom_to_cgpm --column_model_filename data/column_models.json --data_filename
     cmd: "mkdir -p data/cgpm/hydrated && ls loom/samples | parallel  \"poetry run
       loom_to_cgpm --column_model_filename data/column_models.json --data_filename
       data/preprocessed.csv --loom_folder loom/samples/{} --out_filename data/cgpm/hydrated/{}.json\"\
@@ -222,6 +231,7 @@ stages:
       size: 2692047
   marginal-fits-cgpm-raw:
     cmd: "mkdir -p qc/marginals && poetry run marginal_fits --real_data data/preprocessed.csv
+      --model cgpm-raw  --column_models data/column_models.json\n"
       --model cgpm-raw  --column_models data/column_models.json\n"
     deps:
     - path: data/preprocessed.csv
