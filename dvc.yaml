@@ -138,6 +138,7 @@ stages:
   train-baseline:
     foreach:
     - ctgan
+    - tvae
     do:
       cmd: >
         poetry run train-baseline
@@ -153,6 +154,7 @@ stages:
   sample-baseline:
     foreach:
     - ctgan
+    - tvae
     do:
       cmd: >
         poetry run sample-baseline
@@ -169,6 +171,7 @@ stages:
     - cgpm-hydrated
     - sppl-hydrated
     - ctgan
+    - tvae
     do:
       cmd: >
         poetry run marginal_fits
@@ -191,6 +194,7 @@ stages:
       poetry run marginal-fits-plot
       -m cgpm-raw
       -m ctgan
+      -m tvae
     deps:
     - qc/marginals/ctgan_1d_fits.csv
     - qc/marginals/ctgan_2d_fits.csv
