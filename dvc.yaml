@@ -11,6 +11,8 @@ plots:
     template: resources/marginal_fits.json
     y: Score
     x: idx
+- data/religion_vote_race.png
+- data/income_vote_church_attendance.png
 
 stages:
   preprocess:

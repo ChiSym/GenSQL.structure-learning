@@ -111,3 +111,42 @@ stages:
       hash: md5
       md5: cacb942941e07998ad1e3ba78687de2f
       size: 945222788
+  loom-to-cgpm:
+    cmd: "mkdir -p data/cgpm/hydrated && ls loom/samples | parallel  \"poetry run
+      loom_to_cgpm --column_model_filename data/column_models.json --data_filename
+      data/preprocessed.csv --loom_folder loom/samples/{} --out_filename data/cgpm/hydrated/{}.json\"\
+      \n"
+    deps:
+    - path: data/column_models.json
+      hash: md5
+      md5: 0de858868b5a52df93dfb9068b89767f
+      size: 5173
+    - path: data/preprocessed.csv
+      hash: md5
+      md5: 89e944af8bc6e62d966fc9d13cf993ef
+      size: 149879237
+    - path: loom/samples
+      hash: md5
+      md5: a6e9ab5a8bcb1b9abf6cce678fe49764.dir
+      size: 2092688137
+      nfiles: 150
+    outs:
+    - path: data/cgpm/hydrated
+      hash: md5
+      md5: c9f68bced1021424d7faa9da8f81cf9b.dir
+      size: 269840046
+      nfiles: 10
+  dependence-probability@hydrated:
+    cmd: poetry run dependence-probability --model_dir data/cgpm/hydrated --out_file
+      qc/cgpm-hydrated-dependence-probability.csv
+    deps:
+    - path: data/cgpm/hydrated
+      hash: md5
+      md5: c9f68bced1021424d7faa9da8f81cf9b.dir
+      size: 269840046
+      nfiles: 10
+    outs:
+    - path: qc/cgpm-hydrated-dependence-probability.csv
+      hash: md5
+      md5: 0340d98ef5c565562c5da22c6f9cf181
+      size: 18711
