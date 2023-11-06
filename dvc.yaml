@@ -19,14 +19,10 @@ stages:
       --data data/data.csv
       --output data/preprocessed.csv
       --column_model_output data/column_models.json
-      --column_model_output data/column_models.json
       --sql "${sql_preprocessing}"
     deps:
     - data/data.csv
-    - data/data.csv
     outs:
-    - data/preprocessed.csv
-    - data/column_models.json
     - data/preprocessed.csv
     - data/column_models.json
 
@@ -37,9 +33,7 @@ stages:
       --output data/loom-schema.json
     deps:
     - data/column_models.json
-    - data/column_models.json
     outs:
-    - data/loom-schema.json
     - data/loom-schema.json
 
   loom-ingest:
@@ -47,11 +41,7 @@ stages:
     deps:
     - data/loom-schema.json
     - data/preprocessed.csv
-    - data/loom-schema.json
-    - data/preprocessed.csv
     outs:
-    - loom/ingest
-    - loom/query
     - loom/ingest
     - loom/query
 
@@ -61,7 +51,6 @@ stages:
       > data/infer-config.json
     outs:
     - data/infer-config.json
-    - data/infer-config.json
 
   loom-infer:
     cmd: ./bin/loom_task infer loom ${sample_count} data/infer-config.json
@@ -69,14 +58,9 @@ stages:
     - loom/ingest
     - loom/query
     - data/infer-config.json
-    - loom/ingest
-    - loom/query
-    - data/infer-config.json
     params:
     - sample_count
-    - sample_count
     outs:
-    - loom/samples
     - loom/samples
 
   loom-sample:
@@ -87,26 +71,20 @@ stages:
     deps:
     - loom/samples
     - scripts/loom_sample.py
-    - loom/samples
-    - scripts/loom_sample.py
     outs:
-    - data/synthetic-data-loom.csv
     - data/synthetic-data-loom.csv
 
   loom-to-json:
     cmd: >
       find loom/samples -type f ! -name '*.json' |
       parallel  "./bin/loom python scripts/loom_to_json.py loom_to_json {}"
-      parallel  "./bin/loom python scripts/loom_to_json.py loom_to_json {}"
     deps:
-    - loom/samples
     - loom/samples
 
   loom-to-cgpm:
     cmd: >
       mkdir -p data/cgpm/hydrated &&
       ls loom/samples |
-      parallel  "poetry run loom_to_cgpm
       parallel  "poetry run loom_to_cgpm
       --column_model_filename data/column_models.json
       --data_filename data/preprocessed.csv
@@ -116,11 +94,7 @@ stages:
     - loom/samples
     - data/column_models.json
     - data/preprocessed.csv
-    - loom/samples
-    - data/column_models.json
-    - data/preprocessed.csv
     outs:
-    - data/cgpm/hydrated
     - data/cgpm/hydrated
 
   cgpm-sample:
@@ -146,7 +120,6 @@ stages:
       --data data/preprocessed.csv
     deps:
     - data/cgpm/hydrated
-    - data/cgpm/hydrated
     outs:
     - data/sppl/merged.json
 
@@ -165,6 +138,7 @@ stages:
   train-baseline:
     foreach:
     - ctgan
+    - tvae
     do:
       cmd: >
         poetry run train-baseline
@@ -180,6 +154,7 @@ stages:
   sample-baseline:
     foreach:
     - ctgan
+    - tvae
     do:
       cmd: >
         poetry run sample-baseline
@@ -196,6 +171,7 @@ stages:
     - cgpm-hydrated
     - sppl-hydrated
     - ctgan
+    - tvae
     do:
       cmd: >
         poetry run marginal_fits
@@ -218,6 +194,7 @@ stages:
       poetry run marginal-fits-plot
       -m cgpm-raw
       -m ctgan
+      -m tvae
     deps:
     - qc/marginals/ctgan_1d_fits.csv
     - qc/marginals/ctgan_2d_fits.csv
