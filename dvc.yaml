@@ -11,6 +11,8 @@ plots:
     template: resources/marginal_fits.json
     y: Score
     x: idx
+- data/org_size_salary_remote.png
+- data/anxiety_gender_sexuality.png
 
 stages:
   preprocess:
