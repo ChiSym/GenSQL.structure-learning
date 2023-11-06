@@ -1,31 +1,16 @@
 plots:
-- loom_1d_fits:
-    template: bar_horizontal_sorted
-    y:
-      qc/marginals/loom_1d_fits.csv: Column
-    x: Score
-- qc/marginals/loom_2d_fits.csv:
-    template: resources/heatmap.json
-    y: Column 1
-    x: Column 2
-- qc/marginals/loom_worst_2d_fit.png
-- qc/marginals/loom_worst_1d_fit.png
-- cgpm-raw_1d_fits:
-    template: bar_horizontal_sorted
-    y:
-      qc/marginals/cgpm-raw_1d_fits.csv: Column
-    x: Score
-- qc/marginals/cgpm-raw_2d_fits.csv:
-    template: resources/heatmap.json
-    y: Column 1
-    x: Column 2
-- qc/marginals/cgpm-raw_worst_2d_fit.png
-- qc/marginals/cgpm-raw_worst_1d_fit.png
 - qc/cgpm-hydrated-dependence-probability.csv:
     template: resources/dependence_probability.json
     y: column1
     x: column2
-- data/roc_endocrine.png
+- qc/marginals/1d_fits.csv:
+    template: resources/marginal_fits.json
+    y: Score
+    x: idx
+- qc/marginals/2d_fits.csv:
+    template: resources/marginal_fits.json
+    y: Score
+    x: idx
 
 stages:
   preprocess:
@@ -204,11 +189,11 @@ stages:
   marginal-fits-plot:
     cmd: >
       poetry run marginal-fits-plot
-      -m loom
       -m cgpm-raw
+      -m ctgan
     deps:
-    - qc/marginals/loom_1d_fits.csv
-    - qc/marginals/loom_2d_fits.csv
+    - qc/marginals/ctgan_1d_fits.csv
+    - qc/marginals/ctgan_2d_fits.csv
     - qc/marginals/cgpm-raw_1d_fits.csv
     - qc/marginals/cgpm-raw_2d_fits.csv
     outs:
