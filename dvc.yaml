@@ -150,14 +150,13 @@ stages:
     outs:
     - data/synthetic-data-sppl-hydrated.csv
   
-  train-sample-baseline:
+  train-baseline:
     foreach:
     - ctgan
     do:
       cmd: >
-        poetry run train-sample-baseline
+        poetry run train-baseline
         --data data/preprocessed.csv
-        --n_samples ${qc.sample_count}
         --column_models data/column_models.json
         --model ${item}
       deps:
@@ -165,7 +164,19 @@ stages:
       - data/column_models.json
       outs:
       - data/${item}.pkl
-      - data/synthetic-data-${item}.csv
+
+  sample-baseline:
+    foreach:
+    - ctgan
+    do:
+      cmd: >
+        poetry run sample-baseline
+        --model ${item}
+        --sample_count ${qc.sample_count}
+      deps:
+        - data/${item}.pkl
+      outs:
+        - data/synthetic-data-${item}.csv
 
   marginal-fits:
     foreach:

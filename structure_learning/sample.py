@@ -3,6 +3,7 @@ import os
 import polars as pl
 import numpy as np
 import json
+import pickle
 
 from sppl.compilers.spe_to_dict import spe_from_dict
 from scipy.special import logsumexp
@@ -63,3 +64,14 @@ def sppl_sample(sample_count, model, output, data):
 
 def sppl_sample_to_dict(sample):
     return {k.token: v for k, v in sample.items()}
+
+@click.command()
+@click.option('--sample_count', type=int, help='Number of samples to draw')
+@click.option('--model', help='Path to the model')
+def baseline_sample(model, sample_count):
+    model_path = "data/{}.pkl".format(model)
+    synthesizer = pickle.load(open(model_path, "rb"))
+    synthetic_data = synthesizer.sample(num_rows=sample_count)
+    synthetic_data_path = f"data/synthetic-data-{model}.csv"
+
+    synthetic_data.to_csv(synthetic_data_path, index=False)

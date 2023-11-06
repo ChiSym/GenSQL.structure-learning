@@ -17,8 +17,7 @@ model_to_class = {
 @click.option('--data', help='Path to the data file')
 @click.option('--column_models', help='Path to the column models file')
 @click.option('--model', help='Name of the model to be evaluated')
-@click.option('--n_samples', help='Number of synthetic data samples')
-def train_sample_baseline(data, column_models, model, n_samples):
+def train_baseline(data, column_models, model):
     with open(column_models, "rb") as f:
         column_models = orjson.loads(f.read())
 
@@ -42,8 +41,3 @@ def train_sample_baseline(data, column_models, model, n_samples):
 
     with open(f"data/{model}.pkl", "wb") as f:
         pickle.dump(synthesizer, f)
-
-    synthetic_data = synthesizer.sample(num_rows=n_samples)
-    synthetic_data_path = f"data/synthetic-data-{model}.csv"
-
-    synthetic_data.to_csv(synthetic_data_path, index=False)
