@@ -257,3 +257,134 @@ stages:
       hash: md5
       md5: 7d0d0de55a94b8b14c6af98e1df8e2f5
       size: 97547
+  sample-baseline@ctgan:
+    cmd: "poetry run sample-baseline --model ctgan --sample_count 10000\n"
+    deps:
+    - path: data/ctgan.pkl
+      hash: md5
+      md5: cacb942941e07998ad1e3ba78687de2f
+      size: 945222788
+    outs:
+    - path: data/synthetic-data-ctgan.csv
+      hash: md5
+      md5: 57cb3303b1f2c6170a034fa07e7823e1
+      size: 2470136
+  marginal-fits@ctgan:
+    cmd: "poetry run marginal_fits --real_data data/preprocessed.csv --model ctgan
+      --column_models data/column_models.json\n"
+    deps:
+    - path: data/preprocessed.csv
+      hash: md5
+      md5: 89e944af8bc6e62d966fc9d13cf993ef
+      size: 149879237
+    - path: data/synthetic-data-ctgan.csv
+      hash: md5
+      md5: 57cb3303b1f2c6170a034fa07e7823e1
+      size: 2470136
+    outs:
+    - path: qc/marginals/ctgan_1d_fits.csv
+      hash: md5
+      md5: 8a79fa745ff34d936a67e51fe4dddb21
+      size: 1114
+    - path: qc/marginals/ctgan_2d_fits.csv
+      hash: md5
+      md5: 91172324ee40a6373e071de0fe4f3ce3
+      size: 19745
+    - path: qc/marginals/ctgan_worst_1d_fit.html
+      hash: md5
+      md5: 78488e3d6328811edf01f02eedd0edac
+      size: 10590929
+    - path: qc/marginals/ctgan_worst_1d_fit.png
+      hash: md5
+      md5: 0a5fa3315be29dd14a51a25dde8d6e31
+      size: 185767
+    - path: qc/marginals/ctgan_worst_2d_fit.html
+      hash: md5
+      md5: 85f0838da889c78e19a6c50096e640fe
+      size: 28650287
+    - path: qc/marginals/ctgan_worst_2d_fit.png
+      hash: md5
+      md5: 077e16c1a69f623074ff16323aeb54e0
+      size: 148536
+  marginal-fits-plot:
+    cmd: "poetry run marginal-fits-plot -m cgpm-raw -m ctgan\n"
+    deps:
+    - path: qc/marginals/cgpm-raw_1d_fits.csv
+      hash: md5
+      md5: 37b8346c19dcd1bf77ab31d262aebe6c
+      size: 1114
+    - path: qc/marginals/cgpm-raw_2d_fits.csv
+      hash: md5
+      md5: a0f7de401b32d2e784d0113be7227110
+      size: 19739
+    - path: qc/marginals/ctgan_1d_fits.csv
+      hash: md5
+      md5: 8a79fa745ff34d936a67e51fe4dddb21
+      size: 1114
+    - path: qc/marginals/ctgan_2d_fits.csv
+      hash: md5
+      md5: 91172324ee40a6373e071de0fe4f3ce3
+      size: 19745
+    outs:
+    - path: qc/marginals/1d_fits.csv
+      hash: md5
+      md5: 15a84f3bc3cb6f094f707825a6dbe2cf
+      size: 2071
+    - path: qc/marginals/2d_fits.csv
+      hash: md5
+      md5: d5501af3cea888b79ebc911882e052a6
+      size: 32258
+  train-baseline@ctgan:
+    cmd: "poetry run train-baseline --data data/preprocessed.csv --column_models data/column_models.json
+      --model ctgan\n"
+    deps:
+    - path: data/column_models.json
+      hash: md5
+      md5: 0de858868b5a52df93dfb9068b89767f
+      size: 5173
+    - path: data/preprocessed.csv
+      hash: md5
+      md5: 89e944af8bc6e62d966fc9d13cf993ef
+      size: 149879237
+    outs:
+    - path: data/ctgan.pkl
+      hash: md5
+      md5: cacb942941e07998ad1e3ba78687de2f
+      size: 945222788
+  marginal-fits@loom:
+    cmd: "poetry run marginal_fits --real_data data/preprocessed.csv --model loom
+      --column_models data/column_models.json\n"
+    deps:
+    - path: data/preprocessed.csv
+      hash: md5
+      md5: 89e944af8bc6e62d966fc9d13cf993ef
+      size: 149879237
+    - path: data/synthetic-data-loom.csv
+      hash: md5
+      md5: 39d9b5b82312f763ab53176500233469
+      size: 2647714
+    outs:
+    - path: qc/marginals/loom_1d_fits.csv
+      hash: md5
+      md5: b771847fa8a5fe4b83a2e3d791e008c0
+      size: 1110
+    - path: qc/marginals/loom_2d_fits.csv
+      hash: md5
+      md5: 5eb7f8d87b7a8d3c1f92f21697f1af10
+      size: 19738
+    - path: qc/marginals/loom_worst_1d_fit.html
+      hash: md5
+      md5: 01152af5adb10778bab2d2b4b09274aa
+      size: 7999274
+    - path: qc/marginals/loom_worst_1d_fit.png
+      hash: md5
+      md5: fddcd4e5b5617e21d7441715ee724915
+      size: 272559
+    - path: qc/marginals/loom_worst_2d_fit.html
+      hash: md5
+      md5: 11a56ef477a16c4624c01f46115941b0
+      size: 13069772
+    - path: qc/marginals/loom_worst_2d_fit.png
+      hash: md5
+      md5: 396540f312ca32e0d6c7ac876bc86412
+      size: 100997
