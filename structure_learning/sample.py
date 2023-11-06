@@ -68,7 +68,7 @@ def sppl_sample_to_dict(sample):
 @click.command()
 @click.option('--sample_count', type=int, help='Number of samples to draw')
 @click.option('--model', help='Path to the model')
-def baseline_sample(model, sample_count):
+def sample_baseline(model, sample_count):
     model_path = "data/{}.pkl".format(model)
     synthesizer = pickle.load(open(model_path, "rb"))
     synthetic_data = synthesizer.sample(num_rows=sample_count)
