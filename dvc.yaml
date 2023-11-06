@@ -1,4 +1,8 @@
 plots:
+- qc/cgpm-hydrated-dependence-probability.csv:
+    template: resources/dependence_probability.json
+    y: column1
+    x: column2
 - qc/marginals/1d_fits.csv:
     template: resources/marginal_fits.json
     y: Score
@@ -134,6 +138,7 @@ stages:
   train-baseline:
     foreach:
     - ctgan
+    - tvae
     do:
       cmd: >
         poetry run train-baseline
@@ -149,6 +154,7 @@ stages:
   sample-baseline:
     foreach:
     - ctgan
+    - tvae
     do:
       cmd: >
         poetry run sample-baseline
@@ -162,8 +168,10 @@ stages:
   marginal-fits:
     foreach:
     - loom
-    - cgpm-raw
+    - cgpm-hydrated
+    - sppl-hydrated
     - ctgan
+    - tvae
     do:
       cmd: >
         poetry run marginal_fits
@@ -186,6 +194,7 @@ stages:
       poetry run marginal-fits-plot
       -m cgpm-raw
       -m ctgan
+      -m tvae
     deps:
     - qc/marginals/ctgan_1d_fits.csv
     - qc/marginals/ctgan_2d_fits.csv

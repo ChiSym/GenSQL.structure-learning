@@ -189,22 +189,22 @@ stages:
     deps:
     - path: data/column_models.json
       hash: md5
-      md5: f30dc034a8332ea7b01f0e5eb4a55617
-      size: 31023
+      md5: 7772ae9f5cb85181948185d4f207758e
+      size: 35668
     - path: data/preprocessed.csv
       hash: md5
-      md5: f43a7238017f2ad295a5bfec56933248
-      size: 8136977
+      md5: 600f11d7faec5d30ad600f015c94faf8
+      size: 71693274
     - path: loom/samples
       hash: md5
-      md5: 08cc9b90117ef2601c85cea56cf66f2d.dir
-      size: 295760637
-      nfiles: 244
+      md5: 7c24c5aef03d9fcb478fd435891b11b5.dir
+      size: 2022975250
+      nfiles: 251
     outs:
     - path: data/cgpm/hydrated
       hash: md5
-      md5: 160e80fd0dfee1a44fad8943efbfcf3a.dir
-      size: 20155346
+      md5: e9c6b239e6fa1f04a64637675e261fd2.dir
+      size: 182875349
       nfiles: 10
   cgpm-hydrated-sample:
     cmd: "poetry run cgpm-sample --sample_count 10000 --output data/synthetic-data-cgpm-raw.csv
@@ -307,7 +307,7 @@ stages:
       md5: b482d91b8330619015a037f73d98abe3
       size: 92252
   marginal-fits-plot:
-    cmd: "poetry run marginal-fits-plot -m cgpm-raw -m ctgan\n"
+    cmd: "poetry run marginal-fits-plot -m cgpm-raw -m ctgan -m tvae\n"
     deps:
     - path: qc/marginals/cgpm-raw_1d_fits.csv
       hash: md5
@@ -328,12 +328,12 @@ stages:
     outs:
     - path: qc/marginals/1d_fits.csv
       hash: md5
-      md5: f0b8506f0e84f4a58c78d28acb30fd50
-      size: 19517
+      md5: e2b6d1eea3a4244660c2509c3d961e5a
+      size: 28685
     - path: qc/marginals/2d_fits.csv
       hash: md5
-      md5: a2130f22654c504261f20f19df98e7f0
-      size: 3008791
+      md5: 24881ec7299b82ef5f1665278b00b506
+      size: 4445503
   train-baseline@ctgan:
     cmd: "poetry run train-baseline --data data/preprocessed.csv --column_models data/column_models.json
       --model ctgan\n"
@@ -425,3 +425,83 @@ stages:
       hash: md5
       md5: b211b5d9de66043fae586ae4d05957eb
       size: 110338
+  dependence-probability@hydrated:
+    cmd: poetry run dependence-probability --model_dir data/cgpm/hydrated --out_file
+      qc/cgpm-hydrated-dependence-probability.csv
+    deps:
+    - path: data/cgpm/hydrated
+      hash: md5
+      md5: e9c6b239e6fa1f04a64637675e261fd2.dir
+      size: 182875349
+      nfiles: 10
+    outs:
+    - path: qc/cgpm-hydrated-dependence-probability.csv
+      hash: md5
+      md5: fe040bb65a46e205e6efa17212fdc213
+      size: 1514999
+  train-baseline@tvae:
+    cmd: "poetry run train-baseline --data data/preprocessed.csv --column_models data/column_models.json
+      --model tvae\n"
+    deps:
+    - path: data/column_models.json
+      hash: md5
+      md5: 7772ae9f5cb85181948185d4f207758e
+      size: 35668
+    - path: data/preprocessed.csv
+      hash: md5
+      md5: 600f11d7faec5d30ad600f015c94faf8
+      size: 71693274
+    outs:
+    - path: data/tvae.pkl
+      hash: md5
+      md5: 591773d8e6bdf1bb522f8b813caaf0b6
+      size: 2606473
+  sample-baseline@tvae:
+    cmd: "poetry run sample-baseline --model tvae --sample_count 10000\n"
+    deps:
+    - path: data/tvae.pkl
+      hash: md5
+      md5: 591773d8e6bdf1bb522f8b813caaf0b6
+      size: 2606473
+    outs:
+    - path: data/synthetic-data-tvae.csv
+      hash: md5
+      md5: 49c5995571d6b0e614fd889d79cbb582
+      size: 9899755
+  marginal-fits@tvae:
+    cmd: "poetry run marginal_fits --real_data data/preprocessed.csv --model tvae
+      --column_models data/column_models.json\n"
+    deps:
+    - path: data/preprocessed.csv
+      hash: md5
+      md5: 600f11d7faec5d30ad600f015c94faf8
+      size: 71693274
+    - path: data/synthetic-data-tvae.csv
+      hash: md5
+      md5: 49c5995571d6b0e614fd889d79cbb582
+      size: 9899755
+    outs:
+    - path: qc/marginals/tvae_1d_fits.csv
+      hash: md5
+      md5: df0744a860db637fd8abbf5163ec6433
+      size: 10226
+    - path: qc/marginals/tvae_2d_fits.csv
+      hash: md5
+      md5: 971960b2e38918814b923703a42bebab
+      size: 1796463
+    - path: qc/marginals/tvae_worst_1d_fit.html
+      hash: md5
+      md5: bbc993924dcc6ccce21f1976c527e67c
+      size: 4955092
+    - path: qc/marginals/tvae_worst_1d_fit.png
+      hash: md5
+      md5: 1931b7c8e7ca66dfb4d20ecf5e319bed
+      size: 140684
+    - path: qc/marginals/tvae_worst_2d_fit.html
+      hash: md5
+      md5: 37c4e32e8e938901f87b806789e21c05
+      size: 5315049
+    - path: qc/marginals/tvae_worst_2d_fit.png
+      hash: md5
+      md5: e8782ab2dd882699d3d39c255c5a45dc
+      size: 85449
