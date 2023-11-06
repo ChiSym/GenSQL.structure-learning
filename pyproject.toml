@@ -34,6 +34,7 @@ black = "^23.10.0"
 statsmodels = "^0.14.0"
 pygit2 = "<1.13.2"
 tqdm = "^4.66.1"
+jupyter = "^1.0.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"
@@ -50,6 +51,8 @@ regression = 'structure_learning.prediction:prediction'
 get-best-model = 'structure_learning.best_model:get_best_model'
 cgpm-to-sppl = 'structure_learning.sppl:cgpm_to_sppl'
 sample-sppl = 'structure_learning.sample:sppl_sample'
+train-sample-baseline = 'structure_learning.baseline_models:train_sample_baseline'
+marginal-fits-plot = 'structure_learning.marginal_fits:marginal_fits_plot'
 
 [build-system]
 requires = ["poetry-core"]
