@@ -6,11 +6,6 @@ from sdv.metadata import SingleTableMetadata
 from sdmetrics.reports.single_table import QualityReport
 from sdmetrics.reports import utils
 
-def get_sdv_type(col):
-    if col.is_numeric():
-        return "numerical"
-    else:
-        return "categorical"
 
 @click.command()
 @click.option('--real_data', help='Path to the real data file')
@@ -76,3 +71,34 @@ def marginal_fits(real_data, model, column_models):
     plotly.offline.plot(fig_2d, filename=f"qc/marginals/{model}_worst_2d_fit.html")
 
     fig_2d.write_image(f"qc/marginals/{model}_worst_2d_fit.png", width=1500, height=800)
+
+
+@click.command()
+@click.option('--model', '-m', multiple=True)
+def marginal_fits_plot(model):
+    paths_1d_fit = [f"qc/marginals/{m}_1d_fits.csv" for m in model]
+    dfs_1d_fit = [pl.read_csv(path) for path in paths_1d_fit]
+    dfs_1d_fit = [preprocess_1d_fits(df, m) 
+        for df, m in zip(dfs_1d_fit, model)]
+
+    pl.concat(dfs_1d_fit).write_csv("qc/marginals/1d_fits.csv")
+
+    paths_2d_fit = [f"qc/marginals/{m}_2d_fits.csv" for m in model]
+    dfs_2d_fit = [pl.read_csv(path) for path in paths_2d_fit]
+    dfs_2d_fit = [preprocess_2d_fits(df, m) 
+        for df, m in zip(dfs_2d_fit, model)]
+
+    pl.concat(dfs_2d_fit).write_csv("qc/marginals/2d_fits.csv")
+
+
+def preprocess_1d_fits(df, model):
+    return df[["Column", "Score"]].with_columns(
+        idx=pl.arange(0, df.shape[0]),
+        model=pl.repeat(model, df.shape[0]),
+    )
+
+def preprocess_2d_fits(df, model):
+    return df[["Column 1", "Column 2", "Score"]].with_columns(
+        idx=pl.arange(0, df.shape[0]),
+        model=pl.repeat(model, df.shape[0]),
+    )

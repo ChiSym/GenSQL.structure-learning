@@ -149,12 +149,30 @@ stages:
     - data/sppl/merged.json
     outs:
     - data/synthetic-data-sppl-hydrated.csv
+  
+  train-sample-baseline:
+    foreach:
+    - ctgan
+    do:
+      cmd: >
+        poetry run train-sample-baseline
+        --data data/preprocessed.csv
+        --n_samples ${qc.sample_count}
+        --column_models data/column_models.json
+        --model ${item}
+      deps:
+      - data/preprocessed.csv
+      - data/column_models.json
+      outs:
+      - data/${item}.pkl
+      - data/synthetic-data-${item}.csv
 
   marginal-fits:
     foreach:
     - loom
     - cgpm-hydrated
     - sppl-hydrated
+    - ctgan
     do:
       cmd: >
         poetry run marginal_fits
@@ -172,6 +190,20 @@ stages:
       - qc/marginals/${item}_worst_1d_fit.html
       - qc/marginals/${item}_worst_2d_fit.html
 
+  marginal-fits-plot:
+    cmd: >
+      poetry run marginal-fits-plot
+      -m loom
+      -m cgpm-raw
+    deps:
+    - qc/marginals/loom_1d_fits.csv
+    - qc/marginals/loom_2d_fits.csv
+    - qc/marginals/cgpm-raw_1d_fits.csv
+    - qc/marginals/cgpm-raw_2d_fits.csv
+    outs:
+    - qc/marginals/1d_fits.csv
+    - qc/marginals/2d_fits.csv
+
   dependence-probability:
     foreach:
     - hydrated
@@ -182,13 +214,3 @@ stages:
       - data/cgpm/${item}
       outs:
       - qc/cgpm-${item}-dependence-probability.csv
-
-  regression:
-    cmd: >
-      poetry run regression 
-      --data data/preprocessed.csv 
-      --formula "${qc.regression_formula}"
-      --model_filename data/sppl/merged.json 
-      --column_model_filename data/column_models.json
-      --result_filename data/prediction.csv
-
