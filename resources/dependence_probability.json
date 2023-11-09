@@ -13,9 +13,9 @@
         }
     },
     "encoding": {
-      "y": {"field": "<DVC_METRIC_Y>", "type": "nominal", "sort": ["endocrine_therapy_tam", "menopausal_status", "endocrine_therapy_ai", "age", "endocrine_therapy_ofs", "survival_status", "recurrence_indicator", "distant_recurrence_indicator", "disease_free_survival", "race_ethnicity", "genetic_recurrence_score", "progesterone_receptor_status", "chemotherapy", "treatment_assignment", "tumor_grade", "nuclear_grade", "tumor_size", "primary_surgical_procedure"], "title": "<DVC_METRIC_Y_LABEL>"},
-      "x": {"field": "<DVC_METRIC_X>", "type": "nominal", "sort": ["endocrine_therapy_tam", "menopausal_status", "endocrine_therapy_ai", "age", "endocrine_therapy_ofs", "survival_status", "recurrence_indicator", "distant_recurrence_indicator", "disease_free_survival", "race_ethnicity", "genetic_recurrence_score", "progesterone_receptor_status", "chemotherapy", "treatment_assignment", "tumor_grade", "nuclear_grade", "tumor_size", "primary_surgical_procedure"], "title": "<DVC_METRIC_X_LABEL>"},
-      "color": {"field": "dependece_probability", "type": "quantitative"}
+      "y": {"field": "<DVC_METRIC_Y>", "type": "nominal", "sort": ["nuclear_grade", "age", "endocrine_therapy_ai", "race_ethnicity", "tumor_grade", "menopausal_status", "distant_recurrence_indicator", "genetic_recurrence_score", "treatment_assignment", "survival_status", "recurrence_indicator", "tumor_size", "endocrine_therapy_ofs", "chemotherapy", "progesterone_receptor_status", "primary_surgical_procedure", "endocrine_therapy_tam", "disease_free_survival"], "title": "<DVC_METRIC_Y_LABEL>"},
+      "x": {"field": "<DVC_METRIC_X>", "type": "nominal", "sort": ["nuclear_grade", "age", "endocrine_therapy_ai", "race_ethnicity", "tumor_grade", "menopausal_status", "distant_recurrence_indicator", "genetic_recurrence_score", "treatment_assignment", "survival_status", "recurrence_indicator", "tumor_size", "endocrine_therapy_ofs", "chemotherapy", "progesterone_receptor_status", "primary_surgical_procedure", "endocrine_therapy_tam", "disease_free_survival"], "title": "<DVC_METRIC_X_LABEL>"},
+      "color": {"field": "dependence_probability", "type": "quantitative"}
     },
     "config": {
       "axis": {"grid": true, "tickBand": "extent"}
