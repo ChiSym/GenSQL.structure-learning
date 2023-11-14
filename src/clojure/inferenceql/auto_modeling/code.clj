@@ -25,24 +25,23 @@
 
 (defmethod distribution->form :distribution.type/categorical
   [{:categorical/keys [category->weight]} & {:keys [distribution-alias]}]
-  (let [categories (vec (keys category->weight))
-        weights (vec (vals category->weight))
-        sym (with-ns 'categorical distribution-alias)]
-    `(~'case (~sym ~weights)
-      ~@(sequence (comp (map-indexed vector)
-                        cat)
-                  categories))))
+  (let [sym (with-ns 'categorical distribution-alias)]
+    `(~sym ~category->weight)))
 
 (defn ^:private cluster->form
   "Converts a cluster map from a multimixture AST to a Gen.clj form."
   [{:cluster/keys [column->distribution]} & {:as opts}]
-  (update-vals column->distribution #(distribution->form % opts)))
+  ;; (update-vals column->distribution #(distribution->form % opts))
+  (reduce-kv (fn [m column distribution]
+               (assoc m column `(~'dynamic/trace! ~column ~@(distribution->form distribution opts))))
+             {}
+             column->distribution))
 
 (defn ^:private view->form
-  [{:view/keys [clusters]} & {:keys [ns-name] :as opts}]
+  [{:view/keys [clusters]} index & {:keys [ns-name] :as opts}]
   (let [weights (mapv :cluster/weight clusters)
         sym (with-ns 'categorical ns-name)]
-    `(~'case (~sym ~weights)
+    `(~'case (~'dynamic/trace! ~(str "view-" index "-cluster") ~sym ~weights)
       ~@(sequence (comp (map #(cluster->form % opts))
                         (map-indexed vector)
                         cat)
@@ -56,7 +55,7 @@
       (~'gen []
        (~'let ~(into []
                      (comp (map-indexed (fn [index view]
-                                          [(index->symbol index) (view->form view opts)]))
+                                          [(index->symbol index) (view->form view index opts)]))
                            cat)
                      views)
         (~'merge ~@(map index->symbol (range (count views)))))))))
@@ -67,10 +66,10 @@
       :or {ns-name 'inferenceql.generative-program}}]
   (assert (some? ns-name))
   `(~'ns ~ns-name
-    (:require [~'gen]
-              [~'gen.distribution.apache-commons-math3 ~@(if distribution-alias
-                                                           [:as distribution-alias]
-                                                           [:refer '[categorical student-t]])])))
+    (:require [~'gen.distribution.commons-math ~@(if distribution-alias
+                                                   [:as distribution-alias]
+                                                   [:refer '[categorical student-t]])]
+              [~'gen.dynamic :as ~'dynamic :refer [~'gen]])))
 
 (defn string
   "Converts a multimixture AST to a pretty-printed Gen.clj program."
@@ -87,6 +86,6 @@
   (assert (fs/exists? path))
   (assert (not (fs/directory? path)))
   (let [ast (-> (slurp path)
-                 (edn/read-string))
+                (edn/read-string))
         s (string ast opts)]
     (print s)))
