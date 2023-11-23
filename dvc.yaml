@@ -1,4 +1,17 @@
 stages:
+  recode:
+    cmd: >
+      python scripts/pre_process.py
+      --data data/raw/CES22_Common.csv
+      --states-to-index data/raw/states-to-index.csv
+      --output data/data.csv
+    deps:
+      - data/raw/CES22_Common.csv
+      - data/raw/states-to-index.csv
+      - scripts/pre_process.py
+    outs:
+      - data/data.csv
+
   subsample:
     cmd: >
       mkdir -p data/test &&
@@ -445,15 +458,30 @@ stages:
     outs:
       - data/xcat/complete/
 
-  qc-dashboard-spec:
+  pairwise-qc:
+      cmd: >
+        python scripts/pairwise_qc.py
+        --data data/ignored.csv
+        --model data/sppl/merged.json
+        --output data/pairwise-qc.csv
+        --best-fit data/best-fit.txt
+        --worst-fit data/worst-fit.txt
+      deps:
+        - data/ignored.csv
+        - data/sppl/merged.json
+      outs:
+        - data/pairwise-qc.csv
+        - data/best-fit.txt
+        - data/worst-fit.txt
+
+
+  qc-dashboard-spec-random:
     cmd: >
       clojure -X inferenceql.auto-modeling.qc.dashboard/spec
       :samples qc/samples/samples.edn
       :schema data/schema.edn
       :correlation data/linear-stats.json
-      > qc/specs/qc-dashboard.vl.json
-    params:
-      - qc.columns
+      > qc/specs/qc-dashboard.random.vl.json
     deps:
       - qc/samples/samples.edn
       - data/schema.edn
@@ -461,55 +489,89 @@ stages:
       - src/clojure/inferenceql/auto_modeling/qc/dashboard.clj
       - src/clojure/inferenceql/auto_modeling/qc/util.clj
     outs:
-      - qc/specs/qc-dashboard.vl.json
+      - qc/specs/qc-dashboard.random.vl.json
 
-  qc-dashboard-app:
+  qc-dashboard-app-random:
     cmd: >
       clojure -X inferenceql.auto-modeling.qc.app/create
       :template qc/templates/index.html
-      :spec qc/specs/qc-dashboard.vl.json
+      :spec qc/specs/qc-dashboard.random.vl.json
       :renderer canvas
       :title '"QC dashboard"'
-      > qc/app/qc-dashboard.html
+      > qc/app/qc-dashboard.random.html
     deps:
       - qc/templates/index.html
-      - qc/specs/qc-dashboard.vl.json
+      - qc/specs/qc-dashboard.random.vl.json
       - src/clojure/inferenceql/auto_modeling/qc/app.clj
     outs:
-      - qc/app/qc-dashboard.html
+      - qc/app/qc-dashboard.random.html
 
-  qc-splom-spec:
+  qc-dashboard-spec-worst:
     cmd: >
-      clojure -X inferenceql.auto-modeling.qc.splom/spec
+      clojure -X inferenceql.auto-modeling.qc.dashboard/spec
       :samples qc/samples/samples.edn
       :schema data/schema.edn
       :correlation data/linear-stats.json
-      > qc/specs/qc-splom.vl.json
-    params:
-      - qc.columns
+      :columns data/worst-fit.txt
+      > qc/specs/qc-dashboard.worst.vl.json
     deps:
       - qc/samples/samples.edn
+      - data/worst-fit.txt
       - data/schema.edn
       - data/linear-stats.json
-      - src/clojure/inferenceql/auto_modeling/qc/splom.clj
+      - src/clojure/inferenceql/auto_modeling/qc/dashboard.clj
       - src/clojure/inferenceql/auto_modeling/qc/util.clj
     outs:
-      - qc/specs/qc-splom.vl.json
+      - qc/specs/qc-dashboard.worst.vl.json
 
-  qc-splom-app:
+  qc-dashboard-app-worst:
     cmd: >
       clojure -X inferenceql.auto-modeling.qc.app/create
       :template qc/templates/index.html
-      :spec qc/specs/qc-splom.vl.json
+      :spec qc/specs/qc-dashboard.worst.vl.json
       :renderer canvas
-      :title '"QC scatter plot matrix"'
-      > qc/app/qc-splom.html
+      :title '"QC dashboard"'
+      > qc/app/qc-dashboard.worst.html
     deps:
       - qc/templates/index.html
-      - qc/specs/qc-splom.vl.json
+      - qc/specs/qc-dashboard.worst.vl.json
       - src/clojure/inferenceql/auto_modeling/qc/app.clj
     outs:
-      - qc/app/qc-splom.html
+      - qc/app/qc-dashboard.worst.html
+
+
+  qc-dashboard-spec-best:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.qc.dashboard/spec
+      :samples qc/samples/samples.edn
+      :schema data/schema.edn
+      :correlation data/linear-stats.json
+      :columns data/best-fit.txt
+      > qc/specs/qc-dashboard.best.vl.json
+    deps:
+      - qc/samples/samples.edn
+      - data/best-fit.txt
+      - data/schema.edn
+      - data/linear-stats.json
+      - src/clojure/inferenceql/auto_modeling/qc/dashboard.clj
+      - src/clojure/inferenceql/auto_modeling/qc/util.clj
+    outs:
+      - qc/specs/qc-dashboard.best.vl.json
+
+  qc-dashboard-app-best:
+    cmd: >
+      clojure -X inferenceql.auto-modeling.qc.app/create
+      :template qc/templates/index.html
+      :spec qc/specs/qc-dashboard.best.vl.json
+      :renderer canvas
+      :title '"QC dashboard"'
+      > qc/app/qc-dashboard.best.html
+    deps:
+      - qc/templates/index.html
+      - qc/specs/qc-dashboard.best.vl.json
+      - src/clojure/inferenceql/auto_modeling/qc/app.clj
+    outs:
+      - qc/app/qc-dashboard.best.html
 
   predict:
       cmd: >

@@ -1,14 +1,12 @@
-dataset_name: test-pub
-seed: 0
-sample_count: 3
+seed: 42
+sample_count: 1
 sub_sample:
-  #according_to_columns:
-  #  Class_of_Orbit:
-  #    - LEO
-  #    - GEO
-  #  Users:
-  #    - Commercial
-  N: 1000
+  according_to_columns:
+    state:
+      - Idaho
+      - Wyoming
+      - Montana
+  N: 10000
 parallel:
   # To limit the number of jobs GNU Parallel spawns use add the flag `--jobs n`.
   flags: >-
@@ -23,7 +21,9 @@ schema:
   # for each column. The available types are as follows: numerical, nominal, and ignore.
   # For example, to force the "age" column to be treated as a
   # numerical uncomment the following line:
-  # age: numerical
+  age: numerical
+  state: ignore
+  zipcode: ignore
   # Apogee_km: numerical
   # Perigee_km: numerical
 loom:
@@ -48,15 +48,13 @@ cgpm:
   #    - Apogee_km
   #  Apogee_km:
   #    - Class_of_Orbit
-clojurecat:
-  iterations: 150
 qc:
   # Set this to the number of synthetic samples desired in QC plots.
   sample_count: 1000
   # Set this to specify the columns visualized in QC plots.
   # When not set, up to 8 columns--taken from the schema--will be visualized.
   # e.g. columns: ["foo", "bar", "baz"]
-  columns: null
+  columns: ["US_citizen", "registered_to_vote", "age", "where_was_ballot_returned", "divorced_last_year", "policy_support_repealing_ACA"]
   # This limits the number of categories shown for categorical variables in
   # 2-dimensional QC plots. Set this to null for no limit.
   category_limit: 10
@@ -67,13 +65,12 @@ mi:
     # health_status: ["c) Average", "b) Below average"]
 synthetic_data_evaluation:
   # If target is not specified, a random target is chosen for prediction.
-  #target: Apogee_km
+  target: policy_support_repealing_ACA
   predictor: Random_forest # One of "Random_forest" or "GLM"
     #N: 10000 # Subsample held-out dataframe with 1000 samples
 database:
   table_name: data
   table_path: data/nullified.csv
   model_name: baseline_model
-  model_path: data/xcat/complete/sample.0.edn
-  # model_path: data/xcat/merged.edn
+  model_path: data/xcat/merged.edn
   # model_path: data/sppl/merged.json

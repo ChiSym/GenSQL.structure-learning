@@ -477,7 +477,7 @@
   "Produces a vega-lite spec for the QC Dashboard app.
   Paths to samples and schema are required.
   Path to correlation data is optional."
-  [{sample-path :samples schema-path :schema correlation-path :correlation}]
+  [{sample-path :samples schema-path :schema correlation-path :correlation fit-path :columns}]
   (let [schema (-> schema-path str slurp edn/read-string)
         samples (-> sample-path str slurp edn/read-string)
         correlation (some-> correlation-path str slurp (cheshire/parse-string true))
@@ -493,12 +493,12 @@
 
         ;; Visualize the columns set in params.yaml.
         ;; If not specified, visualize all the columns.
-        cols (->> (or (get-in (dvc/yaml) [:qc :columns])
-                      (keys schema))
+        cols (->> (if (nil? fit-path)
+                    (keys schema)
+                    (-> fit-path str slurp edn/read-string))
                   (map keyword)
                   (take 8) ; Either way we will visualize at most 8 columns.
                   (filter vega-type)) ; Only keep the columns that we can determine a vega-type for.
-
         cols-by-type (group-by vega-type cols)
 
         histograms-quant (histogram-quant-section "1-D marginals" "(numerical columns)"

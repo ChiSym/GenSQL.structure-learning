@@ -39,3 +39,6 @@
 /predictions.csv
 /synthetic-data-iql.csv
 /db.edn
+/pairwise-qc.csv
+/best-fit.txt
+/worst-fit.txt
