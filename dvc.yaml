@@ -189,7 +189,6 @@ stages:
       --params params.yaml
       --seed $((${seed} + {#} - 1))
       --minutes ${cgpm.minutes}'
-      #--iterations ${cgpm.iterations}
     params:
       - parallel.flags
       - seed
