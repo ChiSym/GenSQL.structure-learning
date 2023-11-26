@@ -6,11 +6,11 @@ stages:
       --states-to-index data/raw/states-to-index.csv
       --output data/data.csv
     deps:
-      - data/raw/CES22_Common.csv
-      - data/raw/states-to-index.csv
-      - scripts/pre_process.py
+    - data/raw/CES22_Common.csv
+    - data/raw/states-to-index.csv
+    - scripts/pre_process.py
     outs:
-      - data/data.csv
+    - data/data.csv
 
   subsample:
     cmd: >
@@ -21,21 +21,21 @@ stages:
       --params params.yaml
       --output data/subsampled.csv
     deps:
-      - data/data.csv
-      - scripts/subsample.py
+    - data/data.csv
+    - scripts/subsample.py
     params:
-      - sub_sample
-      - seed
+    - sub_sample
+    - seed
     outs:
-      - data/subsampled.csv
-      - data/test
+    - data/subsampled.csv
+    - data/test
 
   validate-column-names:
     cmd: bin/validate.sh
     deps:
-      - data/subsampled.csv
+    - data/subsampled.csv
     outs:
-      - data/validated.csv
+    - data/validated.csv
 
   nullify:
     cmd: >
@@ -43,11 +43,11 @@ stages:
       < data/validated.csv
       > data/nullified.csv
     deps:
-      - data/validated.csv
+    - data/validated.csv
     params:
-      - nullify
+    - nullify
     outs:
-      - data/nullified.csv
+    - data/nullified.csv
 
   guess-schema:
     cmd: >
@@ -55,11 +55,11 @@ stages:
       < data/nullified.csv
       > data/schema.edn
     deps:
-      - data/nullified.csv
+    - data/nullified.csv
     params:
-      - schema
+    - schema
     outs:
-      - data/schema.edn
+    - data/schema.edn
 
   cgpm-schema:
     cmd: >
@@ -67,9 +67,9 @@ stages:
       < data/schema.edn
       > data/cgpm-schema.edn
     deps:
-      - data/schema.edn
+    - data/schema.edn
     outs:
-      - data/cgpm-schema.edn
+    - data/cgpm-schema.edn
 
   ignore:
     cmd: >
@@ -78,10 +78,10 @@ stages:
       < data/nullified.csv
       > data/ignored.csv
     deps:
-      - data/nullified.csv
-      - data/schema.edn
+    - data/nullified.csv
+    - data/schema.edn
     outs:
-      - data/ignored.csv
+    - data/ignored.csv
 
   numericalize:
     cmd: >
@@ -91,11 +91,11 @@ stages:
       < data/ignored.csv
       > data/numericalized.csv
     deps:
-      - data/ignored.csv
-      - data/schema.edn
+    - data/ignored.csv
+    - data/schema.edn
     outs:
-      - data/numericalized.csv
-      - data/mapping-table.edn
+    - data/numericalized.csv
+    - data/mapping-table.edn
 
   loom-schema:
     cmd: >
@@ -103,18 +103,18 @@ stages:
       < data/schema.edn
       > data/loom-schema.json
     deps:
-      - data/schema.edn
+    - data/schema.edn
     outs:
-      - data/loom-schema.json
+    - data/loom-schema.json
 
   loom-ingest:
     cmd: ./bin/loom_task ingest loom data/loom-schema.json data/numericalized.csv
     deps:
-      - data/loom-schema.json
-      - data/numericalized.csv
+    - data/loom-schema.json
+    - data/numericalized.csv
     outs:
-      - loom/ingest
-      - loom/query
+    - loom/ingest
+    - loom/query
 
   loom-infer-config:
     cmd: >
@@ -122,21 +122,21 @@ stages:
       < params.yaml
       > data/infer-config.json
     params:
-      - loom.extra_passes
-      - seed
+    - loom.extra_passes
+    - seed
     outs:
-      - data/infer-config.json
+    - data/infer-config.json
 
   loom-infer:
     cmd: ./bin/loom_task infer loom ${sample_count} data/infer-config.json
     deps:
-      - loom/ingest
-      - loom/query
-      - data/infer-config.json
+    - loom/ingest
+    - loom/query
+    - data/infer-config.json
     params:
-      - sample_count
+    - sample_count
     outs:
-      - loom/samples
+    - loom/samples
 
   loom-dump-metadata:
     cmd: >
@@ -146,12 +146,12 @@ stages:
       ./bin/loom python scripts/loom_dump.py {}
       --output data/cgpm/raw/{/}.json
     params:
-      - parallel.flags
+    - parallel.flags
     deps:
-      - loom/samples
-      - scripts/loom_dump.py
+    - loom/samples
+    - scripts/loom_dump.py
     outs:
-      - data/cgpm/raw
+    - data/cgpm/raw
 
   cgpm-hydrate-metadata:
     cmd: >
@@ -170,17 +170,17 @@ stages:
       --mapping-table data/mapping-table.edn
       --seed $((${seed} + {#} - 1))'
     params:
-      - parallel.flags
-      - seed
+    - parallel.flags
+    - seed
     deps:
-      - data/cgpm-schema.edn
-      - data/cgpm/raw
-      - data/mapping-table.edn
-      - data/numericalized.csv
-      - schemas/cgpm.json
-      - scripts/cgpm_hydrate.py
+    - data/cgpm-schema.edn
+    - data/cgpm/raw
+    - data/mapping-table.edn
+    - data/numericalized.csv
+    - schemas/cgpm.json
+    - scripts/cgpm_hydrate.py
     outs:
-      - data/cgpm/hydrated
+    - data/cgpm/hydrated
 
   cgpm-infer-hyperparameters:
     cmd: >
@@ -204,16 +204,16 @@ stages:
       --minutes ${cgpm.minutes}'
       #--iterations ${cgpm.iterations}
     params:
-      - parallel.flags
-      - seed
-      - cgpm
+    - parallel.flags
+    - seed
+    - cgpm
     deps:
-      - data/cgpm/hydrated
-      - schemas/cgpm.json
-      - scripts/cgpm_infer.py
-      - data/numericalized.csv
+    - data/cgpm/hydrated
+    - schemas/cgpm.json
+    - scripts/cgpm_infer.py
+    - data/numericalized.csv
     outs:
-      - data/cgpm/complete
+    - data/cgpm/complete
 
   save-dependencies:
     cmd: >
@@ -223,9 +223,9 @@ stages:
       --data data/numericalized.csv
       --output data/dep-prob.json
     deps:
-      - data/cgpm/complete
+    - data/cgpm/complete
     outs:
-      - data/dep-prob.json
+    - data/dep-prob.json
 
   save-max-number-views:
     cmd: >
@@ -233,9 +233,9 @@ stages:
       xargs python scripts/save_n_views.py
       >> data/max-number-views.txt
     deps:
-      - data/cgpm/complete
+    - data/cgpm/complete
     outs:
-      - data/max-number-views.txt
+    - data/max-number-views.txt
 
   dep-prob-vl:
     cmd: >
@@ -247,10 +247,10 @@ stages:
       :scheme '"blues"'
       > data/dep-prob.vl.json
     deps:
-      - data/dep-prob.json
-      - src/clojure/inferenceql/auto_modeling/heatmap.clj
+    - data/dep-prob.json
+    - src/clojure/inferenceql/auto_modeling/heatmap.clj
     outs:
-      - data/dep-prob.vl.json
+    - data/dep-prob.vl.json
 
   dep-prob-vg:
     cmd: >
@@ -258,9 +258,9 @@ stages:
       < data/dep-prob.vl.json
       > data/dep-prob.vg.json
     deps:
-      - data/dep-prob.vl.json
+    - data/dep-prob.vl.json
     outs:
-      - data/dep-prob.vg.json
+    - data/dep-prob.vg.json
 
   dep-prob-svg:
     cmd: >
@@ -268,9 +268,9 @@ stages:
       < data/dep-prob.vg.json
       > data/dep-prob.svg
     deps:
-      - data/dep-prob.vg.json
+    - data/dep-prob.vg.json
     outs:
-      - data/dep-prob.svg
+    - data/dep-prob.svg
 
   save-linear-stats:
     cmd: >
@@ -279,11 +279,11 @@ stages:
       --schema data/schema.edn
       --output data/linear-stats.json
     deps:
-      - data/ignored.csv
-      - data/schema.edn
-      - scripts/linear_stats.py
+    - data/ignored.csv
+    - data/schema.edn
+    - scripts/linear_stats.py
     outs:
-      - data/linear-stats.json
+    - data/linear-stats.json
 
   linear-stats-vl:
     cmd: >
@@ -297,11 +297,11 @@ stages:
       :scheme '"oranges"'
       > data/linear-stats.vl.json
     deps:
-      - data/linear-stats.json
-      - data/dep-prob.json
-      - src/clojure/inferenceql/auto_modeling/heatmap.clj
+    - data/linear-stats.json
+    - data/dep-prob.json
+    - src/clojure/inferenceql/auto_modeling/heatmap.clj
     outs:
-      - data/linear-stats.vl.json
+    - data/linear-stats.vl.json
 
   linear-stats-vg:
     cmd: >
@@ -309,9 +309,9 @@ stages:
       < data/linear-stats.vl.json
       > data/linear-stats.vg.json
     deps:
-      - data/linear-stats.vl.json
+    - data/linear-stats.vl.json
     outs:
-      - data/linear-stats.vg.json
+    - data/linear-stats.vg.json
 
   linear-stats-svg:
     cmd: >
@@ -319,80 +319,67 @@ stages:
       < data/linear-stats.vg.json
       > data/linear-stats.svg
     deps:
-      - data/linear-stats.vg.json
+    - data/linear-stats.vg.json
     outs:
-      - data/linear-stats.svg
+    - data/linear-stats.svg
   compare-dep-prob-with-linear:
-    desc: "Compares results from dependency probability with standard statistical tests"
+    desc: Compares results from dependency probability with standard statistical tests
     cmd: >
       python scripts/compare_deps.py
       --deps data/dep-prob.json
       --linear data/linear-stats.json
       >> data/qc-statistical-tests.txt
     deps:
-      - data/dep-prob.json
-      - data/linear-stats.json
+    - data/dep-prob.json
+    - data/linear-stats.json
     outs:
-      - data/qc-statistical-tests.txt
+    - data/qc-statistical-tests.txt
 
   ast-export:
-    desc: "Exports ASTs of the parametric model programs resulting from truncating CGPM-CrossCat models."
+    desc: Exports ASTs of the parametric model programs resulting from truncating
+      CGPM-CrossCat models.
     cmd:
-      - >-
-        parallel ${parallel.flags}
-        jsonschema --instance {} schemas/cgpm.json
-        :::: <(find data/cgpm/complete -type f)
-      - mkdir -p data/ast
-      - >-
-        parallel ${parallel.flags}
-        'python scripts/ast_export.py
-        --metadata {}
-        --data data/numericalized.csv
-        --mapping-table data/mapping-table.edn
-        --output data/ast/{/.}.edn'
-        :::: <(find data/cgpm/complete -type f)
+    - >-
+      parallel ${parallel.flags}
+      jsonschema --instance {} schemas/cgpm.json
+      :::: <(find data/cgpm/complete -type f)
+    - mkdir -p data/ast
+    - >-
+      parallel ${parallel.flags}
+      'python scripts/ast_export.py
+      --metadata {}
+      --data data/numericalized.csv
+      --mapping-table data/mapping-table.edn
+      --output data/ast/{/.}.edn'
+      :::: <(find data/cgpm/complete -type f)
     params:
-      - parallel.flags
+    - parallel.flags
     deps:
-      - data/cgpm/complete
-      - data/ignored.csv
-      - scripts/ast_export.py
+    - data/cgpm/complete
+    - data/ignored.csv
+    - scripts/ast_export.py
     outs:
-      - data/ast
-
-  write-gen-programs:
-    deps:
-      - data/ast
-    outs:
-      - data/code
-    cmd:
-      - mkdir -p data/code
-      - >-
-        parallel ${parallel.flags}
-        'clojure -X inferenceql.auto-modeling.code/pprint-string
-        :path \"{}\"
-        > data/code/{/.}.clj'
-        :::: <(find data/ast -type f)
+    - data/ast
 
   sppl-import:
-    desc: "Imports a Multi-Mix AST and exports it AS a sum-product network"
+    desc: Imports a Multi-Mix AST and exports it AS a sum-product network
     cmd:
-      - mkdir -p data/sppl/unmerged
-      - >-
-        parallel ${parallel.flags}
-        'python scripts/sppl_import.py
-        --multi-mix-ast {}
-        --max-number-views data/max-number-views.txt
-        --output data/sppl/unmerged/{/.}.json'
-        :::: <(find data/ast -type f)
+    - mkdir -p data/sppl/unmerged
+    - >-
+      parallel ${parallel.flags}
+      'python scripts/sppl_import.py
+      --multi-mix-ast {}
+      --max-number-views data/max-number-views.txt
+      --output data/sppl/unmerged/{/.}.json'
+      :::: <(find data/ast -type f)
     params:
-      - parallel.flags
+    - parallel.flags
     deps:
-      - data/ast
-      - data/max-number-views.txt
-      - scripts/sppl_import.py
+    - data/ast
+    - data/max-number-views.txt
+    - scripts/sppl_import.py
     outs:
-      - data/sppl/unmerged
+    - data/sppl/unmerged
 
   sppl-merge:
     cmd: >
@@ -401,9 +388,9 @@ stages:
       xargs python scripts/sppl_merge.py
       --output data/sppl/merged.json
     deps:
-      - data/sppl/unmerged
+    - data/sppl/unmerged
     outs:
-      - data/sppl/merged.json
+    - data/sppl/merged.json
 
   sppl-sample:
     cmd: >
@@ -413,11 +400,11 @@ stages:
       > data/synthetic-data-iql.csv
       # --sample_count ${qc.sample_count}
     deps:
-      - scripts/sppl_sample.py
-      - data/sppl/merged.json
-      - data/ignored.csv
+    - scripts/sppl_sample.py
+    - data/sppl/merged.json
+    - data/ignored.csv
     outs:
-      - data/synthetic-data-iql.csv
+    - data/synthetic-data-iql.csv
 
   qc-tag-samples:
     cmd: >
@@ -426,53 +413,53 @@ stages:
       :samples-synthetic data/synthetic-data-iql.csv
       > qc/samples/samples.edn
     deps:
-      - data/ignored.csv
-      - data/synthetic-data-iql.csv
-      - src/clojure/inferenceql/auto_modeling/qc/samples.clj
+    - data/ignored.csv
+    - data/synthetic-data-iql.csv
+    - src/clojure/inferenceql/auto_modeling/qc/samples.clj
     outs:
-      - qc/samples/samples.edn
+    - qc/samples/samples.edn
 
   xcat-complete-import:
-    desc: "Imports the final CGPM Crosscat samples as XCat records."
+    desc: Imports the final CGPM Crosscat samples as XCat records.
     cmd:
-      - mkdir -p data/xcat/complete/
-      - >-
-        parallel ${parallel.flags}
-        'clojure -X inferenceql.auto-modeling.xcat/import
-        :cgpm-json {}
-        :data-csv data/ignored.csv
-        :mapping-table data/mapping-table.edn
-        :numericalized-csv data/numericalized.csv
-        :schema-edn data/schema.edn
-        > data/xcat/complete/{/.}.edn'
-        :::: <(find data/cgpm/complete -type f)
+    - mkdir -p data/xcat/complete/
+    - >-
+      parallel ${parallel.flags}
+      'clojure -X inferenceql.auto-modeling.xcat/import
+      :cgpm-json {}
+      :data-csv data/ignored.csv
+      :mapping-table data/mapping-table.edn
+      :numericalized-csv data/numericalized.csv
+      :schema-edn data/schema.edn
+      > data/xcat/complete/{/.}.edn'
+      :::: <(find data/cgpm/complete -type f)
     params:
-      - parallel.flags
+    - parallel.flags
     deps:
-      - data/cgpm/complete
-      - data/mapping-table.edn
-      - data/ignored.csv
-      - data/numericalized.csv
-      - data/schema.edn
-      - src/clojure/inferenceql/auto_modeling/xcat.clj
+    - data/cgpm/complete
+    - data/mapping-table.edn
+    - data/ignored.csv
+    - data/numericalized.csv
+    - data/schema.edn
+    - src/clojure/inferenceql/auto_modeling/xcat.clj
     outs:
-      - data/xcat/complete/
+    - data/xcat/complete/
 
   pairwise-qc:
-      cmd: >
-        python scripts/pairwise_qc.py
-        --data data/ignored.csv
-        --model data/sppl/merged.json
-        --output data/pairwise-qc.csv
-        --best-fit data/best-fit.txt
-        --worst-fit data/worst-fit.txt
-      deps:
-        - data/ignored.csv
-        - data/sppl/merged.json
-      outs:
-        - data/pairwise-qc.csv
-        - data/best-fit.txt
-        - data/worst-fit.txt
+    cmd: >
+      python scripts/pairwise_qc.py
+      --data data/ignored.csv
+      --model data/sppl/merged.json
+      --output data/pairwise-qc.csv
+      --best-fit data/best-fit.txt
+      --worst-fit data/worst-fit.txt
+    deps:
+    - data/ignored.csv
+    - data/sppl/merged.json
+    outs:
+    - data/pairwise-qc.csv
+    - data/best-fit.txt
+    - data/worst-fit.txt
 
 
   qc-dashboard-spec-random:
@@ -483,13 +470,13 @@ stages:
       :correlation data/linear-stats.json
       > qc/specs/qc-dashboard.random.vl.json
     deps:
-      - qc/samples/samples.edn
-      - data/schema.edn
-      - data/linear-stats.json
-      - src/clojure/inferenceql/auto_modeling/qc/dashboard.clj
-      - src/clojure/inferenceql/auto_modeling/qc/util.clj
+    - qc/samples/samples.edn
+    - data/schema.edn
+    - data/linear-stats.json
+    - src/clojure/inferenceql/auto_modeling/qc/dashboard.clj
+    - src/clojure/inferenceql/auto_modeling/qc/util.clj
     outs:
-      - qc/specs/qc-dashboard.random.vl.json
+    - qc/specs/qc-dashboard.random.vl.json
 
   qc-dashboard-app-random:
     cmd: >
@@ -500,11 +487,11 @@ stages:
       :title '"QC dashboard"'
       > qc/app/qc-dashboard.random.html
     deps:
-      - qc/templates/index.html
-      - qc/specs/qc-dashboard.random.vl.json
-      - src/clojure/inferenceql/auto_modeling/qc/app.clj
+    - qc/templates/index.html
+    - qc/specs/qc-dashboard.random.vl.json
+    - src/clojure/inferenceql/auto_modeling/qc/app.clj
     outs:
-      - qc/app/qc-dashboard.random.html
+    - qc/app/qc-dashboard.random.html
 
   qc-dashboard-spec-worst:
     cmd: >
@@ -515,14 +502,14 @@ stages:
       :columns data/worst-fit.txt
       > qc/specs/qc-dashboard.worst.vl.json
     deps:
-      - qc/samples/samples.edn
-      - data/worst-fit.txt
-      - data/schema.edn
-      - data/linear-stats.json
-      - src/clojure/inferenceql/auto_modeling/qc/dashboard.clj
-      - src/clojure/inferenceql/auto_modeling/qc/util.clj
+    - qc/samples/samples.edn
+    - data/worst-fit.txt
+    - data/schema.edn
+    - data/linear-stats.json
+    - src/clojure/inferenceql/auto_modeling/qc/dashboard.clj
+    - src/clojure/inferenceql/auto_modeling/qc/util.clj
     outs:
-      - qc/specs/qc-dashboard.worst.vl.json
+    - qc/specs/qc-dashboard.worst.vl.json
 
   qc-dashboard-app-worst:
     cmd: >
@@ -533,11 +520,11 @@ stages:
       :title '"QC dashboard"'
       > qc/app/qc-dashboard.worst.html
     deps:
-      - qc/templates/index.html
-      - qc/specs/qc-dashboard.worst.vl.json
-      - src/clojure/inferenceql/auto_modeling/qc/app.clj
+    - qc/templates/index.html
+    - qc/specs/qc-dashboard.worst.vl.json
+    - src/clojure/inferenceql/auto_modeling/qc/app.clj
     outs:
-      - qc/app/qc-dashboard.worst.html
+    - qc/app/qc-dashboard.worst.html
 
 
   qc-dashboard-spec-best:
@@ -549,14 +536,14 @@ stages:
       :columns data/best-fit.txt
       > qc/specs/qc-dashboard.best.vl.json
     deps:
-      - qc/samples/samples.edn
-      - data/best-fit.txt
-      - data/schema.edn
-      - data/linear-stats.json
-      - src/clojure/inferenceql/auto_modeling/qc/dashboard.clj
-      - src/clojure/inferenceql/auto_modeling/qc/util.clj
+    - qc/samples/samples.edn
+    - data/best-fit.txt
+    - data/schema.edn
+    - data/linear-stats.json
+    - src/clojure/inferenceql/auto_modeling/qc/dashboard.clj
+    - src/clojure/inferenceql/auto_modeling/qc/util.clj
     outs:
-      - qc/specs/qc-dashboard.best.vl.json
+    - qc/specs/qc-dashboard.best.vl.json
 
   qc-dashboard-app-best:
     cmd: >
@@ -567,29 +554,29 @@ stages:
       :title '"QC dashboard"'
       > qc/app/qc-dashboard.best.html
     deps:
-      - qc/templates/index.html
-      - qc/specs/qc-dashboard.best.vl.json
-      - src/clojure/inferenceql/auto_modeling/qc/app.clj
+    - qc/templates/index.html
+    - qc/specs/qc-dashboard.best.vl.json
+    - src/clojure/inferenceql/auto_modeling/qc/app.clj
     outs:
-      - qc/app/qc-dashboard.best.html
+    - qc/app/qc-dashboard.best.html
 
   predict:
-      cmd: >
-        python scripts/predict.py
-        --schema data/schema.edn
-        --training data/ignored.csv
-        --training data/synthetic-data-iql.csv
-        --test data/test/test.csv
-        --output data/predictions.csv
-        #--test data/test/test-shifted.csv
-      params:
-        - synthetic_data_evaluation
-      deps:
-        - scripts/predict.py
-        - data/schema.edn
-        - data/ignored.csv
-        - data/synthetic-data-iql.csv
-        - data/test/test.csv
+    cmd: >
+      python scripts/predict.py
+      --schema data/schema.edn
+      --training data/ignored.csv
+      --training data/synthetic-data-iql.csv
+      --test data/test/test.csv
+      --output data/predictions.csv
+      #--test data/test/test-shifted.csv
+    params:
+    - synthetic_data_evaluation
+    deps:
+    - scripts/predict.py
+    - data/schema.edn
+    - data/ignored.csv
+    - data/synthetic-data-iql.csv
+    - data/test/test.csv
         #- data/test/test-shifted.csv
-      outs:
-        - data/predictions.csv
+    outs:
+    - data/predictions.csv

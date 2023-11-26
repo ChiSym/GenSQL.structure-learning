@@ -1,5 +1,5 @@
 seed: 42
-sample_count: 1
+sample_count: 45
 sub_sample:
   according_to_columns:
     state:
@@ -27,10 +27,10 @@ schema:
   # Apogee_km: numerical
   # Perigee_km: numerical
 loom:
-  extra_passes: 1
+  extra_passes: 500
 cgpm:
   iterations: 1
-  minutes: 1
+  minutes: 2160
   #dependence:
   #  # While the CrossCat implementation in CGPM takes dependence constraints, doing so
   #  # throws a not-implemented-error. Hence, we apply a workaround:
