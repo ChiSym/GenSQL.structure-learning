@@ -166,6 +166,38 @@ WARNING: Never push to the main branch on GitHub.
 2. Confirm that you have access to the S3 bucket that serves as a DVC remote in `.dvc/config`.
 3. Run `dvc pull`. The data and QC directories are now populated with what was checked into this branch.
 
+== Reporting a bug or a problem
+
+Bugs can be reported via our https://github.com/InferenceQL/inferenceql.auto-modeling/issues[issue tracker].
+With Bayesian structure learning, bugs and problems can occur only when working with a specific model, schema, or dataset.
+To ensure the IQL team can help you, please share a minimal version of our data and pipeline with us.
+
+=== Report problems with models when the DVC pipeline runs end-to-end
+
+If your DVC pipeline runs end-to-end but you are unhappy with model quality or
+model behavior, please refer to the section about <<sharing>> above. Add a short description of the problem in the most recent commit message.
+
+=== Report a crash of your DVC pipeline
+
+If the DVC pipeline crashes when you run `dvc repro`, follow a four-step procedure.
+
+First, create the  smallest possible configuration of the pipeline:
+- Setting the https://github.com/InferenceQL/inferenceql.auto-modeling/blob/main/params.yaml#L3[sample_count] to 1.
+- Set https://github.com/InferenceQL/inferenceql.auto-modeling/blob/main/params.yaml#L30[Loom inference steps] to 1.
+- Set https://github.com/InferenceQL/inferenceql.auto-modeling/blob/main/params.yaml#L32-L33[Python inference steps] to 1.
+- Sub-sample maximally 1000 rows by setting https://github.com/InferenceQL/inferenceql.auto-modeling/blob/main/params.yaml#L11[N here]
+
+Second, create the smallest possible version of the data used for modeling that does  *not* crash.
+To do this, edit the schema to ignore columns until the pipeline runs end-to-end with `dvc repro` by setting `column_foo: ignore`, `column_bar: ignore` etc.
+
+Third, revisit the section on [[sharing]] and share the version that runs.
+Ensure you don't have any remaining local changes in git (run `git status`).
+
+Finally, make the minimal changes needed to reproduce the crash.
+Record the changes you made into a text file. Run `git diff > change.txt`.
+Commit the new file `change.txt` with git and push it to your branch.
+If you provide the name of your branch the IQL team can run `git apply change.txt` to reproduce the crash.
+
 == Model-building backends
 
 IQL Auto-modeling supports a number of model-building backends. The previous sections on model building used the default CGPM backend. We will provide some more background on the CGPM backend here and also provide information on using alternatives.
