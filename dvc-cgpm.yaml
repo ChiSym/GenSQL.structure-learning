@@ -479,27 +479,3 @@ stages:
         #- data/test/test-shifted.csv
       outs:
         - data/predictions.csv
-
-  prepare-publish:
-    cmd: >
-      rm -rf publish-analysis-output/ &&
-      git clone https://github.com/OpenIQL/inferenceql.analyses.git publish-analysis-output &&
-      mkdir publish-analysis-output/analyses/${dataset_name}/ &&
-      mkdir publish-analysis-output/html-pages/${dataset_name}/ &&
-      cp params.yaml publish-analysis-output/analyses/${dataset_name}/params.yaml &&
-      cp data/data.csv publish-analysis-output/analyses/${dataset_name}/data.csv &&
-      cp data/schema.edn publish-analysis-output/analyses/${dataset_name}/schema.edn &&
-      cp data/sppl/merged.json publish-analysis-output/analyses/${dataset_name}/merged.json &&
-      touch publish-analysis-output/analyses/${dataset_name}/queries.iql &&
-      cp qc/app/qc-dashboard.html publish-analysis-output/html-pages/${dataset_name}/qc-dashboard.html &&
-      cp qc/app/qc-splom.html publish-analysis-output/html-pages/${dataset_name}/qc-splom.html &&
-      cd publish-analysis-output && git checkout -b ${dataset_name}-to-publish && git add ./analyses/* && git add ./html-pages/* && git commit -m "automatic initial commit"
-    deps:
-      - data/data.csv
-      - data/schema.edn
-      - data/sppl/merged.json
-      - qc/app/qc-splom.html
-      - qc/app/qc-dashboard.html
-    outs:
-      - publish-analysis-output/analyses/${dataset_name}/
-      - publish-analysis-output/html-pages/${dataset_name}/
