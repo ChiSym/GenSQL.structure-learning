@@ -1,4 +1,3 @@
-dataset_name: test-pub
 seed: 0
 sample_count: 3
 sub_sample:

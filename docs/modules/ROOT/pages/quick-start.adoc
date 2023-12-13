@@ -75,18 +75,3 @@ There are different ways to query automatically built models from Python,
 Clojure and JavaScript.
 Checkout the https://github.com/InferenceQL/inferenceql.query[inferenceQL.query repository]
 about how to query models and data.
-
-== Publish your results
-
-The auto-modeling pipeline prepares a directory for users to publish models and populations and supply the GitHub CLI tool to make it easy for users to contribute their results to a repository collecting analysis output.
-[source,bash]
-----
-cd publish-analysis-output && gh auth login -w -h GitHub.com
-----
-This command will ask you to authenticate yourself with GitHub.
-[source,bash]
-----
-gh pr create --base public --title "My analysis on [add dataset name and analysis goal here]" --body "Add more info here"
-----
-This command will fork our analyses repository, push your data and results to a branch, and open a pull request back to our repo. Users can use git to customize what get's published.
-
