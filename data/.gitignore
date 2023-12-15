@@ -7,7 +7,6 @@
 /xcat/
 
 # data artifacts
-/data.csv
 /ignored.csv
 /nullified.csv
 /numericalized.csv
