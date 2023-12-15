@@ -8,7 +8,7 @@ sub_sample:
   #    - GEO
   #  Users:
   #    - Commercial
-  N: 1000
+  N: 800
 parallel:
   # To limit the number of jobs GNU Parallel spawns use add the flag `--jobs n`.
   flags: >-
