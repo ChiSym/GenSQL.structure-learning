@@ -233,6 +233,14 @@ In `data/xcat/`, you can find multiple CrossCat models. Each one is a `.edn` fil
 
 `data/sppl/merged.json` is a sum-product network representation of all of the individual CrossCat models merged together forming an ensemble. This file can be used by IQL Query to start an IQL query server. The query server can then respond to sum-product queries from both an Observable notebook and the IQL Viz spreadsheet app. This is covered in a latter section.
 
+===== Gen.clj models
+
+Users can generate parametric https://github.com/probcomp/Gen.clj[Gen.clj] versions of the CrossCat models on the fly to test or edit. After a model was built and the DVC pipeline ran through, you can type the following and go to http://localhost:3000/[localhost:3000] in a web browser.
+[source,bash]
+----
+clojure -X  inferenceql.auto-modeling.code.webapp/start
+----
+
 === Loom and CGPM
 
 ==== Key points
