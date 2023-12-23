@@ -3,11 +3,11 @@ Ulli Schaechtle <u.schaechtle@gmail.com>
 
 == Overview
 
-This guide will help you use the IQL auto-modeling project to build your own
+This guide will help you use the IQL structure-learning project to build your own
 models on tabular data. Once built, these models can be queried using a variety
 of interfaces. This guide starts with building a model from an example dataset.
 It then shows you how to build a model from a dataset you supply. And latter
-sections go into more detail about different backends for auto-modeling and a number of other considerations.
+sections go into more detail about different backends for structure-learning and a number of other considerations.
 
 == Installation
 
@@ -29,17 +29,17 @@ Then,
  ** Confirm you have access to view https://hub.docker.com/r/probcomp/inferenceql.loom
  ** Run `docker pull probcomp/inferenceql.loom`
 
-=== Download Auto-modeling
+=== Download structure-learning
 
 Install from git
 [source,bash]
 ----
-git clone git@github.com:OpenIQL/inferenceql.auto-modeling.git InferenceQL
+git clone git@github.com:OpenIQL/inferenceql.structure-learning.git InferenceQL
 ----
 
 === Start the devenv shell
 
-To install modeling capabilities, go to the auto-modeling directory:
+To install modeling capabilities, go to the structure-learning directory:
 [source,bash]
 ----
 cd InferenceQL
@@ -67,13 +67,13 @@ cp test/satellites/data.csv data/data.csv
 ----
 
 
-=== Run the auto-modeling pipeline
+=== Run the structure-learning pipeline
 
-IQL auto-modeling is built around DVC (https://dvc.org/), a project that helps with version control of machine learning pipelines.
+IQL structure-learning is built around DVC (https://dvc.org/), a project that helps with version control of machine learning pipelines.
 
 The steps for building a model are encoded as dvc pipelines (see `dvc.yaml`) All we have to do is run the pipeline and dvc takes care of the rest.
 
-From the root auto-modeling directory (`InferenceQL`), we can run the following command to get a list of the pipeline stages and which files they will produce giving us an overview of the work that will be done to build the model.
+From the root structure-learning directory (`InferenceQL`), we can run the following command to get a list of the pipeline stages and which files they will produce giving us an overview of the work that will be done to build the model.
 [source,bash]
 ----
 dvc stage list
@@ -91,7 +91,7 @@ Run `dvc repro --help` to see different options of running the pipeline.
 
 Before we use our model, how can we know it is any good?
 
-Auto-modeling produces two quality control apps for comparing simulated data produced by the model and the original observed data.
+structure-learning produces two quality control apps for comparing simulated data produced by the model and the original observed data.
 
 You can find them in `qc/app` folder.
 
@@ -111,23 +111,23 @@ Checkout the https://github.com/InferenceQL/inferenceql.query[inferenceQL.query 
 
 === Data specifications/settings
 
-There are a variety of settings in the `params.yaml` file in the auto-modeling root dir. The following might need to be changed depending on your dataset.
+There are a variety of settings in the `params.yaml` file in the structure-learning root dir. The following might need to be changed depending on your dataset.
 
 ==== schema
 
-Auto-modeling tries to guess the statistical data types in your CSV. You can see
+structure-learning tries to guess the statistical data types in your CSV. You can see
 which statistical types are guessed by running `dvc repro -f guess-schema` and then opening `data/schema.edn`.
 
 If you want to manually set the data types for one or more columns you can do that in `schema` section in `params.yaml`.
 
-TIP: If a statistical type cannot be guessed with confidence, auto-modeling chooses to ignore this column. You can add `default-stat-type: numerical` or `default-stat-type: nominal` if you prefer to define the stattypes of all columns that can't be guessed. This can save you some time when a lot of columns are ignored.
+TIP: If a statistical type cannot be guessed with confidence, structure-learning chooses to ignore this column. You can add `default-stat-type: numerical` or `default-stat-type: nominal` if you prefer to define the stattypes of all columns that can't be guessed. This can save you some time when a lot of columns are ignored.
 
 === nullify
 
 This setting allows you to specify which string values will be considered as
 null values in your CSV. The system will treat strings as categories in a
 categorical variable -- if you have, for example the string `NaN` encoding
-missing data, you have to let the auto-modeling system know.
+missing data, you have to let the structure-learning system know.
 
 === Inference-related settings
 
@@ -141,9 +141,9 @@ See the comments in the `qc` section of the `params.yaml` file for details on th
 
 Sharing models works via https://dvc.org/doc/command-reference/remote#description[DVC remotes].
 Remotes can be configured by editing the
-https://github.com/InferenceQL/inferenceql.auto-modeling/blob/main/.dvc/config[.dvc/config file].
+https://github.com/InferenceQL/inferenceql.structure-learning/blob/main/.dvc/config[.dvc/config file].
 
-Users need to change the s3 bucket and sub-address in https://github.com/InferenceQL/inferenceql.auto-modeling/blob/main/.dvc/config#L5[this line]
+Users need to change the s3 bucket and sub-address in https://github.com/InferenceQL/inferenceql.structure-learning/blob/main/.dvc/config#L5[this line]
 to a bucket and directory that they have access to. Reach out to the team to get access to the buckets managed by the IQL team.
 
 Once this is done, the process consists of pushing changes to GitHub and the remote:
@@ -168,7 +168,7 @@ WARNING: Never push to the main branch on GitHub.
 
 == Reporting a bug or a problem
 
-Bugs can be reported via our https://github.com/InferenceQL/inferenceql.auto-modeling/issues[issue tracker].
+Bugs can be reported via our https://github.com/InferenceQL/inferenceql.structure-learning/issues[issue tracker].
 With Bayesian structure learning, bugs and problems can occur only when working with a specific model, schema, or dataset.
 To ensure the IQL team can help you, please share a minimal version of our data and pipeline with us.
 
@@ -182,10 +182,10 @@ model behavior, please refer to the section about <<sharing>> above. Add a short
 If the DVC pipeline crashes when you run `dvc repro`, follow a four-step procedure.
 
 First, create the  smallest possible configuration of the pipeline:
-- Setting the https://github.com/InferenceQL/inferenceql.auto-modeling/blob/main/params.yaml#L3[sample_count] to 1.
-- Set https://github.com/InferenceQL/inferenceql.auto-modeling/blob/main/params.yaml#L30[Loom inference steps] to 1.
-- Set https://github.com/InferenceQL/inferenceql.auto-modeling/blob/main/params.yaml#L32-L33[Python inference steps] to 1.
-- Sub-sample maximally 1000 rows by setting https://github.com/InferenceQL/inferenceql.auto-modeling/blob/main/params.yaml#L11[N here]
+- Setting the https://github.com/InferenceQL/inferenceql.structure-learning/blob/main/params.yaml#L3[sample_count] to 1.
+- Set https://github.com/InferenceQL/inferenceql.structure-learning/blob/main/params.yaml#L30[Loom inference steps] to 1.
+- Set https://github.com/InferenceQL/inferenceql.structure-learning/blob/main/params.yaml#L32-L33[Python inference steps] to 1.
+- Sub-sample maximally 1000 rows by setting https://github.com/InferenceQL/inferenceql.structure-learning/blob/main/params.yaml#L11[N here]
 
 Second, create the smallest possible version of the data used for modeling that does  *not* crash.
 To do this, edit the schema to ignore columns until the pipeline runs end-to-end with `dvc repro` by setting `column_foo: ignore`, `column_bar: ignore` etc.
@@ -200,7 +200,7 @@ If you provide the name of your branch the IQL team can run `git apply change.tx
 
 == Model-building backends
 
-IQL Auto-modeling supports a number of model-building backends. The previous sections on model building used the default CGPM backend. We will provide some more background on the CGPM backend here and also provide information on using alternatives.
+IQL structure-learning supports a number of model-building backends. The previous sections on model building used the default CGPM backend. We will provide some more background on the CGPM backend here and also provide information on using alternatives.
 
 === Switching between backends
 
