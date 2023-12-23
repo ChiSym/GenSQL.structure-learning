@@ -1,14 +1,14 @@
-(ns inferenceql.auto-modeling.stream.xcat
+(ns inferenceql.structure-learning.stream.xcat
   "Defs used by various DVC stages dealing with Xcat records."
   (:refer-clojure :exclude [import])
   (:require [cheshire.core :as json]
             [clojure.data.csv :as csv]
             [clojure.edn :as edn]
-            [inferenceql.auto-modeling.stream.transit :as transit]
-            [inferenceql.auto-modeling.stream.xcat.sample :as xcat.sample]
-            [inferenceql.auto-modeling.stream.xcat.spec :as xcat.spec]
-            [inferenceql.auto-modeling.xcat :as am.xcat]
-            [inferenceql.auto-modeling.dvc :as dvc]
+            [inferenceql.structure-learning.stream.transit :as transit]
+            [inferenceql.structure-learning.stream.xcat.sample :as xcat.sample]
+            [inferenceql.structure-learning.stream.xcat.spec :as xcat.spec]
+            [inferenceql.structure-learning.xcat :as am.xcat]
+            [inferenceql.structure-learning.dvc :as dvc]
             [clojure.java.io :as io]
             [clojure.string :as string]))
 

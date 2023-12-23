@@ -1,14 +1,14 @@
-(ns inferenceql.auto-modeling.stream.config
+(ns inferenceql.structure-learning.stream.config
   "Defs for creating a config.edn file for iql.viz.stream."
   (:refer-clojure :exclude [import])
   (:require [cheshire.core :as json]
             [clojure.edn :as edn]
             [clojure.pprint :as pprint]
             [medley.core :as medley]
-            [inferenceql.auto-modeling.stream.xcat.util :as util]
-            [inferenceql.auto-modeling.stream.transit :as transit]
-            [inferenceql.auto-modeling.xcat :as am.xcat]
-            [inferenceql.auto-modeling.dvc :as dvc]
+            [inferenceql.structure-learning.stream.xcat.util :as util]
+            [inferenceql.structure-learning.stream.transit :as transit]
+            [inferenceql.structure-learning.xcat :as am.xcat]
+            [inferenceql.structure-learning.dvc :as dvc]
             [clojure.java.io :as io])
   (:import (java.io Writer)))
 

@@ -1,5 +1,5 @@
-(ns inferenceql.auto-modeling.schema-test
-  (:require [inferenceql.auto-modeling.schema :as schema]
+(ns inferenceql.structure-learning.schema-test
+  (:require [inferenceql.structure-learning.schema :as schema]
             [clojure.test :as test :refer [deftest are is]]))
 
 (deftest consecutive?

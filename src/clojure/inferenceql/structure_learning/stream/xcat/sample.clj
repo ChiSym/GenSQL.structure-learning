@@ -1,7 +1,7 @@
-(ns inferenceql.auto-modeling.stream.xcat.sample
+(ns inferenceql.structure-learning.stream.xcat.sample
   "Utility functions for sampling x-cat models."
-  (:require [inferenceql.auto-modeling.stream.xcat.util :refer [sample-xcat]]
-            [inferenceql.auto-modeling.stream.transit :as transit]))
+  (:require [inferenceql.structure-learning.stream.xcat.util :refer [sample-xcat]]
+            [inferenceql.structure-learning.stream.transit :as transit]))
 
 (defn add-null-columns [row schema]
   (let [columns (map keyword (keys schema))

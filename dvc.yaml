@@ -26,7 +26,7 @@ stages:
 
   nullify:
     cmd: >
-      clojure -X inferenceql.auto-modeling.main/nullify
+      clojure -X inferenceql.structure-learning.main/nullify
       < data/validated.csv
       > data/nullified.csv
     deps:
@@ -38,7 +38,7 @@ stages:
 
   guess-schema:
     cmd: >
-      clojure -X inferenceql.auto-modeling.main/guess-schema
+      clojure -X inferenceql.structure-learning.main/guess-schema
       < data/nullified.csv
       > data/schema.edn
     deps:
@@ -50,7 +50,7 @@ stages:
 
   cgpm-schema:
     cmd: >
-      clojure -X inferenceql.auto-modeling.main/cgpm-schema
+      clojure -X inferenceql.structure-learning.main/cgpm-schema
       < data/schema.edn
       > data/cgpm-schema.edn
     deps:
@@ -60,7 +60,7 @@ stages:
 
   ignore:
     cmd: >
-      clojure -X inferenceql.auto-modeling.main/ignore
+      clojure -X inferenceql.structure-learning.main/ignore
       :schema '"data/schema.edn"'
       < data/nullified.csv
       > data/ignored.csv
@@ -72,7 +72,7 @@ stages:
 
   numericalize:
     cmd: >
-      clojure -X inferenceql.auto-modeling.main/numericalize
+      clojure -X inferenceql.structure-learning.main/numericalize
       :schema '"data/schema.edn"'
       :table data/mapping-table.edn
       < data/ignored.csv
@@ -86,7 +86,7 @@ stages:
 
   loom-schema:
     cmd: >
-      clojure -X inferenceql.auto-modeling.main/loom-schema
+      clojure -X inferenceql.structure-learning.main/loom-schema
       < data/schema.edn
       > data/loom-schema.json
     deps:
@@ -105,7 +105,7 @@ stages:
 
   loom-infer-config:
     cmd: >
-      clojure -X inferenceql.auto-modeling.main/infer-config
+      clojure -X inferenceql.structure-learning.main/infer-config
       < params.yaml
       > data/infer-config.json
     params:
@@ -226,7 +226,7 @@ stages:
 
   dep-prob-vl:
     cmd: >
-      clojure -X inferenceql.auto-modeling.heatmap/vega-lite
+      clojure -X inferenceql.structure-learning.heatmap/vega-lite
       :stats-path '"data/dep-prob.json"'
       :domain '[0.0 1.0]'
       :default 1.0
@@ -235,7 +235,7 @@ stages:
       > data/dep-prob.vl.json
     deps:
       - data/dep-prob.json
-      - src/clojure/inferenceql/auto_modeling/heatmap.clj
+      - src/clojure/inferenceql/structure_learning/heatmap.clj
     outs:
       - data/dep-prob.vl.json
 
@@ -274,7 +274,7 @@ stages:
 
   linear-stats-vl:
     cmd: >
-      clojure -X inferenceql.auto-modeling.heatmap/vega-lite
+      clojure -X inferenceql.structure-learning.heatmap/vega-lite
       :stats-path '"data/linear-stats.json"'
       :sort-path '"data/dep-prob.json"'
       :domain '[1.0 0.0]'
@@ -286,7 +286,7 @@ stages:
     deps:
       - data/linear-stats.json
       - data/dep-prob.json
-      - src/clojure/inferenceql/auto_modeling/heatmap.clj
+      - src/clojure/inferenceql/structure_learning/heatmap.clj
     outs:
       - data/linear-stats.vl.json
 
@@ -394,14 +394,14 @@ stages:
 
   qc-tag-samples:
     cmd: >
-      clojure -X inferenceql.auto-modeling.qc.samples/tag
+      clojure -X inferenceql.structure-learning.qc.samples/tag
       :data data/ignored.csv
       :samples-synthetic data/synthetic-data-iql.csv
       > qc/samples/samples.edn
     deps:
       - data/ignored.csv
       - data/synthetic-data-iql.csv
-      - src/clojure/inferenceql/auto_modeling/qc/samples.clj
+      - src/clojure/inferenceql/structure_learning/qc/samples.clj
     outs:
       - qc/samples/samples.edn
 
@@ -411,7 +411,7 @@ stages:
       - mkdir -p data/xcat/complete/
       - >-
         parallel ${parallel.flags}
-        'clojure -X inferenceql.auto-modeling.xcat/import
+        'clojure -X inferenceql.structure-learning.xcat/import
         :cgpm-json {}
         :data-csv data/ignored.csv
         :mapping-table data/mapping-table.edn
@@ -427,13 +427,13 @@ stages:
       - data/ignored.csv
       - data/numericalized.csv
       - data/schema.edn
-      - src/clojure/inferenceql/auto_modeling/xcat.clj
+      - src/clojure/inferenceql/structure_learning/xcat.clj
     outs:
       - data/xcat/complete/
 
   qc-dashboard-spec:
     cmd: >
-      clojure -X inferenceql.auto-modeling.qc.dashboard/spec
+      clojure -X inferenceql.structure-learning.qc.dashboard/spec
       :samples qc/samples/samples.edn
       :schema data/schema.edn
       :correlation data/linear-stats.json
@@ -444,14 +444,14 @@ stages:
       - qc/samples/samples.edn
       - data/schema.edn
       - data/linear-stats.json
-      - src/clojure/inferenceql/auto_modeling/qc/dashboard.clj
-      - src/clojure/inferenceql/auto_modeling/qc/util.clj
+      - src/clojure/inferenceql/structure_learning/qc/dashboard.clj
+      - src/clojure/inferenceql/structure_learning/qc/util.clj
     outs:
       - qc/specs/qc-dashboard.vl.json
 
   qc-dashboard-app:
     cmd: >
-      clojure -X inferenceql.auto-modeling.qc.app/create
+      clojure -X inferenceql.structure-learning.qc.app/create
       :template qc/templates/index.html
       :spec qc/specs/qc-dashboard.vl.json
       :renderer canvas
@@ -460,13 +460,13 @@ stages:
     deps:
       - qc/templates/index.html
       - qc/specs/qc-dashboard.vl.json
-      - src/clojure/inferenceql/auto_modeling/qc/app.clj
+      - src/clojure/inferenceql/structure_learning/qc/app.clj
     outs:
       - qc/app/qc-dashboard.html
 
   qc-splom-spec:
     cmd: >
-      clojure -X inferenceql.auto-modeling.qc.splom/spec
+      clojure -X inferenceql.structure-learning.qc.splom/spec
       :samples qc/samples/samples.edn
       :schema data/schema.edn
       :correlation data/linear-stats.json
@@ -477,14 +477,14 @@ stages:
       - qc/samples/samples.edn
       - data/schema.edn
       - data/linear-stats.json
-      - src/clojure/inferenceql/auto_modeling/qc/splom.clj
-      - src/clojure/inferenceql/auto_modeling/qc/util.clj
+      - src/clojure/inferenceql/structure_learning/qc/splom.clj
+      - src/clojure/inferenceql/structure_learning/qc/util.clj
     outs:
       - qc/specs/qc-splom.vl.json
 
   qc-splom-app:
     cmd: >
-      clojure -X inferenceql.auto-modeling.qc.app/create
+      clojure -X inferenceql.structure-learning.qc.app/create
       :template qc/templates/index.html
       :spec qc/specs/qc-splom.vl.json
       :renderer canvas
@@ -493,7 +493,7 @@ stages:
     deps:
       - qc/templates/index.html
       - qc/specs/qc-splom.vl.json
-      - src/clojure/inferenceql/auto_modeling/qc/app.clj
+      - src/clojure/inferenceql/structure_learning/qc/app.clj
     outs:
       - qc/app/qc-splom.html
 
@@ -520,7 +520,7 @@ stages:
 
   assemble-database:
     cmd: >
-      clojure -M:exec inferenceql.auto-modeling.main assemble-database
+      clojure -M:exec inferenceql.structure-learning.main assemble-database
       --table-name ${database.table_name}
       --table-path ${database.table_path}
       --model-name ${database.model_name}

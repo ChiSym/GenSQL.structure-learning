@@ -1,4 +1,4 @@
-(ns inferenceql.auto-modeling.stream.jsmodel.mmix
+(ns inferenceql.structure-learning.stream.jsmodel.mmix
   "Functions for transforming a multimix model spec into template data for passing to
   a mustache template that displays a javascript representation of the model spec."
   (:require [clojure.string :as str]

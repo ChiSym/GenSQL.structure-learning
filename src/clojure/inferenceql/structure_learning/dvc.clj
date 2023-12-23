@@ -1,4 +1,4 @@
-(ns inferenceql.auto-modeling.dvc
+(ns inferenceql.structure-learning.dvc
   (:require [clj-yaml.core :as yaml]))
 
 (defn yaml

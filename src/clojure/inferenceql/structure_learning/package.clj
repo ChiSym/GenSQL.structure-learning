@@ -1,4 +1,4 @@
-(ns inferenceql.auto-modeling.package
+(ns inferenceql.structure-learning.package
   "Utility functions used by the package.sh script."
   (:require [clojure.edn :as edn]
             [clojure.pprint :refer [pprint]]))

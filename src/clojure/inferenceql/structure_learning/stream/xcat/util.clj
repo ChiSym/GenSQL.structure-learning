@@ -1,4 +1,4 @@
-(ns inferenceql.auto-modeling.stream.xcat.util
+(ns inferenceql.structure-learning.stream.xcat.util
   "Various utility functions dealing with Xcat records."
   (:require [medley.core :as medley]
             [inferenceql.inference.gpm :as gpm]

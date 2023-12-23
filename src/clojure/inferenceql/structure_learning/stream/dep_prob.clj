@@ -1,4 +1,4 @@
-(ns inferenceql.auto-modeling.stream.dep-prob
+(ns inferenceql.structure-learning.stream.dep-prob
   "Utility functions related to dep-prob."
   (:refer-clojure :rename {reduce reduce-core})
   (:require [cheshire.core :as json]

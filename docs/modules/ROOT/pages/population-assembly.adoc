@@ -15,7 +15,7 @@ InferenceQL works best if the data has between 3 and 1000 columns and between 10
 
 == Data types
 
-InferenceQL focuses on two types of columns: numerical (recording real numbers) and nominal columns (recording categories). InferenceQL handles ordinal columns by expressing them as nominal. Columns that are important for the interpretation of analysis results but that can’t be analyzed themselves, such as index columns, can be kept but should be explicitly ignored during analysis. See https://inferenceql-documentation.fly.dev/auto-modeling/auto-modeling.html#_data_specificationssettings[this part of the documentation].
+InferenceQL focuses on two types of columns: numerical (recording real numbers) and nominal columns (recording categories). InferenceQL handles ordinal columns by expressing them as nominal. Columns that are important for the interpretation of analysis results but that can’t be analyzed themselves, such as index columns, can be kept but should be explicitly ignored during analysis. See https://inferenceql-documentation.fly.dev/structure-learning/structure-learning.html#_data_specificationssettings[this part of the documentation].
 
 The system implements modeling of other data types, too, but most users should not work with them. They are experimental and not yet stress-tested.
 
@@ -27,6 +27,6 @@ WARNING: Columns recording time-stamps or concrete dates should be avoided.  Oft
 == Other CAVEATS
 * Every column that is modeled should have more than one unique value.
 * The number of unique categories in every nominal column should be less than the number of rows in the table.
-* Deterministic relationships should be avoided for analysis. For example, if a person's height is recorded in both centimeters and feet, users should https://inferenceql-documentation.fly.dev/auto-modeling/auto-modeling.html#_data_specificationssettings[ignore] this column during analysis or remove it from the data altogether.
+* Deterministic relationships should be avoided for analysis. For example, if a person's height is recorded in both centimeters and feet, users should https://inferenceql-documentation.fly.dev/structure-learning/structure-learning.html#_data_specificationssettings[ignore] this column during analysis or remove it from the data altogether.
 
 WARNING: Column names/headers cannot contain special characters or spaces.

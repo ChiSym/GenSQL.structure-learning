@@ -1,4 +1,4 @@
-(ns inferenceql.auto-modeling.qc.app
+(ns inferenceql.structure-learning.qc.app
   (:require [selmer.parser :refer [render]]
             [selmer.util :refer [without-escaping]]))
 

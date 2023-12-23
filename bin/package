@@ -1,12 +1,12 @@
 #!/bin/bash -x
 
-# This script for produces a zip-archive of the auto-modeling repo including
+# This script for produces a zip-archive of the structure-learning repo including
 # documentation
 script_base_dir=$(basename -- "$PWD")
-# This script should be run from the inferenceql.auto-modeling root directory.
+# This script should be run from the inferenceql.structure-learning root directory.
 # Not from inside the bin/ directory or elsewhere.
-if [ "$script_base_dir" != "inferenceql.auto-modeling" ]; then
-    echo "Script must be run from the inferenceql.automodeling/ directory."
+if [ "$script_base_dir" != "inferenceql.structure-learning" ]; then
+    echo "Script must be run from the inferenceql.structure-learning/ directory."
     exit 1
 fi
 

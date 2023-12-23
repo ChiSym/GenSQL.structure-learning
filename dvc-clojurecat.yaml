@@ -26,7 +26,7 @@ stages:
 
   nullify:
     cmd: >
-      clojure -X inferenceql.auto-modeling.main/nullify
+      clojure -X inferenceql.structure-learning.main/nullify
       < data/validated.csv
       > data/nullified.csv
     deps:
@@ -38,7 +38,7 @@ stages:
 
   guess-schema:
     cmd: >
-      clojure -X inferenceql.auto-modeling.main/guess-schema
+      clojure -X inferenceql.structure-learning.main/guess-schema
       < data/nullified.csv
       > data/schema.edn
     deps:
@@ -50,7 +50,7 @@ stages:
 
   ignore:
     cmd: >
-      clojure -X inferenceql.auto-modeling.main/ignore
+      clojure -X inferenceql.structure-learning.main/ignore
       :schema '"data/schema.edn"'
       < data/nullified.csv
       > data/ignored.csv
@@ -62,7 +62,7 @@ stages:
 
   clojurecat-config:
     cmd: >
-      clojure -X inferenceql.auto-modeling.clojurecat/config
+      clojure -X inferenceql.structure-learning.clojurecat/config
       :iterations ${clojurecat.iterations}
       > data/clojurecat-config.edn
     params:
@@ -88,7 +88,7 @@ stages:
 
   clojurecat-merge:
     cmd: >
-      clj -X inferenceql.auto-modeling.clojurecat/merge
+      clj -X inferenceql.structure-learning.clojurecat/merge
       :models data/xcat/samples
       :out data/xcat/ensemble.edn
     deps:
@@ -98,7 +98,7 @@ stages:
 
   clojurecat-sample:
     cmd: >
-      clojure -X inferenceql.auto-modeling.qc.samples/sample-xcat
+      clojure -X inferenceql.structure-learning.qc.samples/sample-xcat
       :model data/xcat/ensemble.edn
       :data data/ignored.csv
       :sample-count ${qc.sample_count}
@@ -113,7 +113,7 @@ stages:
 
   qc-tag-samples:
     cmd: >
-      clojure -X inferenceql.auto-modeling.qc.samples/tag
+      clojure -X inferenceql.structure-learning.qc.samples/tag
       :data data/ignored.csv
       :schema data/schema.edn
       :samples-synthetic qc/samples/samples-synthetic.edn
@@ -122,13 +122,13 @@ stages:
       - data/ignored.csv
       - data/schema.edn
       - qc/samples/samples-synthetic.edn
-      - src/inferenceql/auto_modeling/qc/samples.clj
+      - src/inferenceql/structure_learning/qc/samples.clj
     outs:
       - qc/samples/samples.edn
 
   qc-dashboard-spec:
     cmd: >
-      clojure -X inferenceql.auto-modeling.qc.dashboard/spec
+      clojure -X inferenceql.structure-learning.qc.dashboard/spec
       :samples qc/samples/samples.edn
       :schema data/schema.edn
       > qc/specs/qc-dashboard.vl.json
@@ -137,14 +137,14 @@ stages:
     deps:
       - qc/samples/samples.edn
       - data/schema.edn
-      - src/inferenceql/auto_modeling/qc/dashboard.clj
-      - src/inferenceql/auto_modeling/qc/util.clj
+      - src/inferenceql/structure_learning/qc/dashboard.clj
+      - src/inferenceql/structure_learning/qc/util.clj
     outs:
       - qc/specs/qc-dashboard.vl.json
 
   qc-dashboard-app:
     cmd: >
-      clojure -X inferenceql.auto-modeling.qc.app/create
+      clojure -X inferenceql.structure-learning.qc.app/create
       :template qc/templates/index.html
       :spec qc/specs/qc-dashboard.vl.json
       :renderer canvas
@@ -153,13 +153,13 @@ stages:
     deps:
       - qc/templates/index.html
       - qc/specs/qc-dashboard.vl.json
-      - src/inferenceql/auto_modeling/qc/app.clj
+      - src/inferenceql/structure_learning/qc/app.clj
     outs:
       - qc/app/qc-dashboard.html
 
   qc-splom-spec:
     cmd: >
-      clojure -X inferenceql.auto-modeling.qc.splom/spec
+      clojure -X inferenceql.structure-learning.qc.splom/spec
       :samples qc/samples/samples.edn
       :schema data/schema.edn
       > qc/specs/qc-splom.vl.json
@@ -168,14 +168,14 @@ stages:
     deps:
       - qc/samples/samples.edn
       - data/schema.edn
-      - src/inferenceql/auto_modeling/qc/splom.clj
-      - src/inferenceql/auto_modeling/qc/util.clj
+      - src/inferenceql/structure_learning/qc/splom.clj
+      - src/inferenceql/structure_learning/qc/util.clj
     outs:
       - qc/specs/qc-splom.vl.json
 
   qc-splom-app:
     cmd: >
-      clojure -X inferenceql.auto-modeling.qc.app/create
+      clojure -X inferenceql.structure-learning.qc.app/create
       :template qc/templates/index.html
       :spec qc/specs/qc-splom.vl.json
       :renderer canvas
@@ -184,6 +184,6 @@ stages:
     deps:
       - qc/templates/index.html
       - qc/specs/qc-splom.vl.json
-      - src/inferenceql/auto_modeling/qc/app.clj
+      - src/inferenceql/structure_learning/qc/app.clj
     outs:
       - qc/app/qc-splom.html

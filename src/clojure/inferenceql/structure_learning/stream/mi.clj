@@ -1,4 +1,4 @@
-(ns inferenceql.auto-modeling.stream.mi
+(ns inferenceql.structure-learning.stream.mi
   "Utility functions related to mutual information."
   (:refer-clojure :rename {reduce reduce-core})
   (:require [cheshire.core :as json]
