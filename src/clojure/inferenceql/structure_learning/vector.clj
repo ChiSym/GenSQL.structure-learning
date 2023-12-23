@@ -1,4 +1,4 @@
-(ns inferenceql.auto-modeling.vector)
+(ns inferenceql.structure-learning.vector)
 
 (defn remove-nth
   [coll n]

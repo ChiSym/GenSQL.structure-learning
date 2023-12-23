@@ -1,5 +1,5 @@
-name: auto-modeling
-title: Auto-modeling
+name: structure-learning
+title: Structure learning
 version: ~
 start_page: quick-start.adoc
 nav:

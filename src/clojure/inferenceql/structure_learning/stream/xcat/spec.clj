@@ -1,4 +1,4 @@
-(ns inferenceql.auto-modeling.stream.xcat.spec
+(ns inferenceql.structure-learning.stream.xcat.spec
   "Utility functions for producing xcat specs from xcat records."
   (:require [medley.core :as medley]))
 

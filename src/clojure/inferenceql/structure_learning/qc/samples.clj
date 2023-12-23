@@ -1,4 +1,4 @@
-(ns inferenceql.auto-modeling.qc.samples
+(ns inferenceql.structure-learning.qc.samples
   (:require [clojure.pprint :refer [pprint]]
             [inferenceql.inference.gpm :as gpm]
             [inferenceql.query.io :as io]))

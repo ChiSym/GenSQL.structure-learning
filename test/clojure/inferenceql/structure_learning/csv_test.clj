@@ -1,10 +1,10 @@
-(ns inferenceql.auto-modeling.csv-test
+(ns inferenceql.structure-learning.csv-test
   (:refer-clojure :exclude [dissoc])
   (:require [clojure.test :refer [is deftest]]
             [clojure.test.check.clojure-test :refer [defspec]]
             [clojure.test.check.generators :as gen]
             [clojure.test.check.properties :as prop]
-            [inferenceql.auto-modeling.csv :as csv]))
+            [inferenceql.structure-learning.csv :as csv]))
 
 
 (deftest as-maps

@@ -1,11 +1,11 @@
-(ns inferenceql.auto-modeling.xcat
+(ns inferenceql.structure-learning.xcat
   "Defs for producing XCat records from CGPM export JSONs."
   (:refer-clojure :exclude [import])
   (:require [cheshire.core :as json]
             [clojure.data.csv :as csv]
             [clojure.edn :as edn]
             [medley.core :as medley]
-            [inferenceql.auto-modeling.csv :as am.csv]
+            [inferenceql.structure-learning.csv :as am.csv]
             [inferenceql.inference.gpm.crosscat :as xcat]))
 
 (defn ^:private view-name

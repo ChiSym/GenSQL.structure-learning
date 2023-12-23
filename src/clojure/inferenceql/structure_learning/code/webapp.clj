@@ -1,12 +1,12 @@
-(ns inferenceql.auto-modeling.code.webapp
+(ns inferenceql.structure-learning.code.webapp
   (:require [babashka.fs :as fs]
             [clojure.data.json :as json]
             [clojure.edn :as edn]
             [com.stuartsierra.component :as component]
             [hiccup.core :as hiccup]
             [hiccup.page :as page]
-            [inferenceql.auto-modeling.ast :as ast]
-            [inferenceql.auto-modeling.code :as code]
+            [inferenceql.structure-learning.ast :as ast]
+            [inferenceql.structure-learning.code :as code]
             [ring.component.jetty :as jetty]
             [ring.middleware.file :as file]
             [ring.middleware.file-info :as file-info]

@@ -1,4 +1,4 @@
-(ns inferenceql.auto-modeling.main
+(ns inferenceql.structure-learning.main
   (:import [java.io PushbackReader])
   (:require [babashka.fs :as fs]
             [cheshire.core :as json]
@@ -7,9 +7,9 @@
             [clojure.edn :as edn]
             [clojure.java.io :as io]
             [clojure.string :as string]
-            [inferenceql.auto-modeling.csv :as iql.csv]
-            [inferenceql.auto-modeling.dvc :as dvc]
-            [inferenceql.auto-modeling.schema :as schema]
+            [inferenceql.structure-learning.csv :as iql.csv]
+            [inferenceql.structure-learning.dvc :as dvc]
+            [inferenceql.structure-learning.schema :as schema]
             [inferenceql.inference.gpm :as gpm]
             [inferenceql.query.db :as db]
             [inferenceql.query.io :as query.io]

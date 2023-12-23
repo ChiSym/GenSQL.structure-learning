@@ -1,4 +1,4 @@
-(ns inferenceql.auto-modeling.code
+(ns inferenceql.structure-learning.code
   "Functions for converting multimixture ASTs to Gen.clj programs."
   (:require [babashka.fs :as fs]
             [clojure.edn :as edn]

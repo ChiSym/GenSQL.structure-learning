@@ -1,4 +1,4 @@
-(ns inferenceql.auto-modeling.heatmap
+(ns inferenceql.structure-learning.heatmap
   "Functions for generating heatmaps."
   (:require [clojure.data.json :as json]
             [medley.core :as medley])

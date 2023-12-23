@@ -1,13 +1,9 @@
-= Automated Modeling
+= Structure learning
 Ulli Schaechtle <u.schaechtle@gmail.com>
 
 == Overview
 
-This guide will help you use the IQL structure-learning project to build your own
-models on tabular data. Once built, these models can be queried using a variety
-of interfaces. This guide starts with building a model from an example dataset.
-It then shows you how to build a model from a dataset you supply. And latter
-sections go into more detail about different backends for structure-learning and a number of other considerations.
+This guide will help you use the IQL structure-learning project to build your own models on tabular data. Once built, these models can be queried using a variety of interfaces. This guide starts with building a model from an example dataset. It then shows you how to build a model from a dataset you supply. And latter sections go into more detail about different backends for structure-learning and a number of other considerations.
 
 == Installation
 
@@ -34,7 +30,7 @@ Then,
 Install from git
 [source,bash]
 ----
-git clone git@github.com:OpenIQL/inferenceql.structure-learning.git InferenceQL
+git clone git@github.com:OpenIQL/inferenceql.structure-learning.git
 ----
 
 === Start the devenv shell

@@ -1,11 +1,11 @@
-(ns inferenceql.auto-modeling.qc.splom
+(ns inferenceql.structure-learning.qc.splom
   "Code related to producing a vega-lite spec for a scatter plot matrix."
   (:require [clojure.data.json :as json]
             [clojure.edn :as edn]
             [cheshire.core :as cheshire]
-            [inferenceql.auto-modeling.dvc :as dvc]
-            [inferenceql.auto-modeling.qc.vega :as vega]
-            [inferenceql.auto-modeling.qc.util :refer [filtering-summary should-bin? bind-to-element
+            [inferenceql.structure-learning.dvc :as dvc]
+            [inferenceql.structure-learning.qc.vega :as vega]
+            [inferenceql.structure-learning.qc.util :refer [filtering-summary should-bin? bind-to-element
                                                        obs-data-color synthetic-data-color
                                                        unselected-color vega-type-fn
                                                        vl5-schema]]))

@@ -1,6 +1,6 @@
-(ns inferenceql.auto-modeling.qc.vega
+(ns inferenceql.structure-learning.qc.vega
   "Functions that modify vega lite specs."
-  (:require [inferenceql.auto-modeling.qc.util :refer [regression-color]]))
+  (:require [inferenceql.structure-learning.qc.util :refer [regression-color]]))
 
 (defn regression-line
   "Adds regression line and text info as new layers in vega-lite `base-spec`.

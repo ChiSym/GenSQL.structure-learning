@@ -1,4 +1,4 @@
-(ns inferenceql.auto-modeling.query-server
+(ns inferenceql.structure-learning.query-server
   "Start an SPN server to run queries against an automatically built model."
   (:require [clojure.data.json :as json]
             [clojure.edn :as edn]

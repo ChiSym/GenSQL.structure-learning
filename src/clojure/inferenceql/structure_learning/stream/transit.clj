@@ -1,4 +1,4 @@
-(ns inferenceql.auto-modeling.stream.transit
+(ns inferenceql.structure-learning.stream.transit
   "Defs for reading and writing iql.inference gpms to transit-encoded strings."
   (:refer-clojure :exclude [reify])
   (:require [clojure.reflect :as cr]

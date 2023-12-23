@@ -25,5 +25,5 @@ jobs:
       - name: Build developer environment and run checks
         run: devenv ci
 
-      - name: Run Auto Modeling's Python tests
+      - name: Run Python tests
         run: devenv shell python -m pytest test/scripts

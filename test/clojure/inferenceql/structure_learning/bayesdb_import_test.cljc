@@ -1,6 +1,6 @@
-(ns inferenceql.auto-modeling.bayesdb-import-test
+(ns inferenceql.structure-learning.bayesdb-import-test
   (:require [clojure.test :refer [deftest is]]
-            [inferenceql.auto-modeling.bayesdb-import :as bayesdb-import]
+            [inferenceql.structure-learning.bayesdb-import :as bayesdb-import]
             [inferenceql.inference.gpm :as gpm]))
 
 (def bdb-export

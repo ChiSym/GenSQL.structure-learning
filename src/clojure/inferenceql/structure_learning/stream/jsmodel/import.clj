@@ -1,10 +1,10 @@
-(ns inferenceql.auto-modeling.stream.jsmodel.import
-  (:require [inferenceql.auto-modeling.stream.jsmodel.mmix :as mmix]
+(ns inferenceql.structure-learning.stream.jsmodel.import
+  (:require [inferenceql.structure-learning.stream.jsmodel.mmix :as mmix]
             [clojure.java.io :as io]
             [cheshire.core :as json]
             [cljstache.core :refer [render]]
             [clojure.string :as string]
-            [inferenceql.auto-modeling.stream.transit :as transit]))
+            [inferenceql.structure-learning.stream.transit :as transit]))
 
 (def pretty-printer
   (json/create-pretty-printer

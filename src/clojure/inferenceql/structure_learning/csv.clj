@@ -1,7 +1,7 @@
-(ns inferenceql.auto-modeling.csv
+(ns inferenceql.structure-learning.csv
   (:refer-clojure :exclude [dissoc])
   (:require [clojure.edn :as edn]
-            [inferenceql.auto-modeling.vector :as vector]))
+            [inferenceql.structure-learning.vector :as vector]))
 
 (defn parse-number
   "Attempts to parse string s as a number or `nil`. Throws a

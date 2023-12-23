@@ -1,4 +1,4 @@
-(ns inferenceql.auto-modeling.clojurecat
+(ns inferenceql.structure-learning.clojurecat
   "Utility functions related to the ClojureCat command-line interface."
   (:refer-clojure :exclude [merge])
   (:require [clojure.java.io :as io]

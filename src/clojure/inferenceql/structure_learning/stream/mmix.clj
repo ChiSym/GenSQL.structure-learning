@@ -1,7 +1,7 @@
-(ns inferenceql.auto-modeling.stream.mmix
+(ns inferenceql.structure-learning.stream.mmix
   (:refer-clojure :exclude [import])
   (:require [cheshire.core :as json]
-            [inferenceql.auto-modeling.stream.transit :as transit]
+            [inferenceql.structure-learning.stream.transit :as transit]
             [inferenceql.inference.gpm.crosscat :as xcat]
             [clojure.java.io :as io]))
 

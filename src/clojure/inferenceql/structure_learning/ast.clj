@@ -1,4 +1,4 @@
-(ns inferenceql.auto-modeling.ast)
+(ns inferenceql.structure-learning.ast)
 
 (defn columns
   [ast]

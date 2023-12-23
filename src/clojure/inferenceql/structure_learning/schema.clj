@@ -1,4 +1,4 @@
-(ns inferenceql.auto-modeling.schema
+(ns inferenceql.structure-learning.schema
   (:require [clojure.set]))
 
 (defn consecutive?

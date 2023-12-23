@@ -1,4 +1,4 @@
-(ns inferenceql.auto-modeling.qc.util
+(ns inferenceql.structure-learning.qc.util
   "Supporting code for producing vega-lite specs."
   (:require [medley.core :as medley]))
 

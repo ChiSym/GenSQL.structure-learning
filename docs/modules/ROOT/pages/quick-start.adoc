@@ -3,7 +3,7 @@ Ulli Schaechtle <u.schaechtle@gmail.com>
 
 == Overview
 
-This is a quickstart guide to help you use the IQL auto-modeling project to build your own
+This is a quickstart guide to help you use the IQL structure-learning project to build your own
 models on tabular data and query them. This guide starts with building a model from an example dataset.
 
 == Installation
@@ -23,17 +23,17 @@ https://docs.docker.com/engine/install/[here]. Then,
     1. Confirm you have access to view https://hub.docker.com/r/probcomp/inferenceql.loom
     2. Run `docker pull probcomp/inferenceql.loom`
 
-=== Download Auto-modeling
+=== Download structure-learning
 
 Install from git
 [source,bash]
 ----
-git clone git@github.com:OpenIQL/inferenceql.auto-modeling.git InferenceQL
+git clone git@github.com:OpenIQL/inferenceql.structure-learning.git InferenceQL
 ----
 
 === Start the Nix shell
 
-To install modeling capabilities, go to the auto-modeling directory:
+To install modeling capabilities, go to the structure-learning directory:
 [source,bash]
 ----
 cd InferenceQL
@@ -45,7 +45,7 @@ devenv shell
 ----
 WARNING: on macOS, this step can take up to an hour. The reason is that certain dependencies get compiled from scratch. It will only be slow once. The second time you run the `devenv shell` command, it will succeed instantaneously.
 
-=== Running auto-modeling
+=== Running structure-learning
 Add a csv file:
 [source,bash]
 ----
@@ -63,7 +63,7 @@ If not, see the section below on editing the schema generation.
 Go to `qc/app/qc-dashboard.html` and open it with a web browser to check the quality.
 
 You can improve the default models by further editing the `params.yaml` file.
-See our xref:auto-modeling::auto-modeling.adoc[section on automated data
+See our xref:structure-learning::structure-learning.adoc[section on automated data
 modeling].
 
 TIP: Add columns you are particularly interested in to the `columns` section for quality control (see commented out example in the `params.yaml` file). That way, you can ensure that the model captures exactly what you care about.
