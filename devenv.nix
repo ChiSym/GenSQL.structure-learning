@@ -9,6 +9,8 @@
       parallel
       xsv
       duckdb
+      nodePackages.vega-lite
+      nodePackages.vega-cli
     ];
     python-packages = with config.languages.python.package.pkgs; [
       numpy
