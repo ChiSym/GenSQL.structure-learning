@@ -28,7 +28,7 @@ https://docs.docker.com/engine/install/[here]. Then,
 Install from git
 [source,bash]
 ----
-git clone git@github.com:OpenIQL/inferenceql.structure-learning.git InferenceQL
+git clone git@github.com:InferenceQL/inferenceql.structure-learning.git InferenceQL
 ----
 
 === Start the Nix shell
