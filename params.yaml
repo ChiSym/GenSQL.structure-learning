@@ -1,13 +1,10 @@
 seed: 42
 sample_count: 45
 sub_sample:
-  #according_to_columns:
-  #  Class_of_Orbit:
-  #    - LEO
-  #    - GEO
-  #  Users:
-  #    - Commercial
-  N: 6000
+  according_to_columns:
+    year:
+      - 2019
+  N: 6053
 parallel:
   # To limit the number of jobs GNU Parallel spawns use add the flag `--jobs n`.
   flags: >-
@@ -23,6 +20,8 @@ schema:
   # For example, to force the "age" column to be treated as a
   # numerical uncomment the following line:
   rakutenid: ignore
+  year: ignore
+  age: numerical
   household_composition_single: nominal
   household_composition_spouse: nominal
   household_composition_childrens_spouse: nominal
@@ -59,20 +58,18 @@ schema:
   big_five_calm_emotionally_stable: nominal
   big_five_conventional_uncreative: nominal
   gender: nominal
-  age: numerical
   pref: nominal
   region: nominal
-  p_extraversion: nominal
-  p_agreeableness: nominal
-  p_conscientiousness: nominal
-  p_neuroticism: nominal
-  p_openness: nominal
+  extraversion: nominal
+  agreeableness: nominal
+  conscientiousness: nominal
+  neuroticism: nominal
+  openness: nominal
   schooling: nominal
   spouse_schooling: nominal
   father_schooling: nominal
   mother_schooling: nominal
-  income: numerical
-  income2: nominal
+  income: nominal
   spouse_income: nominal
   hh_income: nominal
   hopeful_income: nominal
@@ -82,24 +79,24 @@ schema:
   child_primary: nominal
   child_secondary: nominal
   child_university: nominal
-  dm_durablegoods: nominal
-  dm_dailygoods: nominal
-  dm_invest: nominal
-  v_intl: nominal
-  v_energy: nominal
-  v_eat: nominal
-  v_product: nominal
-  v_fairtrade: nominal
-  v_work: nominal
-  v_localgrown: nominal
-  v_ac: nominal
-  v_peace: nominal
-  v_invest: nominal
+  decision_making_invovles_durablegoods: nominal
+  decision_making_invovles_dailygoods: nominal
+  decision_making_invovles_invest: nominal
+  values_intl: nominal
+  values_energy: nominal
+  values_eat: nominal
+  values_product: nominal
+  values_fairtrade: nominal
+  values_work: nominal
+  values_localgrown: nominal
+  values_ac: nominal
+  values_peace: nominal
+  values_invest: nominal
 loom:
   extra_passes: 100
 cgpm:
   iterations: 1
-  minutes: 840
+  minutes: 4200
   #dependence:
   #  # While the CrossCat implementation in CGPM takes dependence constraints, doing so
   #  # throws a not-implemented-error. Hence, we apply a workaround:
