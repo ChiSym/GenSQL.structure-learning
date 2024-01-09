@@ -19,14 +19,17 @@ IMPORTANT: Updates to MacOS are known to cause issues with the Nix package manag
 
 Further, we require docker to be installed and to be runnable without `sudo`.
 Installation instructions for Mac or Ubuntu are
-https://docs.docker.com/engine/install/[here]. Then,
-1. if on linux, run postinstall script: https://docs.docker.com/engine/install/linux-postinstall/
-2. login using credentials sufficient for probcomp’s Docker org:
-    1. if on linux run `docker login`
-    2. if on mac, open the Docker app GUI and log in with credentials
-3. Pull the Loom Docker image:
-    1. Confirm you have access to view https://hub.docker.com/r/probcomp/inferenceql.loom
-    2. Run `docker pull probcomp/inferenceql.loom`
+https://docs.docker.com/engine/install/[here].
+
+Then,
+
+* if on linux, run postinstall script: https://docs.docker.com/engine/install/linux-postinstall/
+* login using credentials sufficient for probcomp’s Docker org:
+ ** if on linux run `docker login`
+ ** if on mac, open the Docker app GUI and log in with credentials
+* Pull the Loom Docker image:
+ ** Confirm you have access to view https://hub.docker.com/r/probcomp/inferenceql.loom
+ ** Run `docker pull probcomp/inferenceql.loom`
 
 === Download structure-learning
 
