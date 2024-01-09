@@ -70,9 +70,9 @@ schema:
   father_schooling: nominal
   mother_schooling: nominal
   income: nominal
-  spouse_income: nominal
-  hh_income: nominal
-  hopeful_income: nominal
+  spouse_income: ignore
+  hh_income: ignore
+  hopeful_income: ignore
   hhsize: nominal
   children: nominal
   child_underprimary: nominal
@@ -96,7 +96,7 @@ loom:
   extra_passes: 100
 cgpm:
   iterations: 1
-  minutes: 4200
+  minutes: 1260
   #dependence:
   #  # While the CrossCat implementation in CGPM takes dependence constraints, doing so
   #  # throws a not-implemented-error. Hence, we apply a workaround:
