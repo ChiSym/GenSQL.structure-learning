@@ -9,7 +9,12 @@ This guide will help you use the IQL structure-learning project to build your ow
 
 === Dependencies
 
-We rely on the Devenv package manager. Please find instructions to install it https://devenv.sh/getting-started/[here]. Devenv takes care of all our dependencies; currently confirmed to be working on Ubuntu and Mac.
+We rely on the Devenv package manager. Devenv takes care of all our dependencies; currently confirmed to be working on Ubuntu and Mac.
+
+IMPORTANT: Updates to MacOS are known to cause issues with the Nix package manager that powers Devenv.
+
+- Mac users need to first install the Nix package manager with https://determinate.systems/posts/determinate-nix-installer[this installer].  Then they need to execute step 3 and only step 3 https://devenv.sh/getting-started/[here], i.e. `nix-env -if https://install.devenv.sh/latest`.
+- Ubuntu users can find instructions to install Devenv https://devenv.sh/getting-started/[here].
 
 Further, we require docker to be installed and to be runnable without `sudo`.
 Installation instructions for Mac or Ubuntu are
