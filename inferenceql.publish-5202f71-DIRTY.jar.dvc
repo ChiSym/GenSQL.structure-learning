@@ -1,0 +1,5 @@
+outs:
+- md5: 9bb81217af782cfec0edb8630bf576f5
+  size: 129258706
+  hash: md5
+  path: inferenceql.publish-5202f71-DIRTY.jar
