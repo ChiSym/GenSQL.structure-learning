@@ -1,0 +1,5 @@
+nix develop github:inferenceql/inferenceql.gpm.sppl -c \
+    java -jar inferenceql.publish-5202f71-DIRTY.jar \
+    --db data/db.edn --schema data/schema.edn \
+    --language permissive \
+    --path notebooks/demo.adoc --port 8888

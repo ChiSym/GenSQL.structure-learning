@@ -17,7 +17,6 @@
 # schema artifacts
 /cgpm-schema.edn
 /mapping-table.edn
-/schema.edn
 
 # loom artifacts
 /loom-schema.json
@@ -38,7 +37,6 @@
 /max-number-views.txt
 /predictions.csv
 /synthetic-data-iql.csv
-/db.edn
 /preprocessed.csv
 /synthetic-data-loom.csv
 /synthetic-data-cgpm-raw.csv

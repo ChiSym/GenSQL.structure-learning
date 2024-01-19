@@ -1,0 +1,33 @@
+== WIP - demos
+////
+Create the population that differs
+[source,iql]
+----
+CREATE TABLE temp AS SELECT year, gender, age, educ, race_ethnicity, citizen,
+religion, religion_importance, church_attendance, evangelical,
+protestantism_branch, marital_status, ownhome, has_child, state,
+no_immediate_family_served_military, family_income, employment_status, uninsured
+FROM us_residents WHERE race_ethnicity = "Asian" AND religion_importance = "Very
+Important" LIMIT 1000!
+----
+
+[source,iql]
+----
+.export data/religious-asians.csv temp
+----
+
+////
+
+[source,iql]
+----
+SELECT ideology, religion FROM (GENERATE * UNDER lpm) LIMIT 1000
+----
+
+[source,iql]
+----
+SELECT ideology, religion FROM (
+    (SELECT * FROM minority_cohort LIMIT 50) GENERATIVE JOIN lpm GIVEN
+        race_ethnicity AND religion)
+LIMIT 1000)
+----
+

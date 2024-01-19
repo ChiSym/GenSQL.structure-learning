@@ -1,0 +1,1 @@
+ clojure -M:exec inferenceql.structure-learning.main assemble-database --table-name minority_cohort --table-path data/religious-asians.csv --model-name lpm --model-path data/sppl/merged.json > data/db.edn
