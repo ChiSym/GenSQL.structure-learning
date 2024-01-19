@@ -1,30 +1,30 @@
 sample_count: 10
 sql_preprocessing:
- SELECT 
-  CAST(year as VARCHAR) as year, 
-  gender, 
-  age, 
-  educ, 
-  race_h as race_ethnicity, 
-  citizen, 
-  religion, 
-  relig_imp as religion_importance, 
-  relig_church as church_attendance, 
-  marstat as marital_status, 
-  ownhome, 
-  has_child, 
+ SELECT
+  CAST(year as VARCHAR) as year,
+  gender,
+  age,
+  educ,
+  race_h as race_ethnicity,
+  citizen,
+  religion,
+  relig_imp as religion_importance,
+  relig_church as church_attendance,
+  marstat as marital_status,
+  ownhome,
+  has_child,
   no_milstat as no_immediate_family_served_military,
-  pid7 as partisan_identity, 
-  ideo5 as ideology, 
-  faminc as family_income, 
-  employ as employment_status, 
-  no_healthins as uninsured, 
-  'union' as union_membership, 
-  economy_retro, 
-  newsint as interest_in_news, 
-  vv_turnout_gvm as voted_general_election, 
+  pid7 as partisan_identity,
+  ideo5 as ideology,
+  faminc as family_income,
+  employ as employment_status,
+  no_healthins as uninsured,
+  'union' as union_membership,
+  economy_retro,
+  newsint as interest_in_news,
+  vv_turnout_gvm as voted_general_election,
   approval_pres as approval_president,
-  voted_pres_party as voted_president_party 
+  voted_pres_party as voted_president_party
   FROM data
 loom:
   # loom config, see here for an example:
