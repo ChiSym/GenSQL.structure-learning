@@ -28,6 +28,6 @@ SELECT ideology, religion FROM (GENERATE * UNDER lpm) LIMIT 1000
 SELECT ideology, religion FROM (
     (SELECT * FROM minority_cohort LIMIT 50) GENERATIVE JOIN lpm GIVEN
         race_ethnicity AND religion)
-LIMIT 1000)
+LIMIT 1000
 ----
 
