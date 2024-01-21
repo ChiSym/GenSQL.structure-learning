@@ -489,8 +489,8 @@ stages:
     outs:
     - path: data/minority-cohort.csv
       hash: md5
-      md5: 5c93441be4f510c1cb2abad5d66b0609
-      size: 23121
+      md5: 37a28303e8cf3c1c1008a2141b0e0e0c
+      size: 2321
   smaller-model:
     cmd: "python scripts/single_model.py\n"
     deps:
