@@ -216,3 +216,28 @@ stages:
       - data/cgpm/${item}
       outs:
       - qc/cgpm-${item}-dependence-probability.csv
+
+  minority-table:
+    cmd: >
+      python scripts/minority_cohort.py
+    deps:
+      - data/preprocessed.csv
+    outs:
+      - data/minority-cohort.csv
+
+  smaller-model:
+    cmd: >
+      python scripts/single_model.py
+    deps:
+      - data/sppl/merged.json
+    outs:
+      - data/sppl/small-spe.json
+
+  schema-to-s3:
+    # Hack.
+    cmd: >
+      cp data/schema.edn data/schema-s3.edn
+    deps:
+      - data/schema.edn
+    outs:
+      - data/schema-s3.edn

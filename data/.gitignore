@@ -41,3 +41,5 @@
 /synthetic-data-loom.csv
 /synthetic-data-cgpm-raw.csv
 /column_models.json
+/minority-cohort.csv
+/schema-s3.edn

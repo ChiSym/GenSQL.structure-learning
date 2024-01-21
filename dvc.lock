@@ -479,3 +479,39 @@ stages:
       hash: md5
       md5: b42bf7efed66bf3ce41c8f31b4d0c494
       size: 111082
+  minority-table:
+    cmd: "python scripts/minority_cohort.py\n"
+    deps:
+    - path: data/preprocessed.csv
+      hash: md5
+      md5: 43febc050e09de2e476b3c615bdc83b6
+      size: 275458033
+    outs:
+    - path: data/minority-cohort.csv
+      hash: md5
+      md5: 5c93441be4f510c1cb2abad5d66b0609
+      size: 23121
+  smaller-model:
+    cmd: "python scripts/single_model.py\n"
+    deps:
+    - path: data/sppl/merged.json
+      hash: md5
+      md5: d0b7d605e180b0837504c77bafbd73d0
+      size: 32540894
+    outs:
+    - path: data/sppl/small-spe.json
+      hash: md5
+      md5: 33839b2e43733d70d97c9d7aad859e86
+      size: 2483619
+  schema-to-s3:
+    cmd: "cp data/schema.edn data/schema-s3.edn\n"
+    deps:
+    - path: data/schema.edn
+      hash: md5
+      md5: 4da25a2f8cebdf85529349ac4a1c714f
+      size: 1315
+    outs:
+    - path: data/schema-s3.edn
+      hash: md5
+      md5: 4da25a2f8cebdf85529349ac4a1c714f
+      size: 1315
