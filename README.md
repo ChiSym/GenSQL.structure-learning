@@ -7,6 +7,10 @@ gcloud auth login
 ```
 
 ``` shell
+docker login
+```
+
+``` shell
 mkdir -p data/raw
 gsutil -m cp \
   "gs://civitech-ai-explore/voterfile/voterfile_000000000000.csv" \
