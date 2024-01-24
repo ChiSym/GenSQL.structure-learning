@@ -19,7 +19,7 @@ nullify:
   # - missing
   - UNKNOWN
 schema:
-  age: numerical
+  int_age: numerical
   score_support_gen_dem: numerical
 loom:
   extra_passes: 100
