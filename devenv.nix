@@ -6,6 +6,7 @@
     system-packages = with pkgs; [
       awscli2
       clj-kondo
+      google-cloud-sdk
       parallel
       xsv
       duckdb
