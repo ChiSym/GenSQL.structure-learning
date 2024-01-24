@@ -2,11 +2,12 @@
 
 ## Setup
 
-```
+``` shell
 gcloud auth login
 ```
 
 ``` shell
+mkdir -p data/raw
 gsutil -m cp \
   "gs://civitech-ai-explore/voterfile/voterfile_000000000000.csv" \
   "gs://civitech-ai-explore/voterfile/voterfile_000000000001.csv" \
@@ -58,5 +59,5 @@ gsutil -m cp \
   "gs://civitech-ai-explore/voterfile/voterfile_000000000047.csv" \
   "gs://civitech-ai-explore/voterfile/voterfile_000000000048.csv" \
   "gs://civitech-ai-explore/voterfile/voterfile_000000000049.csv" \
-  .
+  data/raw
 ```
