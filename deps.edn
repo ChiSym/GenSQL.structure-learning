@@ -6,8 +6,8 @@
         com.cognitect/transit-clj {:mvn/version "1.0.324"}
         com.github.haifengl/smile-core {:mvn/version "3.0.1"}
         io.github.inferenceql/inferenceql.gpm.sppl {:git/sha "52f8316e094b3644709dccde8f0a935f9b55f187"}
-        io.github.inferenceql/inferenceql.inference {:git/sha "f8b864bffeb4b11913414796c2af0f0f0cd665cc"}
-        io.github.inferenceql/inferenceql.query {:git/sha "9f601603a47b9dfcfb7c38441af2d279f1764031"}
+        io.github.inferenceql/inferenceql.inference {:git/sha "40e77dedf680b7936ce988b66186a86f5c4db6a5"}
+        io.github.inferenceql/inferenceql.query {:git/sha "933a1d1b620bb227ddcf6f649187c8759b46ac27"}
         lambdaisland/regal {:mvn/version "0.0.143"}
         medley/medley {:mvn/version "1.4.0"}
         org.babashka/cli {:mvn/version "0.3.34"}
