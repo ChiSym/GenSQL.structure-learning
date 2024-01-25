@@ -431,6 +431,16 @@ stages:
     outs:
       - data/xcat/complete/
 
+  xcat-merge:
+    cmd: >
+      clj -X inferenceql.structure-learning.clojurecat/merge
+      :models data/xcat/complete
+      :out data/xcat/xcat.merged.edn
+    deps:
+      - data/xcat/complete
+    outs:
+      - data/xcat/xcat.merged.edn
+
   qc-dashboard-spec:
     cmd: >
       clojure -X inferenceql.structure-learning.qc.dashboard/spec
