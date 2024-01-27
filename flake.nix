@@ -5,7 +5,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
   };
 
-  outputs = inputs@{ self, nixpkgs }: let
+  outputs = { self, nixpkgs }: let
     system = "aarch64-darwin";
     pkgs = (import nixpkgs { system = system; });
   in {
@@ -111,6 +111,31 @@
         clojure -X inferenceql.structure-learning.main/ignore \
           :schema '"${schema}"' \
           < ${nullified} \
+          > $out
+      '';
+
+      numericalized = pkgs.runCommand "numericalized.csv" {
+        nativeBuildInputs = with pkgs; [ offline-clojure ];
+        src = ./.;
+      } ''
+        cp -r $src/* ./
+        mkdir -p $out
+        clojure -X inferenceql.structure-learning.main/numericalize \
+          :schema '"${schema}"' \
+          :table mapping-table.edn \
+          < ${ignored} \
+          > numericalized.csv
+        cp mapping-table.edn $out
+        cp numericalized.csv $out
+      '';
+
+      loom-schema = pkgs.runCommand "loom-schema.json" {
+        nativeBuildInputs = with pkgs; [ offline-clojure ];
+        src = ./.;
+      } ''
+        cp -r $src/* ./
+        clojure -X inferenceql.structure-learning.main/loom-schema \
+          < ${schema} \
           > $out
       '';
 
