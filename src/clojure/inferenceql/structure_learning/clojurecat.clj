@@ -14,14 +14,12 @@
 
 (defn merge
   "Merges the GPMs in a directory."
-  [{path :models out :out}]
-  (let [path (str path)
-        out (str out)]
-    (->> (io/file path)
-         (file-seq)
-         (filter #(.isFile %))
-         (map slurp)
-         (map gpm/read-string)
-         (ensemble/ensemble)
-         (pr-str)
-         (spit out))))
+  [{path :models}]
+  (let [path (str path)]
+      (->> (io/file path)
+           (file-seq)
+           (filter #(.isFile %))
+           (map slurp)
+           (map gpm/read-string)
+           (ensemble/ensemble)
+           (prn))))
