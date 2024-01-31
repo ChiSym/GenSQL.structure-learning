@@ -12,6 +12,10 @@ resource "aws_instance" "instance" {
   key_name = resource.aws_key_pair.ssh_key.key_name
   security_groups = [aws_security_group.allow_ssh.name]
   associate_public_ip_address = true
+
+  root_block_device = {
+    volume_size = 200
+  }
 }
 
 resource "aws_key_pair" "ssh_key" {
