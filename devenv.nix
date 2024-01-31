@@ -6,12 +6,13 @@
     system-packages = with pkgs; [
       awscli2
       clj-kondo
-      google-cloud-sdk
-      parallel
-      xsv
       duckdb
-      nodePackages.vega-lite
+      google-cloud-sdk
       nodePackages.vega-cli
+      nodePackages.vega-lite
+      parallel
+      terraform
+      xsv
     ];
     python-packages = with config.languages.python.package.pkgs; [
       numpy
