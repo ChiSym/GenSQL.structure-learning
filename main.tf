@@ -33,6 +33,13 @@ resource "aws_security_group" "allow_ssh" {
     cidr_blocks = ["0.0.0.0/0"] # allow all traffic
   }
 
+  egress { # allow all outbound traffic on all ports
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   tags = {
     Name = "allow_ssh"
   }
