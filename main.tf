@@ -13,7 +13,8 @@ resource "aws_instance" "instance" {
   security_groups = [aws_security_group.allow_ssh.name]
   associate_public_ip_address = true
 
-  root_block_device = {
+  root_block_device {
+    volume_type = "gp2"
     volume_size = 200
   }
 }
