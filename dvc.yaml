@@ -1,10 +1,10 @@
 stages:
-  merge-raw:
+  merge-voterfile:
     cmd: >
-      xsv cat rows data/raw/*
+      xsv cat rows data/voterfile/*
       > data/data.merged.csv
     deps:
-      - data/raw
+      - data/voterfile
     outs:
       - data/data.merged.csv
 
