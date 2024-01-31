@@ -10,7 +10,7 @@ stages:
 
   select-columns:
     cmd: >
-      xsv select int_age,demo_gender,demo_race,score_support_gen_dem,score_turnout_presidential,score_turnout_midterm
+      xsv select demo_party_id,civitech_voter_status,sos_voter_status,int_age,demo_gender,demo_race,score_support_gen_dem,score_turnout_presidential,score_turnout_midterm
       < data/data.merged.csv
       > data/data.csv
     deps:
