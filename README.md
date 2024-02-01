@@ -16,9 +16,9 @@ gsutil -m cp -r "gs://civitech-ai-explore/voterfile" data
 
 ## Cloud
 
-Follow the workflow below to instantiate and interact with a remote AWS machine capable of running structure learning. Note that you must still get structure learning onto the target machine, and you must log into Docker so the Loom Docker image can be retrieved.
+Follow the workflow below to instantiate and interact with a remote AWS machine capable of running structure learning.
 
-Instantiate remote machine:
+Create cloud infrastructure:
 
 ``` shell
 terraform init
@@ -28,25 +28,37 @@ terraform init
 terraform apply
 ```
 
-SSH into to remote machine:
+SSH into to the instance:
 
 ``` shell
 ./connect.sh
 ```
 
-Send files to remote machine:
+(on instance) Log into GitHub:
+
+``` shell
+gh auth login
+```
+
+(on instance) Clone this branch:
+
+``` shell
+git clone -b <BRANCH> https://github.com/InferenceQL/inferenceql.structure-learning.git
+```
+
+Send files to remote instance:
 
 ``` shell
 ./upload.sh <PATH>
 ```
 
-Send files to remote machine:
+Send files to remote instance:
 
 ``` shell
 ./download.sh <PATH>
 ```
 
-Destroy remote machine:
+Destroy all cloud infrastructure:
 
 ``` shell
 terraform destroy
