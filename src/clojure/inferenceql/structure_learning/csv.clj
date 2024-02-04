@@ -116,43 +116,6 @@
        (recur csv (first ks) (next ks))
        csv))))
 
-(defn heuristic-coerce
-  [& coll]
-  (try (into []
-             (map #(if (nil? %)
-                     %
-                     (Long/parseLong %)))
-             coll)
-       (catch java.lang.NumberFormatException _
-         (try (into []
-                    (map #(if (nil? %)
-                            %
-                            (Double/parseDouble %)))
-                    coll)
-              (catch java.lang.NumberFormatException _
-                coll)))))
-
-(defn apply-column
-  [k f coll]
-  (let [new-column (->> coll
-                        (map #(get % k))
-                        (apply f))]
-    (map-indexed (fn [index m]
-                   (let [v (get new-column index)]
-                     (cond-> m
-                       (some? v) (assoc k v))))
-                 coll)))
-
-(defn heuristic-coerce-all
-  [coll]
-  (let [ks (into #{}
-                 (mapcat keys)
-                 coll)]
-    (reduce (fn [acc k]
-              (apply-column k heuristic-coerce acc))
-            coll
-            ks)))
-
 (defn update-by-key
   "For each key k in coll if (f k) returns a function update the value for k in
   coll with that function."

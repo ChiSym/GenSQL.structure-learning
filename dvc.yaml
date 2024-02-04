@@ -36,37 +36,34 @@ stages:
     outs:
       - data/nullified.csv
 
-  guess-schema:
+  summarize:
     cmd: >
-      clojure -X inferenceql.structure-learning.main/guess-schema
+      duckdb -csv :memory: "SUMMARIZE SELECT * FROM read_csv_auto('/dev/stdin', header=true)"
       < data/nullified.csv
-      > data/schema.edn
+      > data/summarized.csv
     deps:
       - data/nullified.csv
-    params:
-      - schema
     outs:
-      - data/schema.edn
+      - data/summarized.csv
 
-  cgpm-schema:
+  guess-schema:
     cmd: >
-      clojure -X inferenceql.structure-learning.main/cgpm-schema
-      < data/schema.edn
-      > data/cgpm-schema.edn
+      duckdb -csv :memory: "$(cat scripts/guess_schema.sql)"
+      < data/summarized.csv
+      > data/schema.csv
     deps:
-      - data/schema.edn
+      - data/summarized.csv
     outs:
-      - data/cgpm-schema.edn
+      - data/schema.csv
 
   ignore:
     cmd: >
-      clojure -X inferenceql.structure-learning.main/ignore
-      :schema '"data/schema.edn"'
+      ./scripts/ignore.sh
       < data/nullified.csv
       > data/ignored.csv
     deps:
       - data/nullified.csv
-      - data/schema.edn
+      - data/schema.csv
     outs:
       - data/ignored.csv
 
@@ -86,11 +83,14 @@ stages:
 
   loom-schema:
     cmd: >
-      clojure -X inferenceql.structure-learning.main/loom-schema
-      < data/schema.edn
+      duckdb -json :memory: '
+      SELECT column_name, loom_statistical_type
+      FROM read_csv_auto("data/schema.csv", header=true)
+      WHERE loom_statistical_type IS NOT NULL'
+      | jq 'map({(.column_name): .loom_statistical_type}) | add'
       > data/loom-schema.json
     deps:
-      - data/schema.edn
+      - data/schema.csv
     outs:
       - data/loom-schema.json
 
@@ -153,14 +153,14 @@ stages:
       --metadata {}
       --output data/cgpm/hydrated/{/}
       --data data/numericalized.csv
-      --schema data/cgpm-schema.edn
+      --schema data/schema.csv
       --mapping-table data/mapping-table.edn
       --seed $((${seed} + {#} - 1))'
     params:
       - parallel.flags
       - seed
     deps:
-      - data/cgpm-schema.edn
+      - data/schema.csv
       - data/cgpm/raw
       - data/mapping-table.edn
       - data/numericalized.csv

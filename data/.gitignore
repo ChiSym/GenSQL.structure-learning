@@ -12,12 +12,12 @@
 /nullified.csv
 /numericalized.csv
 /subsampled.csv
+/summarized.csv
 /validated.csv
 
 # schema artifacts
-/cgpm-schema.edn
 /mapping-table.edn
-/schema.edn
+/schema.csv
 
 # loom artifacts
 /loom-schema.json
