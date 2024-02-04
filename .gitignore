@@ -10,6 +10,8 @@
 .nrepl-port
 .venv/
 /.clj-kondo/.cache/
+/.terraform.lock.hcl
+/.terraform/
 /checkouts/
 /classes/
 /learning-dashboard/
@@ -19,9 +21,10 @@
 /out/
 /qc/
 /target/
+/terraform.tfstate
+/terraform.tfstate.backup
 catboost_info/
 devenv.local.nix
 pom.xml
 pom.xml.asc
 sum-product-dsl/
-/data/raw/
