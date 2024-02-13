@@ -197,12 +197,16 @@ def main():
 
             probabilities = ml_model.predict_proba(X_test)
             for i in range(len(probabilities)):
+		# TODO
                 # This only works because we know that the range of possible survey
-                # responses is integers 1-N. To do this in the general case we would
-                # need to map the predicted results to a vector V of length N such
-                # that the V.index(value) is the index of the element in PROBABILITIES
-                # corresponding to that value. Such a mapping must already exist, but
-                # I'm not sure where to find it.
+                # responses is integers 1-N, and ASSUME that the vector returned by
+		# predict_proba() uses that same ordering.
+		#
+		# To do this in the general case we would need to map the predicted
+		# results to a vector V of length N such that the V.index(value) is
+		# the index of the element in PROBABILITIES corresponding to that
+		# value. Such a mapping must already exist, but I'm not sure where
+		# to find it.
                 j = int(results["prediction"][i])-1
                 results["predictive-probability"].append(probabilities[i][j])
             results["true_value"].extend(y_test.tolist())
