@@ -1,0 +1,41 @@
+# directories
+/ast
+/cgpm/
+/code
+/sppl/
+/test
+/xcat/
+
+# data artifacts
+/data.csv
+/ignored.csv
+/nullified.csv
+/numericalized.csv
+/subsampled.csv
+/validated.csv
+
+# schema artifacts
+/cgpm-schema.edn
+/mapping-table.edn
+/schema.edn
+
+# loom artifacts
+/loom-schema.json
+/infer-config.json
+
+# plotting artifacts
+/dep-prob.vl.json
+/dep-prob.vg.json
+/dep-prob.svg
+/linear-stats.vg.json
+/linear-stats.svg
+/linear-stats.vl.json
+/linear-stats.json
+/dep-prob.json
+
+# Other artefacts
+/qc-statistical-tests.txt
+/max-number-views.txt
+/predictions.csv
+/synthetic-data-iql.csv
+/db.edn
