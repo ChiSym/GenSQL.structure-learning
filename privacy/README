@@ -68,15 +68,22 @@ that serve as inputs to the 'predict' stage to
 
 	target-as-5tuple/{original,synthetic,edited,extra}/.
 
-along with the corresponding schema.edn file. Then convert the data from the
-target column to binary, write the modified files to
+The required CSV files are
+
+	data/data.csv
+	data/ignored.csv
+	data/synthetic-data-iql.csv
+	data/test/test.csv
+
+plus you need the corresponding data/schema.edn file. Then convert the data
+from the target column to binary, write the modified files to
 
 	target-as-binary/{original,synthetic,edited,extra}/
 
-along with the corresponding schema.edn file. Then run the same prediction
-command found in dvc.yaml on these modified files and generate a new output
-predictions.csv file. Statistics and an ROC plot are then generated from 
-the new predictions.csv file.
+along with the corresponding schema.edn file. Then run a custom script
+containing the same prediction command found in dvc.yaml on these modified
+files and generate a new output predictions.csv file. Statistics and an ROC
+plot are then produced from the new predictions.csv file.
 
 HOWTO
 
