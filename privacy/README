@@ -63,34 +63,29 @@ PROCEDURE
 
 The goal here was to generate a classifer on the data from each model after
 mapping the values for the CC22_320a feature from a five-tuple to binary as
-described above. The way this was done is to copy each of the four CSV files
-that serve as inputs to the 'predict' stage to
-
-	target-as-5tuple/{original,synthetic,edited,extra}/.
-
-The required CSV files are
+described above. The way this was done is to modify each of the four CSV files
+that serve as inputs to the 'predict' stage:
 
 	data/data.csv
 	data/ignored.csv
 	data/synthetic-data-iql.csv
 	data/test/test.csv
 
-plus you need the corresponding data/schema.edn file. Then convert the data
-from the target column to binary, write the modified files to
+Convert the data from the target column to binary, and write the modified files
+to:
 
-	target-as-binary/{original,synthetic,edited,extra}/
+	binary/{original,synthetic,edited,extra}/
 
-along with the corresponding schema.edn file. Then run a custom script
+along with the model's data/schema.edn file. Then run a custom script
 containing the same prediction command found in dvc.yaml on these modified
 files and generate a new output predictions.csv file. Statistics and an ROC
 plot are then produced from the new predictions.csv file.
 
 HOWTO
 
-Once the relevant CSV files have been copied from the models to appropriate
-subdirectories in target-as-5tuple, run
+To convert the CC22_320a feature columns to binary, execute:
 
-	privacy/scripts/convert-files-to-binary
+	privacy/scripts/convert-to-binary
 
 Now to generate the predictions you'll need to enter the 'devenv shell'
 environment and run
@@ -103,10 +98,10 @@ environment and run
 To evaluate the classifier predictions via common metrics you need to:
 
     (1) exit from the 'devenv shell' environment
-    (2) cd to one of the subdirectories under target-as-binary,
+    (2) cd to one of the subdirectories under binary/
         for example, 'original':
 
-	cd privacy/target-as-binary/original
+	cd privacy/binary/original
 
     (3) execute
 

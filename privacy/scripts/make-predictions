@@ -3,7 +3,7 @@
 # This script needs be run within the 'devenv shell' environment
 
 TD=/home/ubuntu/cesql			# Structure Learning Directory
-DD=${TD}/privacy/target-as-binary	# Binary-ized data directories
+DD=${TD}/privacy/binary			# Binary-ized data directories
 
 if [ -z "${1}" ]; then
     echo "Usage: ${0} <directory name in ${DD}/>"
