@@ -174,6 +174,7 @@ def main():
         "training_data": [],
         "test_data": [],
         "prediction": [],
+        "predictive-probability": [],
         "true_value": [],
     }
     for train_dataset_path in args.training:
@@ -193,6 +194,21 @@ def main():
             # Need to call NP.array.flatten() here because CatBoost decides to
             # wrap prediction into a separate list.
             results["prediction"].extend((ml_model.predict(X_test).flatten().tolist()))
+
+            probabilities = ml_model.predict_proba(X_test)
+            for i in range(len(probabilities)):
+                # TODO
+                # This only works because we know that the range of possible survey
+                # responses is integers 1-N, and ASSUME that the vector returned by
+                # predict_proba() uses that same ordering.
+                #
+                # To do this in the general case we would need to map the predicted
+                # results to a vector V of length N such that the V.index(value) is
+                # the index of the element in PROBABILITIES corresponding to that
+                # value. Such a mapping must already exist, but I'm not sure where
+                # to find it.
+                j = int(results["prediction"][i]) - 1
+                results["predictive-probability"].append(probabilities[i][j])
             results["true_value"].extend(y_test.tolist())
 
             n_test_datapoints = y_test.shape[0]

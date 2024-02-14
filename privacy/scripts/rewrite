@@ -1,0 +1,41 @@
+#!/usr/bin/perl
+
+# This script replaces all categorical values in the target column with binary
+#
+#	1	"Strongly approve"	-> 1
+#	2	"Somewhat approve"	-> 1
+#	3	"Somewhat disapprove"	-> 0
+#	4	"Strongly disapprove"	-> 0
+#	5	"Not sure"		-> 0
+#
+# Since these semantics are dependent on the survey question you can't just 
+# use this script with another feature, but have to check the documentation:
+# "CES Guide 2022.pdf", pg 40.
+#
+# Note that ~3% of the respondents were unsure, so strictly speaking, a 0
+# represents a lack of approval, but not disapproval.
+
+$TARGET="CC22_320a";		# The survey feature name from the datasets
+
+$LN = 0;
+$DF = $ARGV[0];
+open DATA,"$DF" or die "Unable to open $DF: $!";
+while (<DATA>)
+{
+    chomp;
+    @F = split /,/;
+    unless ($LN++)
+    {
+	for ($C=0;$C<=$#F;$C++)
+	{
+	    last if ($F[$C] eq $TARGET);
+	}
+	die "Unable to find target column in $DF" unless ($F[$C] eq $TARGET);
+	printf "%s\n",$_;
+	next;
+    }
+
+    $F[$C] = ($F[$C] == 1 || $F[$C] == 2) ? 1 : 0;
+    printf "%s\n",join(",",@F);
+}
+close DATA;

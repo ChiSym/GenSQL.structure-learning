@@ -1,0 +1,17 @@
+#!/bin/bash
+
+TD=/home/ubuntu/cesql/privacy
+REAL=models
+HACK=binary
+REWRITER=${TD}/scripts/rewrite
+for RD in ${TD}/${REAL}/*; do
+    if [ -d "${RD}" ]; then
+	ND=$(echo "${RD}" | sed -e "s@${REAL}@${HACK}@")
+	mkdir -p "${ND}"
+	${REWRITER} ${RD}/data/data.csv >${ND}/data.csv
+	${REWRITER} ${RD}/data/ignored.csv >${ND}/ignored.csv
+	${REWRITER} ${RD}/data/synthetic-data-iql.csv >${ND}/synthetic-data-iql.csv
+	${REWRITER} ${RD}/data/test/test.csv >${ND}/test.csv
+	cp ${RD}/data/schema.edn ${ND}/.
+    fi
+done

@@ -1,0 +1,130 @@
+dataset_name: ces-2022
+seed: 12
+sample_count: 16
+sub_sample:
+  #according_to_columns:
+  #  Class_of_Orbit:
+  #    - LEO
+  #    - GEO
+  #  Users:
+  #    - Commercial
+  N: 16000
+parallel:
+  # To limit the number of jobs GNU Parallel spawns use add the flag `--jobs n`.
+  flags: >-
+    --verbose
+nullify:
+  # Entries added here will be treated as null. For example, to treat "NaN" and
+  # "missing" as null uncomment the following two lines:
+  NA
+schema:
+  # Key/value pairs can be added here to explicitly override the inferred schema
+  # for each column. The available types are as follows: numerical, nominal, and ignore.
+  # For example, to force the "age" column to be treated as a
+  # numerical uncomment the following line:
+  # age: numerical
+  # Apogee_km: numerical
+  # Perigee_km: numerical
+  gender4: nominal
+  educ: nominal
+  race: nominal
+  hispanic: nominal
+  CC22_300b_1: nominal
+  CC22_300b_2: nominal
+  CC22_300b_3: nominal
+  CC22_300b_4: nominal
+  CC22_300b_5: nominal
+  CC22_300b_6: nominal
+  CC22_300b_7: nominal
+  CC22_300b_8: nominal
+  CC22_300d_1: nominal
+  CC22_300d_2: nominal
+  CC22_300d_3: nominal
+  CC22_300d_4: nominal
+  CC22_300d_5: nominal
+  CC22_300d_6: nominal
+  CC22_302: nominal
+  CC22_303: nominal
+  CC22_304: nominal
+  CC22_306: nominal
+  CC22_309e: nominal
+  CC22_309f: nominal
+  CC22_320a: nominal
+  CC22_320b: nominal
+  CC22_320c: nominal
+  CC22_327a: nominal
+  CC22_333: nominal
+  CC22_360: nominal
+  urbancity: nominal
+  presvote20post: nominal
+  ideo5: nominal
+  employ: nominal
+  investor: nominal
+  pew_religimp: nominal
+  religpew: nominal
+  marstat: nominal
+  faminc_new: nominal
+  presvote16post: nominal
+  industry: nominal
+  sexuality: nominal
+  transgender: nominal
+  gunown: nominal
+  numchildren: numerical
+loom:
+  extra_passes: 200
+cgpm:
+  iterations: 32
+  minutes: 600
+  #dependence:
+  #  # While the CrossCat implementation in CGPM takes dependence constraints, doing so
+  #  # throws a not-implemented-error. Hence, we apply a workaround:
+  #  #   - Supply a map from a target column name to a list of column names.
+  #  #   - Each column in said list gets moved to the target column's view.
+  #  Users:
+  #    - Purpose
+  #  Launch_Site:
+  #    - Type_of_Orbit
+  ## Independence is un-directional. For two columns foo and bar, setting `foo: - bar`
+  ## and `bar: - foo` has the identical effect.
+  #independence:
+  #  Perigee_km:
+  #    - Class_of_Orbit
+  #    - Apogee_km
+  #  Apogee_km:
+  #    - Class_of_Orbit
+  #independence:
+  # CC22_320a:
+  #   - presvote20post
+  #   - presvote16post
+  #   - ideo5
+  #   - pew_religimp
+  #   - religpew
+clojurecat:
+  iterations: 150
+qc:
+  # Set this to the number of synthetic samples desired in QC plots.
+  sample_count: 1000
+  # Set this to specify the columns visualized in QC plots.
+  # When not set, up to 8 columns--taken from the schema--will be visualized.
+  # e.g. columns: ["foo", "bar", "baz"]
+  columns: ["CC22_320a","presvote20post","presvote16post","ideo5","religpew","pew_religimp","gunown","race"]
+  # This limits the number of categories shown for categorical variables in
+  # 2-dimensional QC plots. Set this to null for no limit.
+  category_limit: null
+mi:
+  configs:
+    # Set MI configs here. If not set, the configs are chosen at random.
+    # For example, to set the config for health_status.
+    # health_status: ["c) Average", "b) Below average"]
+synthetic_data_evaluation:
+  # If target is not specified, a random target is chosen for prediction.
+  target: CC22_320a
+  predictor: Random_forest # One of "Random_forest" or "GLM"
+    #N: 10000 # Subsample held-out dataframe with 1000 samples
+database:
+  table_name: data
+  table_path: data/nullified.csv
+  model_name: model
+  # model_path: data/xcat/complete/sample.0.edn
+  # model_path: data/xcat/merged.edn
+  model_path: data/sppl/merged.json

@@ -38,9 +38,10 @@ stages:
 
   guess-schema:
     cmd: >
-      clojure -X inferenceql.structure-learning.main/guess-schema
-      < data/nullified.csv
-      > data/schema.edn
+      cp cc22-small-schema.edn data/schema.edn
+      #      clojure -X inferenceql.structure-learning.main/guess-schema
+      #< data/nullified.csv
+      #> data/schema.edn
     deps:
       - data/nullified.csv
     params:
@@ -410,7 +411,7 @@ stages:
     cmd:
       - mkdir -p data/xcat/complete/
       - >-
-        parallel ${parallel.flags}
+        parallel --jobs 4 --verbose
         'clojure -X inferenceql.structure-learning.xcat/import
         :cgpm-json {}
         :data-csv data/ignored.csv

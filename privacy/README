@@ -1,0 +1,137 @@
+Welcome to the Privacy Experiment on the CES 2022 Dataset
+
+Some things to note:
+
+    o The dataset is the first 20000 rows of the full 60000 row dataset,
+      of which params.yaml subsamples 16000.
+    o Custom change in dvc.yaml to copy a canned copy of schema.edn into
+      the data directory rather than run through guess-schema. It was 
+      taking too long and all of the statistical types are explicitly
+      set in params.yaml
+    o Custom change in dvc.yaml to set --jobs 4 in xcat-complete-import
+      because I had some trouble running out of memory, but this was 
+      with a larger version of the dataset so likely not an issue. No
+      harm, though.
+    o Custom change to scripts/predict.py to save the classivier's
+      predictive probabilities as a new column in data/predictions.csv
+      (needed for the ROC plot). The source is also in the privacy/src
+      directory.
+
+		Note that the solution is not general and depends (in
+		this specific case) on the fact that the possible
+		responses to the target survey question are [1,2,3,4,5],
+		and the assumption that the vector of probabilities
+		returned by predict_proba() for each row is ordered
+		such that the returned probabilities correspond to
+		those possible responses IN THAT SAME ORDER. A general
+		solution would need to somehow get the mapping between
+		the list of categorical options for the feature and
+		the vector of probabilities, but it is not clear how
+		to do that.
+
+		See the TODO comments in main().
+
+    o For demonstration purposes we recode the target feature CC22_320a
+      (President Biden's approval rating in 2022) from a 5-tuple to a
+      binary choice in which "Strongly approve" and "Somewhat approve"
+      both map to 1 and all other responses (including "Not sure")
+      mapped to 0.
+    o Four modeling runs were done with the parameters in params.yaml
+      (16000 row subsample, 16 sample_count, 200 loom extra_passes,
+      600 minutes of runtime for CGPM). This gave a little over 32
+      CGPM iterations. In all four runs the random seed was the same.
+    o Full copies of the data and qc directories, as well as the main
+      configuration files for each modeling run are available in
+      privacy/models under the subdirectories:
+
+	original/	Model built from the original dataset
+	synthetic/	Model built from a synthetic dataset that
+			was generated from the original model
+	edited/		Model built from the synthetic dataset
+			with two features:
+				presvote16post
+				presvote20post
+			held independent of the target CC22_302a
+			feature (see params.yaml)
+	extra/		Model built from the synthetic dataset
+			with five features:
+				presvote16post
+				presvote20post
+				ideo5
+				pew_religimp
+				religpew
+			held independent of the target CC22_302a
+			feature (see params.yaml)
+    o The features held independent in the 'edited' and 'extra'
+      models were those with the highest mutual information shared
+      with CC22_320a:
+				presvote20post	0.443
+				presvote16post	0.328
+				ideo5		0.288
+				pew_religimp	0.076
+				religpew	0.067
+    o The model currently found in the main data subdirectory is the 'extra'
+      model.
+    o I should have renamed the target feature from the beginning... Lesson
+      learned!
+
+PROCEDURE
+
+The goal here was to generate a classifer on the data from each model after
+mapping the values for the CC22_320a feature from a five-tuple to binary as
+described above. The way this was done is to modify each of the four CSV files
+that serve as inputs to the 'predict' stage:
+
+	data/data.csv
+	data/ignored.csv
+	data/synthetic-data-iql.csv
+	data/test/test.csv
+
+Convert the data from the target column to binary, and write the modified files
+to:
+
+	binary/{original,synthetic,edited,extra}/
+
+along with the model's data/schema.edn file. Then run a custom script
+containing the same prediction command found in dvc.yaml on these modified
+files and generate a new output predictions.csv file. Statistics and an ROC
+plot are then produced from the new predictions.csv file.
+
+HOWTO
+
+To convert the CC22_320a feature columns to binary, execute:
+
+	privacy/scripts/convert-to-binary
+
+Now to generate the predictions you'll need to enter the 'devenv shell'
+environment and run
+
+	privacy/make-predictions original
+	privacy/make-predictions synthetic
+	privacy/make-predictions edited
+	privacy/make-predictions extra
+
+To evaluate the classifier predictions via common metrics you need to:
+
+    (1) exit from the 'devenv shell' environment
+    (2) cd to one of the subdirectories under binary/
+        for example, 'original':
+
+	cd privacy/binary/original
+
+    (3) execute
+
+	../../scripts/evaluate-classifier-statistics
+
+    (4) Generate an ROC plot
+
+	../../scripts/evaluate-classifier-roc
+
+CONCERNS
+
+Please look at privacy/scripts/evaluate-classifier-roc to make sure it is
+doing the right thing with the predictions.csv data.
+
+The larger problem is making sure that predict.py is mapping the returned
+probabilities to the correct categorical options for the target feature.
+See the TODO comments in src/predict.py:main().
