@@ -207,7 +207,7 @@ def main():
                 # the index of the element in PROBABILITIES corresponding to that
                 # value. Such a mapping must already exist, but I'm not sure where
                 # to find it.
-                j = int(results["prediction"][i])-1
+                j = int(results["prediction"][i]) - 1
                 results["predictive-probability"].append(probabilities[i][j])
             results["true_value"].extend(y_test.tolist())
 
