@@ -6,6 +6,7 @@ df = pd.read_csv("predictions.csv",header=0)
 yv = df['prediction']
 yp = df['predictive-probability']
 tv = df['true_value']
+yt = [1 if yv[i] == tv[i] else 0 for i in range(len(tv))]
 
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
@@ -14,7 +15,7 @@ from sklearn.datasets import make_classification
 from sklearn.linear_model import LogisticRegression
 
 # Compute ROC curve and ROC area
-fpr, tpr, thresholds = roc_curve(tv,yp)
+fpr, tpr, thresholds = roc_curve(yt,yp)
 roc_auc = auc(fpr, tpr)
 
 # Plot ROC curve
