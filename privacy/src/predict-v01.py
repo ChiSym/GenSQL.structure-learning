@@ -174,7 +174,6 @@ def main():
         "training_data": [],
         "test_data": [],
         "prediction": [],
-        "predictive-probability": [],
         "true_value": [],
     }
     for train_dataset_path in args.training:
@@ -194,11 +193,6 @@ def main():
             # Need to call NP.array.flatten() here because CatBoost decides to
             # wrap prediction into a separate list.
             results["prediction"].extend((ml_model.predict(X_test).flatten().tolist()))
-
-            probabilities = ml_model.predict_proba(X_test)
-            for i in range(len(probabilities)):
-                j = list(ml_model.classes_).index(results["prediction"][i])
-                results["predictive-probability"].append(probabilities[i][j])
             results["true_value"].extend(y_test.tolist())
 
             n_test_datapoints = y_test.shape[0]
