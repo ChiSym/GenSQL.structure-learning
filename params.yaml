@@ -7,7 +7,7 @@ sub_sample:
   #    - GEO
   #  Users:
   #    - Commercial
-  N: 1000
+  N: 400
 parallel:
   # To limit the number of jobs GNU Parallel spawns use add the flag `--jobs n`.
   flags: >-
@@ -67,7 +67,8 @@ mi:
 synthetic_data_evaluation:
   # If target is not specified, a random target is chosen for prediction.
   #target: Apogee_km
-  predictor: Random_forest # One of "Random_forest" or "GLM"
+  predictor:
+    Random_forest # One of "Random_forest" or "GLM"
     #N: 10000 # Subsample held-out dataframe with 1000 samples
 database:
   table_name: data
