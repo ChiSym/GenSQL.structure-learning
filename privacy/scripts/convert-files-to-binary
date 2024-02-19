@@ -1,0 +1,22 @@
+#!/bin/bash
+
+TD=/home/ubuntu/cesql/privacy
+REAL=target-as-5tuple
+FAKE=target-as-binary
+REWRITER=${TD}/scripts/rewrite
+for RD in ${TD}/${REAL}/*; do
+    if [ -d "${RD}" ]; then
+        ND=$(echo "${RD}" | sed -e "s@${REAL}@${FAKE}@")
+	mkdir -p "${ND}"
+	for C in ${RD}/*.csv; do
+	    BN=$(basename "${C}")
+	    if [ "${BN}" != "predictions.csv" ]; then
+		echo "Rewrite ${C}"
+		${REWRITER} ${C} > "${ND}/${BN}"
+	    fi
+	done
+	if [ -f "${RD}/schema.edn" ]; then
+	    cp ${RD}/schema.edn ${ND}/.
+	fi
+    fi
+done
