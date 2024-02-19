@@ -29,8 +29,6 @@ Some things to note:
 		the vector of probabilities, but it is not clear how
 		to do that.
 
-		See the TODO comments in main().
-
     o For demonstration purposes we recode the target feature CC22_320a
       (President Biden's approval rating in 2022) from a 5-tuple to a
       binary choice in which "Strongly approve" and "Somewhat approve"
@@ -134,4 +132,3 @@ doing the right thing with the predictions.csv data.
 
 The larger problem is making sure that predict.py is mapping the returned
 probabilities to the correct categorical options for the target feature.
-See the TODO comments in src/predict.py:main().
