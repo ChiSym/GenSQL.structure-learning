@@ -12,11 +12,25 @@ Some things to note:
       because I had some trouble running out of memory, but this was 
       with a larger version of the dataset so likely not an issue. No
       harm, though.
-    o Custom change to scripts/predict.py to save the classifier's
+    o Custom change to scripts/predict.py to save the classivier's
       predictive probabilities as a new column in data/predictions.csv
-      (needed for the ROC plot). In each row we select the probability
-      value corresponding to the choice in the 'prediction' column
-      for that row.
+      (needed for the ROC plot). The source is also in the privacy/src
+      directory.
+
+		Note that the solution is not general and depends (in
+		this specific case) on the fact that the possible
+		responses to the target survey question are [1,2,3,4,5],
+		and the assumption that the vector of probabilities
+		returned by predict_proba() for each row is ordered
+		such that the returned probabilities correspond to
+		those possible responses IN THAT SAME ORDER. A general
+		solution would need to somehow get the mapping between
+		the list of categorical options for the feature and
+		the vector of probabilities, but it is not clear how
+		to do that.
+
+		See the TODO comments in main().
+
     o For demonstration purposes we recode the target feature CC22_320a
       (President Biden's approval rating in 2022) from a 5-tuple to a
       binary choice in which "Strongly approve" and "Somewhat approve"
@@ -117,3 +131,7 @@ CONCERNS
 
 Please look at privacy/scripts/evaluate-classifier-roc to make sure it is
 doing the right thing with the predictions.csv data.
+
+The larger problem is making sure that predict.py is mapping the returned
+probabilities to the correct categorical options for the target feature.
+See the TODO comments in src/predict.py:main().
