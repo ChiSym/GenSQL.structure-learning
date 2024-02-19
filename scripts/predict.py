@@ -194,7 +194,6 @@ def main():
             # Need to call NP.array.flatten() here because CatBoost decides to
             # wrap prediction into a separate list.
             results["prediction"].extend((ml_model.predict(X_test).flatten().tolist()))
-
             probabilities = ml_model.predict_proba(X_test)
             for i in range(len(probabilities)):
                 # This only works because we know that the range of possible survey
