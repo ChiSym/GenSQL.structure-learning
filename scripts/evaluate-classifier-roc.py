@@ -7,6 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_curve, auc
 from sklearn.datasets import make_classification
 from sklearn.linear_model import LogisticRegression
+import yaml
 
 # Generate generic ROC curve for the results found in 'predictions.csv' in the
 # current directory
@@ -16,13 +17,13 @@ yv = df["prediction"]
 yp = df["predictive-probability"]
 tv = df["true_value"]
 
-# Create a new binary column that is 1 IFF the classifier prediction matches
-# the true value. This is what roc_curve() seems to want, but I'm not 100%
-# sure.
-yt = [1 if yv[i] == tv[i] else 0 for i in range(len(tv))]
+with open("params.yaml", "r") as f:
+    params = yaml.safe_load(f.read())
+# Get held-out configuration for evaluation.
+pos_label = params["synthetic_data_evaluation"]["positive_label"]
 
 # Compute ROC curve and ROC area
-fpr, tpr, thresholds = roc_curve(yt, yp)
+fpr, tpr, thresholds = roc_curve(tv, yp, pos_label=pos_label)
 roc_auc = auc(fpr, tpr)
 
 # Plot ROC curve

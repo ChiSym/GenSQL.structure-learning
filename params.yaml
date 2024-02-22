@@ -67,6 +67,7 @@ mi:
 synthetic_data_evaluation:
   # If target is not specified, a random target is chosen for prediction.
   target: CC22_320a
+  positive_label: "yes" # XXX
   predictor: Random_forest # One of "Random_forest" or "GLM"
     #N: 10000 # Subsample held-out dataframe with 1000 samples
 database:

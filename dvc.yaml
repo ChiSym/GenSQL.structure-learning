@@ -553,6 +553,8 @@ stages:
       python scripts/evaluate-classifier-roc.py
     deps:
       - data/predictions.csv
+    params:
+      - synthetic_data_evaluation.positive_label
     outs:
       - roc.png
 

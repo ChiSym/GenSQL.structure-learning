@@ -201,8 +201,9 @@ def main():
             #     linear_model.LogisticRegression.html#sklearn.linear_model.
             #     LogisticRegression.predict_proba
             probabilities = ml_model.predict_proba(X_test)
+            pos_label = config["positive_label"]
+            j = list(ml_model.classes_).index(pos_label)
             for i in range(len(probabilities)):
-                j = list(ml_model.classes_).index(results["prediction"][i])
                 results["predictive-probability"].append(probabilities[i][j])
 
             results["true_value"].extend(y_test.tolist())
