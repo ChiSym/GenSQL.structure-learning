@@ -547,3 +547,19 @@ stages:
       - data/xcat
     outs:
       - data/db.edn
+
+  roc-curve:
+    cmd: >
+      python scripts/evaluate-classifier-roc.py
+    deps:
+      - data/predictions.csv
+    outs:
+      - roc.png
+
+  ml-metrics:
+    cmd: >
+      python scripts/evaluate-classifier-statistics.py
+    deps:
+      - data/predictions.csv
+    outs:
+      - data/ml-metrics.csv
