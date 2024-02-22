@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 
-df = pd.read_csv("predictions.csv", header=0)
+df = pd.read_csv("data/predictions.csv", header=0)
 
 # Show some generic metrics for the results found in 'predictions.csv' in the
 # current directory
