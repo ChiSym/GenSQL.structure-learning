@@ -174,6 +174,7 @@ def main():
         "training_data": [],
         "test_data": [],
         "prediction": [],
+        "predictive-probability": [],
         "true_value": [],
     }
     for train_dataset_path in args.training:
@@ -193,8 +194,19 @@ def main():
             # Need to call NP.array.flatten() here because CatBoost decides to
             # wrap prediction into a separate list.
             results["prediction"].extend((ml_model.predict(X_test).flatten().tolist()))
-            results["true_value"].extend(y_test.tolist())
 
+            # Add a new column with the probability of the predicted value.
+            # Although it looks evil, use of 'classes_' is documented here:
+            # https://scikit-learn.org/stable/modules/generated/sklearn.
+            #     linear_model.LogisticRegression.html#sklearn.linear_model.
+            #     LogisticRegression.predict_proba
+            probabilities = ml_model.predict_proba(X_test)
+            pos_label = config["positive_label"]
+            j = list(ml_model.classes_).index(pos_label)
+            for i in range(len(probabilities)):
+                results["predictive-probability"].append(probabilities[i][j])
+
+            results["true_value"].extend(y_test.tolist())
             n_test_datapoints = y_test.shape[0]
             results["target"].extend([target] * n_test_datapoints)
             results["training_data"].extend([train_dataset_path] * n_test_datapoints)
