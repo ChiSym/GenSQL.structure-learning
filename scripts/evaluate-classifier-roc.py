@@ -11,7 +11,7 @@ from sklearn.linear_model import LogisticRegression
 # Generate generic ROC curve for the results found in 'predictions.csv' in the
 # current directory
 
-df = pd.read_csv("predictions.csv", header=0)
+df = pd.read_csv("data/predictions.csv", header=0)
 yv = df["prediction"]
 yp = df["predictive-probability"]
 tv = df["true_value"]
