@@ -2,6 +2,7 @@
 
 import argparse
 import cgpm.utils.general as general
+import duckdb
 import edn_format
 import json
 import pandas
@@ -25,7 +26,7 @@ def main():
         "--data", type=argparse.FileType("r"), help="Path to numericalized CSV."
     )
     parser.add_argument(
-        "--schema", type=argparse.FileType("r"), help="Path to CGPM schema."
+        "--schema", help="Path to schema."
     )
     parser.add_argument(
         "--mapping-table",
@@ -51,16 +52,17 @@ def main():
         sys.exit(1)
 
     df = pandas.read_csv(args.data)
-    schema = edn_format.loads(args.schema.read(), write_ply_tables=False)
+    schema = duckdb.read_csv(args.schema, header=True)
+    stattypes = dict(duckdb.sql("SELECT column_name, column_cgpm_statistical_type FROM schema").fetchall())
     mapping_table = edn_format.loads(args.mapping_table.read(), write_ply_tables=False)
 
     def n_categories(column):
         return len(mapping_table[column])
 
     def distarg(column):
-        return {"k": n_categories(column)} if schema[column] == "categorical" else None
+        return {"k": n_categories(column)} if stattypes[column] == "categorical" else None
 
-    cctypes = [schema[column] for column in df.columns]
+    cctypes = [stattypes[column] for column in df.columns]
     distargs = [distarg(column) for column in df.columns]
 
     if args.metadata is not None:

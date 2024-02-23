@@ -9,7 +9,6 @@
             [clojure.string :as string]
             [inferenceql.structure-learning.csv :as iql.csv]
             [inferenceql.structure-learning.dvc :as dvc]
-            [inferenceql.structure-learning.schema :as schema]
             [inferenceql.inference.gpm :as gpm]
             [inferenceql.query.db :as db]
             [inferenceql.query.io :as query.io]
@@ -25,45 +24,6 @@
     (->> (conj (map nullify-row rows)
                headers)
          (csv/write-csv *out*))))
-
-(defn guess-schema
-  [_]
-  (let [params (dvc/yaml)
-        params-schema (:schema params)
-        default-stattype (get params :default-stat-type  :ignore)
-        guessed-schema (->> (csv/read-csv *in*)
-                            (sequence (comp (iql.csv/as-maps)
-                                            (map #(medley/remove-vals (every-pred string? string/blank?) %))
-                                            (map #(medley/remove-keys (set (keys params-schema)) %))))
-                            (iql.csv/heuristic-coerce-all)
-                            (schema/guess default-stattype))
-        schema (merge guessed-schema params-schema)]
-    (assert (not (every? #{:ignore} (vals schema)))
-            "The statistical types of the columns in data.csv can't be guessed confidently.\nAll columns are ignored. Set statistical types manually in params.yaml to fix this")
-    (schema/print-ignored schema)
-    (prn schema)))
-
-(defn loom-schema
-  [_]
-  (-> (edn/read *in*)
-      (schema/loom)
-      (json/generate-stream *out*)))
-
-(defn cgpm-schema
-  [_]
-  (-> (edn/read *in*)
-      (schema/cgpm)
-      (pr)))
-
-(defn ignore
-  [{:keys [schema]}]
-  (let [ignored (into #{}
-                      (comp (filter (comp #{:ignore} val))
-                            (map key))
-                      (edn/read-string (slurp schema)))
-        csv (csv/read-csv *in*)
-        ignored-csv (apply iql.csv/dissoc csv ignored)]
-    (csv/write-csv *out* ignored-csv)))
 
 (defn numericalize
   [{table-path :table schema-path :schema}]
