@@ -36,17 +36,25 @@ stages:
     outs:
       - data/nullified.csv
 
-  guess-schema:
+  summarize:
     cmd: >
-      clojure -X inferenceql.structure-learning.main/guess-schema
+      duckdb -csv :memory: "SUMMARIZE SELECT * FROM read_csv_auto('/dev/stdin', header=true)"
       < data/nullified.csv
-      > data/schema.edn
+      > data/summarized.csv
     deps:
       - data/nullified.csv
-    params:
-      - schema
     outs:
-      - data/schema.edn
+      - data/summarized.csv
+
+  guess-schema:
+    cmd: >
+      duckdb -csv :memory: "$(cat scripts/guess_schema.sql)"
+      < data/summarized.csv
+      > data/schema.csv
+    deps:
+      - data/summarized.csv
+    outs:
+      - data/schema.csv
 
   cgpm-schema:
     cmd: >
@@ -60,13 +68,12 @@ stages:
 
   ignore:
     cmd: >
-      clojure -X inferenceql.structure-learning.main/ignore
-      :schema '"data/schema.edn"'
+      ./scripts/ignore.sh
       < data/nullified.csv
       > data/ignored.csv
     deps:
       - data/nullified.csv
-      - data/schema.edn
+      - data/schema.csv
     outs:
       - data/ignored.csv
 
