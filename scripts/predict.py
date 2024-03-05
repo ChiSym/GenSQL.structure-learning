@@ -202,6 +202,9 @@ def main():
             #     LogisticRegression.predict_proba
             probabilities = ml_model.predict_proba(X_test)
             pos_label = config["positive_label"]
+            print("type(pos_label): %s" % type(pos_label))
+            print("type(classes[1]): %s" % type(ml_model.classes_[1]))
+            print(ml_model.classes_)
             j = list(ml_model.classes_).index(pos_label)
             for i in range(len(probabilities)):
                 results["predictive-probability"].append(probabilities[i][j])
