@@ -511,7 +511,6 @@ stages:
       cmd: >
         python scripts/predict.py
         --schema data/schema.edn
-        --training data/ignored.csv
         --training data/synthetic-data-iql.csv
         --test data/test/test.csv
         --output data/predictions.csv
