@@ -10,6 +10,7 @@
 .nrepl-port
 .venv/
 /.clj-kondo/.cache/
+/cljs-test-runner-out/
 /checkouts/
 /classes/
 /learning-dashboard/
