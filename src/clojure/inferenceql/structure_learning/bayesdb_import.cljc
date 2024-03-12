@@ -1,4 +1,4 @@
-(ns inferenceql.structure-learning.bayesdb-import
+(ns ^:deprecated inferenceql.structure-learning.bayesdb-import
   "Functions for importing BayesDB model dumps into InferenceQL."
   (:require [clojure.walk :as walk]
             [medley.core :as medley]
