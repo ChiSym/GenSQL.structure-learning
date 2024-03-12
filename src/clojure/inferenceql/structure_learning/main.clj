@@ -120,8 +120,8 @@
 
 (defn assemble-database
   {:org.babashka.cli
-   {:coerce {:table-name :symbol
-             :model-name :symbol
+   {:coerce {:table-name :string
+             :model-name :string
              :table-path :file
              :model-path :file}}}
   [{:keys [table-name table-path model-name model-path]}]

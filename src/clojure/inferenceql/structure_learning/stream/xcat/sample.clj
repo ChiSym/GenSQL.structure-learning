@@ -4,7 +4,7 @@
             [inferenceql.structure-learning.stream.transit :as transit]))
 
 (defn add-null-columns [row schema]
-  (let [columns (map keyword (keys schema))
+  (let [columns (map name (keys schema))
         null-kvs (zipmap columns (repeat nil))]
     (merge null-kvs row)))
 
