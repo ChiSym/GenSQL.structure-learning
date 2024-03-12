@@ -25,3 +25,6 @@ devenv.local.nix
 pom.xml
 pom.xml.asc
 sum-product-dsl/
+.lsp/.cache/
+.lsp/sqlite.*.db
+
