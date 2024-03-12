@@ -1,4 +1,4 @@
-(ns inferenceql.structure-learning.bayesdb-import-test
+(ns ^:deprecated inferenceql.structure-learning.bayesdb-import-test
   (:require [clojure.test :refer [deftest is]]
             [inferenceql.structure-learning.bayesdb-import :as bayesdb-import]
             [inferenceql.inference.gpm :as gpm]))
