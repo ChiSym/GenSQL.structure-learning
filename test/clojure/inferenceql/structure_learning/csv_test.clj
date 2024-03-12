@@ -21,7 +21,7 @@
 
 (defspec round-trip
   (let [max-cols 10
-        gen-header gen/keyword
+        gen-header gen/string-alphanumeric
         gen-value gen/small-integer]
     (prop/for-all [coll (gen/let [header-row (gen/not-empty (gen/vector-distinct gen-header {:max-elements max-cols}))
                                   rows (gen/not-empty (gen/vector (gen/vector gen-value (count header-row))))]
@@ -32,46 +32,46 @@
                        coll))))))
 
 (deftest dissoc
-  (let [csv [[:a :b :c]
+  (let [csv [["a" "b" "c"]
              [0 1 2]
              [0 1 2]
              [0 1 2]]]
     (is (= csv (csv/dissoc csv)))
-    (is (= [[:b :c]
+    (is (= [["b" "c"]
             [1 2]
             [1 2]
             [1 2]]
-           (csv/dissoc csv :a)))
-    (is (= [[:a :c]
+           (csv/dissoc csv "a")))
+    (is (= [["a" "c"]
             [0 2]
             [0 2]
             [0 2]]
-           (csv/dissoc csv :b)))
-    (is (= [[:a :b]
+           (csv/dissoc csv "b")))
+    (is (= [["a" "b"]
             [0 1]
             [0 1]
             [0 1]]
-           (csv/dissoc csv :c)))
-    (is (= [[:a]
+           (csv/dissoc csv "c")))
+    (is (= [["a"]
             [0]
             [0]
             [0]]
-           (csv/dissoc csv :b :c)))
-    (is (= [[:b]
+           (csv/dissoc csv "b" "c")))
+    (is (= [["b"]
             [1]
             [1]
             [1]]
-           (csv/dissoc csv :a :c)))
-    (is (= [[:c]
+           (csv/dissoc csv "a" "c")))
+    (is (= [["c"]
             [2]
             [2]
             [2]]
-           (csv/dissoc csv :a :b)))
+           (csv/dissoc csv "a" "b")))
     (is (= [[]
             []
             []
             []]
-           (csv/dissoc csv :a :b :c)))))
+           (csv/dissoc csv "a" "b" "c")))))
 
 (defspec numericalizer
   (prop/for-all [coll (gen/vector gen/string)]
