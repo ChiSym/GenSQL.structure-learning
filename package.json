@@ -1,9 +1,13 @@
 {
   "dependencies": {
+    "@mapbox/node-pre-gyp": "^1.0.11",
     "cli-progress": "^3.9.0",
     "inliner": "^1.13.1",
     "lodash": "^4.17.21",
     "lz-string": "1.4.4",
-    "rfc6902": "^4.0.2"
+    "node-gyp": "^10.1.0",
+    "rfc6902": "^4.0.2",
+    "vega-cli": "^5.28.0",
+    "vega-lite": "^5.17.0"
   }
 }

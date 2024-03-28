@@ -9,8 +9,7 @@
       parallel
       xsv
       duckdb
-      nodePackages.vega-lite
-      nodePackages.vega-cli
+      giflib
     ];
     python-packages = with config.languages.python.package.pkgs; [
       numpy
@@ -18,7 +17,12 @@
       scipy
       duckdb
     ];
-  in system-packages ++ python-packages;
+    linux-only-pkgs = if pkgs.stdenv.isLinux then with pkgs; [
+      libgcc
+    ] else [];
+    darwin-only-pkgs = if pkgs.stdenv.isDarwin then with pkgs; [
+    ] else [];
+  in system-packages ++ python-packages ++ linux-only-pkgs ++ darwin-only-pkgs;
 
   enterShell = ''
     pnpm install
@@ -39,6 +43,10 @@
     enable = true;
     poetry = {
       enable = true;
+      install = {
+        enable = true;
+        allExtras = true;
+      };
       activate.enable = true;
     };
   };
