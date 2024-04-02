@@ -21,10 +21,9 @@ on:
 
 jobs:
   run-tests:
-    build:
-      strategy:
-        matrix:
-          os: [macos-latest, ubuntu-latest]
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
 
@@ -35,20 +34,29 @@ jobs:
       - name: Install Nix
         uses: cachix/install-nix-action@v22
 
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+
       - name: Set up Cachix
         uses: cachix/cachix-action@v12
         with:
           name: devenv
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10.12"
+
       - name: Install devenv
         run: nix profile install tarball+https://install.devenv.sh/latest
         shell: sh
 
-      - name: Build developer environment and run checks
-        run: devenv ci
+      - name: Build developer environment
+        run: devenv shell -- echo "devenv built"
 
-      - name: Run CGPM tests
-        run: devenv shell python -m pytest --pyargs cgpm -k "not __ci_"
+          # NB. These tests are very slow, especially in Github Actions.
+          #     Seeing as they are a dependency, we will exclude them for
+          #     now.
+      # - name: Run CGPM tests
+      #   run: devenv shell -- python -m pytest --pyargs cgpm -k "not __ci_"
 
       - name: Run SPPL tests
-        run: devenv shell python -m pytest --pyargs sppl
+        run: devenv shell -- python -m pytest --pyargs sppl

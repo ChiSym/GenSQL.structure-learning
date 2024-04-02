@@ -10,8 +10,10 @@
       xsv
       duckdb
       giflib
+      libgcc
     ];
     python-packages = with config.languages.python.package.pkgs; [
+      setuptools
       numpy
       pandas
       scipy
@@ -26,6 +28,7 @@
 
   enterShell = ''
     pnpm install
+    export PYTHONPATH=$PWD/.venv/lib/python3.10/site-packages:$PYTHONPATH
     parallel () {
       command parallel --will-cite "$@";
     }
