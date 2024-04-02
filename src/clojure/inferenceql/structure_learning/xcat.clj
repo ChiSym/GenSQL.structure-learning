@@ -11,12 +11,12 @@
 (defn ^:private view-name
   "Returns a cluster name for view index n."
   [n]
-  (str "view_" n))
+  (keyword (str "view_" n)))
 
 (defn ^:private cluster-name
   "Returns a cluster name for cluster index n."
   [n]
-  (str "cluster_" n))
+  (keyword (str "cluster_" n)))
 
 (defn ^:private map-invert
   "Returns m with its vals as keys and its keys grouped into a vector as vals."
@@ -35,8 +35,9 @@
 
 (defn ^:private data
   [data-cells schema num-rows]
-  (let [headers (map name (first data-cells))
+  (let [headers (map keyword (first data-cells))
         column->f (comp {:numerical am.csv/parse-number
+                         :count am.csv/parse-number
                          :nominal am.csv/parse-str}
                         schema
                         name)
@@ -58,15 +59,16 @@
 
 (defn ^:private col-names
   [numericalized cgpm-model]
-  (mapv name (get cgpm-model :col_names (first numericalized))))
+  (mapv keyword (get cgpm-model :col_names (first numericalized))))
 
 (defn ^:private spec
   [numericalized schema cgpm-model]
   (let [columns (col-names numericalized cgpm-model)
         views (views columns cgpm-model)
         types (->> schema
-                   (medley/map-keys name)
+                   (medley/map-keys keyword)
                    (medley/map-vals {:nominal :categorical
+                                     :count :poisson
                                      :numerical :gaussian}))]
     {:views views
      :types types}))
@@ -93,7 +95,7 @@
 (defn options
   [mapping-table]
   (->> mapping-table
-       (medley/map-keys name)
+       (medley/map-keys keyword)
        (medley/map-vals #(->> % (sort-by val) (map key) (into [])))))
 
 (defn xcat-model

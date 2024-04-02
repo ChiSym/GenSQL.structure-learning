@@ -192,7 +192,7 @@ def export_primitive(output, cctype, hypers, suffstats, distargs, categorical_ma
         a = hypers["a"]
         b = hypers["b"]
         N = suffstats["N"]
-        x_sum = suffstats["x_sum"]
+        sum_x = suffstats["sum_x"]
         # Compute the distribution.
         # The implementation of Poisson.logpdf in CGPM is rather suspicious:
         # https://github.com/probcomp/cgpm/issues/251

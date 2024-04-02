@@ -68,6 +68,7 @@
   "Returns the Loom schema for an InferenceQL schema."
   [schema]
   (let [replacements {:nominal "dd" ; discrete dirichlet
+                      :count "gp" ; gamma-poisson
                       :numerical "nich"}] ; normal inverse chi squared
     (into {}
           (comp (remove (comp #{:ignore} val))
@@ -78,6 +79,7 @@
   "Returns the CGPM schema for an InferenceQL schema."
   [schema]
   (let [replacements {:nominal "categorical" ; discrete dirichlet
+                      :count "poisson"
                       :numerical "normal"}]
     (into {}
           (comp (remove (comp #{:ignore} val))
