@@ -21,10 +21,9 @@ on:
 
 jobs:
   run-tests:
-    build:
-      strategy:
-        matrix:
-          os: [macos-latest, ubuntu-latest]
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
 
@@ -44,11 +43,11 @@ jobs:
         run: nix profile install tarball+https://install.devenv.sh/latest
         shell: sh
 
-      - name: Build developer environment and run checks
-        run: devenv ci
+      - name: Build developer environment
+        run: devenv shell -- echo "devenv built"
 
       - name: Run CGPM tests
-        run: devenv shell python -m pytest --pyargs cgpm -k "not __ci_"
+        run: devenv shell -- python -m pytest --pyargs cgpm -k "not __ci_"
 
       - name: Run SPPL tests
-        run: devenv shell python -m pytest --pyargs sppl
+        run: devenv shell -- python -m pytest --pyargs sppl

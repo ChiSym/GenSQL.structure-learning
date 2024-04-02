@@ -25,8 +25,8 @@ jobs:
         run: nix profile install tarball+https://install.devenv.sh/latest
         shell: sh
 
-      - name: Build developer environment and run checks
-        run: devenv ci
+      - name: Build developer environment
+        run: devenv shell -- echo "devenv built"
 
       - name: Lint files
-        run: devenv shell clj-kondo --lint deps.edn src bin test --config '{:output {:pattern "::{{level}} file={{filename}},line={{row}},col={{col}}::{{message}}"}}'
+        run: devenv shell -- clj-kondo --lint deps.edn src bin test --config '{:output {:pattern "::{{level}} file={{filename}},line={{row}},col={{col}}::{{message}}"}}'
