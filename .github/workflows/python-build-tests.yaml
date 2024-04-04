@@ -23,7 +23,10 @@ jobs:
   run-tests:
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest]
+        # n.b. github actions macos runners are currently
+        # not supporting python 3.10.12. If we upgrade python
+        # we can resume these tests on mac, if we want to.
+        os: [ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
 
@@ -51,12 +54,6 @@ jobs:
 
       - name: Build developer environment
         run: devenv shell -- echo "devenv built"
-
-          # NB. These tests are very slow, especially in Github Actions.
-          #     Seeing as they are a dependency, we will exclude them for
-          #     now.
-      # - name: Run CGPM tests
-      #   run: devenv shell -- python -m pytest --pyargs cgpm -k "not __ci_"
 
       - name: Run SPPL tests
         run: devenv shell -- python -m pytest --pyargs sppl
