@@ -17,6 +17,7 @@
       pandas
       scipy
       duckdb
+      statsmodels
     ];
   in system-packages ++ python-packages;
 
