@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Vega-Lite Plot with Inlined Data</title>
+  <script src="https://cdn.jsdelivr.net/npm/vega@5.20.2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.1.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.18.2"></script>
+</head>
+<body>
+  <div id="vis"></div>
+
+  <script>
+    const spec = {
+      "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+      "data": {
+        "values": {{DATA}}
+      },
+    "width": 400,
+    "height": 400,
+    "layer": [
+        {
+          "mark": "line",
+          "encoding": {
+            "x": {
+              "field": "index",
+              "type": "ordinal"
+            },
+            "y": {
+              "field": "tvd",
+              "type": "quantitative"
+            }
+          },
+          "mark": {
+            "type": "line",
+            "strokeDash": [5,5]  // Specifies the dash pattern as an array [dash length, gap length]
+          }
+        },
+        {
+          "mark": "point",
+          "encoding": {
+            "x": {
+              "field": "index",
+              "type": "ordinal",
+              "axis": {
+                "title": "Pairs of columns (ordered from best fit to worst)",
+                "labels": false  // Disables x-axis tick labels
+              }
+            },
+            "y": {
+              "field": "tvd",
+              "type": "quantitative",
+              "axis": {
+                "title": "Total variation distance"
+              }
+            },
+        "tooltip": [
+          {"field": "column-1", "type": "nominal", "title": "Column 1"},
+          {"field": "column-2", "type": "nominal", "title": "Column 2"}
+        ]
+          }
+        }
+      ]
+    };
+
+    vegaEmbed('#vis', spec, {
+      actions: false,
+      renderer: 'canvas'
+    });
+  </script>
+</body>
+</html>
