@@ -18,7 +18,9 @@
 /loom
 /node_modules/
 /out/
-/qc/
+/qc/app/
+/qc/samples/
+/qc/specs/
 /target/
 catboost_info/
 devenv.local.nix
