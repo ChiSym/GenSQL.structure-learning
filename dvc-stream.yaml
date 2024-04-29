@@ -8,7 +8,7 @@ stages:
 
   nullify:
     cmd: >
-      clojure -X inferenceql.structure-learning.main/nullify
+      clojure -X gensql.structure-learning.main/nullify
       < data/validated.csv
       > data/nullified.csv
     deps:
@@ -20,7 +20,7 @@ stages:
 
   guess-schema:
     cmd: >
-      clojure -X inferenceql.structure-learning.main/guess-schema
+      clojure -X gensql.structure-learning.main/guess-schema
       < data/nullified.csv
       > data/schema.edn
     deps:
@@ -32,7 +32,7 @@ stages:
 
   cgpm-schema:
     cmd: >
-      clojure -X inferenceql.structure-learning.main/cgpm-schema
+      clojure -X gensql.structure-learning.main/cgpm-schema
       < data/schema.edn
       > data/cgpm-schema.edn
     deps:
@@ -42,7 +42,7 @@ stages:
 
   ignore:
     cmd: >
-      clojure -X inferenceql.structure-learning.main/ignore
+      clojure -X gensql.structure-learning.main/ignore
       :schema '"data/schema.edn"'
       < data/nullified.csv
       > data/ignored.csv
@@ -54,7 +54,7 @@ stages:
 
   numericalize:
     cmd: >
-      clojure -X inferenceql.structure-learning.main/numericalize
+      clojure -X gensql.structure-learning.main/numericalize
       :schema '"data/schema.edn"'
       :table data/mapping-table.edn
       < data/ignored.csv
@@ -170,7 +170,7 @@ stages:
       This reduces the binary dep-prob values in the previous stage into values ranging [0,1] by
       averaging across all crosscat models at each iteration (cgpm-model checkpoint).
     cmd: >-
-      clojure -X inferenceql.structure-learning.stream.dep-prob/reduce
+      clojure -X gensql.structure-learning.stream.dep-prob/reduce
       :dep-prob data/cgpm/dep-prob/transitions-merged-not-reduced.json
       > data/cgpm/dep-prob/transitions-merged.json
     deps:
@@ -188,7 +188,7 @@ stages:
       - mkdir -p data/xcat/transitions
       - >-
         parallel ${parallel.flags}
-        'clojure -X inferenceql.structure-learning.stream.xcat/transitions-import
+        'clojure -X gensql.structure-learning.stream.xcat/transitions-import
         :transitions-path {1}
         :data-csv data/ignored.csv
         :mapping-table data/mapping-table.edn
@@ -203,7 +203,7 @@ stages:
       - data/ignored.csv
       - data/numericalized.csv
       - data/schema.edn
-      - src/inferenceql/structure_learning/xcat.clj
+      - src/gensql/structure_learning/xcat.clj
     outs:
       - data/xcat/transitions
 
@@ -220,7 +220,7 @@ stages:
       the paths that are produced from the command. Instead it will be passed as text to Clojure.
     cmd:
       - >-
-        clojure -X inferenceql.structure-learning.stream.xcat/transitions-merge
+        clojure -X gensql.structure-learning.stream.xcat/transitions-merge
         :transitions-paths '"'"$(find data/xcat/transitions -type f | sort)"'"'
         > data/xcat/transitions-merged.json
     deps:
@@ -234,7 +234,7 @@ stages:
       produced using a model chosen randomly from the ensemble. The collection of samples produced
       is a transit-encoded string of a clojure collection.
     cmd: >-
-      clojure -X inferenceql.structure-learning.stream.xcat/transitions-sample
+      clojure -X gensql.structure-learning.stream.xcat/transitions-sample
       :schema-edn data/schema.edn
       :transitions-merged data/xcat/transitions-merged.json
       > data/xcat/transitions-samples.json
@@ -270,7 +270,7 @@ stages:
       - mkdir -p data/mmix/transitions
       - >-
         parallel ${parallel.flags}
-        'clojure -X inferenceql.structure-learning.stream.mmix/transitions-import
+        'clojure -X gensql.structure-learning.stream.mmix/transitions-import
         :transitions-path {1}
         > data/mmix/transitions/{2}'
         :::: <(find data/xcat/transitions -type f | sort)
@@ -288,7 +288,7 @@ stages:
       - mkdir -p data/jsprogram/transitions
       - >-
         parallel ${parallel.flags}
-        'clojure -X inferenceql.structure-learning.stream.jsmodel.import/transitions-import
+        'clojure -X gensql.structure-learning.stream.jsmodel.import/transitions-import
         :transitions-path {1}
         > data/jsprogram/transitions/{2}'
         :::: <(find data/mmix/transitions -type f | sort)
@@ -304,7 +304,7 @@ stages:
       each iteration in the sequences of programs produced for each crosscat sample.
     cmd:
       - >-
-        clojure -X inferenceql.structure-learning.stream.jsmodel.import/transitions-merge
+        clojure -X gensql.structure-learning.stream.jsmodel.import/transitions-merge
         :transitions-paths '"'"$(find data/jsprogram/transitions -type f | sort)"'"'
         > data/jsprogram/transitions-merged.json
     deps:
@@ -334,7 +334,7 @@ stages:
       over as a temp-resource for iql.viz.stream.
     cmd:
       - >-
-        clojure -X inferenceql.structure-learning.stream.xcat/transitions-shorten-ensemble
+        clojure -X gensql.structure-learning.stream.xcat/transitions-shorten-ensemble
         :transitions-merged data/xcat/transitions-merged.json
         > learning-dashboard/source/temp-resources/transitions.json
     deps:
@@ -347,7 +347,7 @@ stages:
     desc: "Creates a config.edn file for the iql.viz.stream app."
     cmd:
       - >-
-        clojure -X inferenceql.structure-learning.stream.config/generate
+        clojure -X gensql.structure-learning.stream.config/generate
         :config learning-dashboard/source/resources/config-template.edn
         :mapping-table data/mapping-table.edn
         :transitions-merged data/xcat/transitions-merged.json

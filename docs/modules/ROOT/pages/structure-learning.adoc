@@ -3,7 +3,7 @@ Ulli Schaechtle <u.schaechtle@gmail.com>
 
 == Overview
 
-This guide will help you use the IQL structure-learning project to build your own models on tabular data. Once built, these models can be queried using a variety of interfaces. This guide starts with building a model from an example dataset. It then shows you how to build a model from a dataset you supply. And latter sections go into more detail about different backends for structure-learning and a number of other considerations.
+This guide will help you use the GenSQL structure-learning project to build your own models on tabular data. Once built, these models can be queried using a variety of interfaces. This guide starts with building a model from an example dataset. It then shows you how to build a model from a dataset you supply. And latter sections go into more detail about different backends for structure-learning and a number of other considerations.
 
 == Installation
 
@@ -36,7 +36,7 @@ Then,
 Install from git
 [source,bash]
 ----
-git clone git@github.com:InferenceQL/inferenceql.structure-learning.git
+git clone git@github.com:OpenGen/GenSQL.structure-learning.git
 ----
 
 === Start the devenv shell
@@ -44,7 +44,7 @@ git clone git@github.com:InferenceQL/inferenceql.structure-learning.git
 To install modeling capabilities, go to the structure-learning directory:
 [source,bash]
 ----
-cd InferenceQL
+cd GenSQL
 ----
 and enter a development shell that includes all the dependencies by running:
 [source,bash]
@@ -71,11 +71,11 @@ cp test/satellites/data.csv data/data.csv
 
 === Run the structure-learning pipeline
 
-IQL structure-learning is built around DVC (https://dvc.org/), a project that helps with version control of machine learning pipelines.
+GenSQL structure-learning is built around DVC (https://dvc.org/), a project that helps with version control of machine learning pipelines.
 
 The steps for building a model are encoded as dvc pipelines (see `dvc.yaml`) All we have to do is run the pipeline and dvc takes care of the rest.
 
-From the root structure-learning directory (`InferenceQL`), we can run the following command to get a list of the pipeline stages and which files they will produce giving us an overview of the work that will be done to build the model.
+From the root structure-learning directory (`GenSQL`), we can run the following command to get a list of the pipeline stages and which files they will produce giving us an overview of the work that will be done to build the model.
 [source,bash]
 ----
 dvc stage list
@@ -107,7 +107,7 @@ NOTE: The plots support a number of features including panning, zooming, cross-s
 
 == Querying the model
 There are different ways to query automatically built models from Python, Clojure and JavaScript.
-Checkout the https://github.com/InferenceQL/inferenceql.query[inferenceQL.query repository] about how to query models and data.
+Checkout the https://github.com/OpenGen/GenSQL.query[GenSQL.query repository] about how to query models and data.
 
 == Configuring the pipeline
 
@@ -143,10 +143,10 @@ See the comments in the `qc` section of the `params.yaml` file for details on th
 
 Sharing models works via https://dvc.org/doc/command-reference/remote#description[DVC remotes].
 Remotes can be configured by editing the
-https://github.com/InferenceQL/inferenceql.structure-learning/blob/main/.dvc/config[.dvc/config file].
+https://github.com/OpenGen/GenSQL.structure-learning/blob/main/.dvc/config[.dvc/config file].
 
-Users need to change the s3 bucket and sub-address in https://github.com/InferenceQL/inferenceql.structure-learning/blob/main/.dvc/config#L5[this line]
-to a bucket and directory that they have access to. Reach out to the team to get access to the buckets managed by the IQL team.
+Users need to change the s3 bucket and sub-address in https://github.com/OpenGen/GenSQL.structure-learning/blob/main/.dvc/config#L5[this line]
+to a bucket and directory that they have access to. Reach out to the team to get access to the buckets managed by the GenSQL team.
 
 Once this is done, the process consists of pushing changes to GitHub and the remote:
 
@@ -170,9 +170,9 @@ WARNING: Never push to the main branch on GitHub.
 
 == Reporting a bug or a problem
 
-Bugs can be reported via our https://github.com/InferenceQL/inferenceql.structure-learning/issues[issue tracker].
+Bugs can be reported via our https://github.com/OpenGen/GenSQL.structure-learning/issues[issue tracker].
 With Bayesian structure learning, bugs and problems can occur only when working with a specific model, schema, or dataset.
-To ensure the IQL team can help you, please share a minimal version of our data and pipeline with us.
+To ensure the GenSQL team can help you, please share a minimal version of our data and pipeline with us.
 
 === Report problems with models when the DVC pipeline runs end-to-end
 
@@ -184,10 +184,10 @@ model behavior, please refer to the section about <<sharing>> above. Add a short
 If the DVC pipeline crashes when you run `dvc repro`, follow a four-step procedure.
 
 First, create the  smallest possible configuration of the pipeline:
-- Setting the https://github.com/InferenceQL/inferenceql.structure-learning/blob/main/params.yaml#L3[sample_count] to 1.
-- Set https://github.com/InferenceQL/inferenceql.structure-learning/blob/main/params.yaml#L30[Loom inference steps] to 1.
-- Set https://github.com/InferenceQL/inferenceql.structure-learning/blob/main/params.yaml#L32-L33[Python inference steps] to 1.
-- Sub-sample maximally 1000 rows by setting https://github.com/InferenceQL/inferenceql.structure-learning/blob/main/params.yaml#L11[N here]
+- Setting the https://github.com/OpenGen/GenSQL.structure-learning/blob/main/params.yaml#L3[sample_count] to 1.
+- Set https://github.com/OpenGen/GenSQL.structure-learning/blob/main/params.yaml#L30[Loom inference steps] to 1.
+- Set https://github.com/OpenGen/GenSQL.structure-learning/blob/main/params.yaml#L32-L33[Python inference steps] to 1.
+- Sub-sample maximally 1000 rows by setting https://github.com/OpenGen/GenSQL.structure-learning/blob/main/params.yaml#L11[N here]
 
 Second, create the smallest possible version of the data used for modeling that does  *not* crash.
 To do this, edit the schema to ignore columns until the pipeline runs end-to-end with `dvc repro` by setting `column_foo: ignore`, `column_bar: ignore` etc.
@@ -198,11 +198,11 @@ Ensure you don't have any remaining local changes in git (run `git status`).
 Finally, make the minimal changes needed to reproduce the crash.
 Record the changes you made into a text file. Run `git diff > change.txt`.
 Commit the new file `change.txt` with git and push it to your branch.
-If you provide the name of your branch the IQL team can run `git apply change.txt` to reproduce the crash.
+If you provide the name of your branch the GenSQL team can run `git apply change.txt` to reproduce the crash.
 
 == Model-building backends
 
-IQL structure-learning supports a number of model-building backends. The previous sections on model building used the default CGPM backend. We will provide some more background on the CGPM backend here and also provide information on using alternatives.
+GenSQL structure-learning supports a number of model-building backends. The previous sections on model building used the default CGPM backend. We will provide some more background on the CGPM backend here and also provide information on using alternatives.
 
 === Switching between backends
 
@@ -229,18 +229,18 @@ The key artifacts produced are as follows.
 
 ===== Individual CrossCat models
 
-In `data/xcat/`, you can find multiple CrossCat models. Each one is a `.edn` file named `sample.0.edn`, `sample.1.edn`, etc. Any one of these individual CrossCat models can be used in an Observable notebook or in the IQL Viz spreadsheet app.
+In `data/xcat/`, you can find multiple CrossCat models. Each one is a `.edn` file named `sample.0.edn`, `sample.1.edn`, etc. Any one of these individual CrossCat models can be used in an Observable notebook or in the GenSQL Viz spreadsheet app.
 
 ===== Ensemble of CrossCat models
 
-`data/sppl/merged.json` is a sum-product network representation of all of the individual CrossCat models merged together forming an ensemble. This file can be used by IQL Query to start an IQL query server. The query server can then respond to sum-product queries from both an Observable notebook and the IQL Viz spreadsheet app. This is covered in a latter section.
+`data/sppl/merged.json` is a sum-product network representation of all of the individual CrossCat models merged together forming an ensemble. This file can be used by GenSQL Query to start an GenSQL query server. The query server can then respond to sum-product queries from both an Observable notebook and the GenSQL Viz spreadsheet app. This is covered in a latter section.
 
 ===== Gen.clj models
 
 Users can generate parametric https://github.com/probcomp/Gen.clj[Gen.clj] versions of the CrossCat models on the fly to test or edit. After a model was built and the DVC pipeline ran through, you can type the following and go to http://localhost:3000/[localhost:3000] in a web browser.
 [source,bash]
 ----
-clojure -X  inferenceql.auto-modeling.code.webapp/start
+clojure -X  gensql.structure-learning.code.webapp/start
 ----
 
 === Loom and CGPM

@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "inferenceql-structure-learning"
+name = "gensql-structure-learning"
 version = "0.1.0"
 description = ""
 authors = ["Zane Shelby <poetry@zane.io>"]

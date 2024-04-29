@@ -3,7 +3,7 @@ Ulli Schaechtle <u.schaechtle@gmail.com>
 
 == Overview
 
-This is a quickstart guide to help you use the IQL structure-learning project to build your own
+This is a quickstart guide to help you use the GenSQL structure-learning project to build your own
 models on tabular data and query them. This guide starts with building a model from an example dataset.
 
 == Installation
@@ -37,7 +37,7 @@ Then,
 Install from git
 [source,bash]
 ----
-git clone git@github.com:InferenceQL/inferenceql.structure-learning.git InferenceQL
+git clone git@github.com:OpenGen/GenSQL.structure-learning.git GenSQL
 ----
 
 === Start the Nix shell
@@ -45,7 +45,7 @@ git clone git@github.com:InferenceQL/inferenceql.structure-learning.git Inferenc
 To install modeling capabilities, go to the structure-learning directory:
 [source,bash]
 ----
-cd InferenceQL
+cd GenSQL
 ----
 and enter a development shell that includes all the dependencies by running:
 [source,bash]
@@ -82,5 +82,5 @@ If not, see the section below on editing the schema generation.
 == Querying the model
 There are different ways to query automatically built models from Python,
 Clojure and JavaScript.
-Checkout the https://github.com/InferenceQL/inferenceql.query[inferenceQL.query repository]
+Checkout the https://github.com/OpenGen/GenSQL.query[GenSQL.query repository]
 about how to query models and data.

@@ -3,14 +3,14 @@
 # This script for produces a zip-archive of the structure-learning repo including
 # documentation
 script_base_dir=$(basename -- "$PWD")
-# This script should be run from the inferenceql.structure-learning root directory.
+# This script should be run from the gensql.structure-learning root directory.
 # Not from inside the bin/ directory or elsewhere.
-if [ "$script_base_dir" != "inferenceql.structure-learning" ]; then
-    echo "Script must be run from the inferenceql.structure-learning/ directory."
+if [ "$script_base_dir" != "gensql.structure-learning" ]; then
+    echo "Script must be run from the gensql.structure-learning/ directory."
     exit 1
 fi
 
-package_dir='../InferenceQL/'
+package_dir='../GenSQL/'
 
 rm -rf ${package_dir}
 mkdir -p ${package_dir}
@@ -27,5 +27,5 @@ cp -r ../openiql.github.io/build/site/* documentation/
 pwd
 cd ..
 
-zip -r InferenceQL.v0.02.zip InferenceQL
-rm -rf InferenceQL
+zip -r GenSQL.v0.02.zip GenSQL
+rm -rf GenSQL
