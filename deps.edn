@@ -5,9 +5,9 @@
         cljstache/cljstache {:mvn/version "2.0.6"}
         com.cognitect/transit-clj {:mvn/version "1.0.324"}
         com.github.haifengl/smile-core {:mvn/version "3.0.1"}
-        io.github.inferenceql/inferenceql.gpm.sppl {:git/sha "52f8316e094b3644709dccde8f0a935f9b55f187"}
-        io.github.inferenceql/inferenceql.inference {:git/sha "40e77dedf680b7936ce988b66186a86f5c4db6a5"}
-        io.github.inferenceql/inferenceql.query {:git/sha "933a1d1b620bb227ddcf6f649187c8759b46ac27"}
+        io.github.OpenGen/GenSQL.gpm.sppl {:git/sha "718de40878766bb8d08acc2b429a76ed662a1352"}
+        io.github.OpenGen/GenSQL.inference {:git/sha "689fe740dead93f3ba349a88efa52f2544aa138b"}
+        io.github.OpenGen/GenSQL.query {:git/sha "32adb67ff07c1bba67255384adbe30d80d4e0f9f"}
         lambdaisland/regal {:mvn/version "0.0.143"}
         medley/medley {:mvn/version "1.4.0"}
         org.babashka/cli {:mvn/version "0.3.34"}
