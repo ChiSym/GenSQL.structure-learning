@@ -435,7 +435,7 @@ stages:
     cmd: >
       clj -X inferenceql.structure-learning.clojurecat/merge
       :models data/xcat/complete
-      :out data/xcat/xcat.merged.edn
+      > data/xcat/xcat.merged.edn
     deps:
       - data/xcat/complete
     outs:
