@@ -9,19 +9,26 @@
       parallel
       xsv
       duckdb
-      nodePackages.vega-lite
-      nodePackages.vega-cli
+      giflib
+      libgcc
     ];
     python-packages = with config.languages.python.package.pkgs; [
+      setuptools
       numpy
       pandas
       scipy
       duckdb
     ];
-  in system-packages ++ python-packages;
+    linux-only-pkgs = if pkgs.stdenv.isLinux then with pkgs; [
+      libgcc
+    ] else [];
+    darwin-only-pkgs = if pkgs.stdenv.isDarwin then with pkgs; [
+    ] else [];
+  in system-packages ++ python-packages ++ linux-only-pkgs ++ darwin-only-pkgs;
 
   enterShell = ''
     pnpm install
+    export PYTHONPATH=$PWD/.venv/lib/python3.10/site-packages:$PYTHONPATH
     parallel () {
       command parallel --will-cite "$@";
     }
@@ -39,6 +46,10 @@
     enable = true;
     poetry = {
       enable = true;
+      install = {
+        enable = true;
+        allExtras = true;
+      };
       activate.enable = true;
     };
   };

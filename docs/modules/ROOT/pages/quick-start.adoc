@@ -14,8 +14,9 @@ We rely on the Devenv package manager. Devenv takes care of all our dependencies
 
 IMPORTANT: Updates to MacOS are known to cause issues with the Nix package manager that powers Devenv.
 
-- Mac users need to first install the Nix package manager with https://determinate.systems/posts/determinate-nix-installer[this installer].  Then they need to execute step 3 and only step 3 https://devenv.sh/getting-started/[here], i.e. `nix-env -if https://install.devenv.sh/latest`.
-- Ubuntu users can find instructions to install Devenv https://devenv.sh/getting-started/[here].
+- Follow [this guide](https://devenv.sh/getting-started) steps 1 and 2 to install nix and devenv.
+
+The minimum devenv  version is `1.0.0`.
 
 Further, we require docker to be installed and to be runnable without `sudo`.
 Installation instructions for Mac or Ubuntu are
