@@ -29,6 +29,8 @@ def impute_missing_features(train_dataset, test_dataset, schema):
             replacements[c] = train_dataset[c].median()
         elif schema[c] == "nominal":
             replacements[c] = train_dataset[c].mode()[0]
+        elif schema[c] == "count":
+            replacements[c] = int(train_dataset[c].median())
         else:
             raise ValueError(error_message_stat_type(schema[c]))
     train_dataset = train_dataset.fillna(replacements)
@@ -62,7 +64,7 @@ def recode_categoricals(train_dataset, test_dataset, schema, target):
     )
     # Add new cols to df
     col_names = [
-        c for c in train_dataset.columns if (schema[c] == "numerical") and (c != target)
+        c for c in train_dataset.columns if (schema[c] not in ["nominal", "ignored"] ) and (c != target)
     ]
     for i in range(X_transformed.shape[1]):
         col_name = f"c_{i}"
