@@ -3,6 +3,7 @@ from distributions.io.stream import (
 from loom.cFormat import assignment_stream_load
 from loom.util import get_message, protobuf_to_dict
 from parsable import parsable
+import errno
 import json
 import os
 
@@ -10,7 +11,15 @@ import os
 def loom_to_json(filename):
     ''' Convert a loom file to a json file. '''
     name = filename.split("/")[-1].split(".")[0]
-    output_filename = "/".join(filename.split("/")[:-1]) + "/{}.json".format(name)
+    output_dir = "/".join(filename.split("/")[:-1]) 
+    output_dir = output_dir.replace("/samples", "/samples_json")
+    output_filename = output_dir + "/{}.json".format(name)
+
+    try:
+        os.makedirs(output_dir)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
 
     parts = os.path.basename(filename).split('.')
     if parts[-1] in ['gz', 'bz2']:
