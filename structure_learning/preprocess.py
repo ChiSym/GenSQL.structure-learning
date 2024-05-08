@@ -8,9 +8,9 @@ from structurelearningapi.column_model import create_column_model
 @click.command()
 @click.option('--data', help='Path to the data file')
 @click.option('--sql', default="SELECT * FROM data", help='SQL query for preprocessing')
-@click.option('--output', help='Path to the output file')
+@click.option('--n_test', type=click.INT, help='Number of test examples')
 @click.option('--column_model_output', help='Path to the column models output file')
-def preprocess(data, sql, output, column_model_output):
+def preprocess(data, sql, n_test, column_model_output):
     data = pl.read_csv(data, infer_schema_length=None)
 
     preprocessed = duckdb.sql(sql).pl()
@@ -20,7 +20,14 @@ def preprocess(data, sql, output, column_model_output):
     with open(column_model_output, 'wb') as f:
         f.write(orjson.dumps(model, option=orjson.OPT_INDENT_2))
 
-    preprocessed.write_csv(output)
+    preprocessed = preprocessed.sample(fraction=1, shuffle=True)
+    test, train = preprocessed.head(n_test), preprocessed.tail(-n_test)
+
+    train.write_csv("data/train.csv")
+    test.write_csv("data/test.csv")
+
+    train.write_parquet("data/train.parquet")
+    test.write_parquet("data/test.parquet")
 
 @click.command()
 @click.option('--column_models', help='Path to the column models file.')

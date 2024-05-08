@@ -10,7 +10,7 @@ from structurelearningapi.io import deserialize_column_models, serialize
 
 @click.command()
 @click.option("--loom_folder")
-@click.option("--data_filename", default="data/preprocessed.csv")
+@click.option("--data_filename", default="data/train.parquet")
 @click.option("--column_model_filename", default="data/column_models.json")
 @click.option("--out_filename", default="data/cgpm/hydrated/sample.0.json")
 def loom_to_cgpm(loom_folder, data_filename, column_model_filename, out_filename):
@@ -32,13 +32,7 @@ def loom_to_cgpm(loom_folder, data_filename, column_model_filename, out_filename
         column_models = orjson.loads(f.read())
         column_models = deserialize_column_models(column_models)
 
-    df = pl.read_csv(
-        data_filename, 
-        dtypes={
-            cm.name: pl.Utf8 if cm.distribution == "categorical" else pl.Float64
-            for cm in column_models
-        }
-    )
+    df = pl.read_parquet(data_filename)
 
     kinds = model_metadata["kinds"]
 

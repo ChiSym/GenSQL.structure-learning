@@ -24,11 +24,8 @@ import click
 @click.option('--model_filename', help='Model filename')
 @click.option('--result_filename', help='Result filename')
 def prediction(data, formula, model_filename, column_model_filename, result_filename):
-    with open(column_model_filename, "rb") as f:
-        column_models = orjson.loads(f.read())
-        column_models = deserialize_column_models(column_models)
-
-    df = read_csv(data, column_models)
+    df = read_csv(data)
+    column_models = deserialize_column_models(column_models)
     
     model = spe_from_dict(json.load(open(model_filename, "r")))
 

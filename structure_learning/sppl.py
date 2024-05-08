@@ -15,20 +15,12 @@ from structurelearningapi.sppl import sppl
 @click.option('--output', help='Path to the output file')
 def cgpm_to_sppl(model_dir, output, data):
     sample_filenames = os.listdir(model_dir)
-    n_models = len(sample_filenames)
 
     metadatas = [deserialize(
             os.path.join(model_dir, sample_filename))
         for sample_filename in sample_filenames]
-    column_models = metadatas[0].column_models
 
-    df = pl.read_csv(
-        data, 
-        dtypes={
-            cm.name: pl.Utf8 if cm.distribution == "categorical" else pl.Float64
-            for cm in column_models
-        }
-    )
+    df = pl.read_parquet(data)
 
     wrappers = [
         wrapper(metadata, df)

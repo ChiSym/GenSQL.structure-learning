@@ -15,6 +15,7 @@ def save_dependence_probability(model_dir, out_file):
 
     df = dependence_probability(models)
     sorted_cols = reorder(df)
+    import ipdb; ipdb.set_trace()
 
     with open("resources/dependence_probability_template.json", "r") as f:
         template = f.read()

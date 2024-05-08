@@ -15,27 +15,18 @@ model_to_class = {
 
 @click.command()
 @click.option('--data', help='Path to the data file')
-@click.option('--column_models', help='Path to the column models file')
 @click.option('--model', help='Name of the model to be evaluated')
-def train_baseline(data, column_models, model):
-    with open(column_models, "rb") as f:
-        column_models = orjson.loads(f.read())
-
-    df = pl.read_csv(
-        data,
-        dtypes={
-            cm["name"]: pl.Utf8 
-                if cm["distribution"] == "categorical" 
-                else pl.Float64
-            for cm in column_models
-        }
-    ).to_pandas()
+def train_baseline(data, model):
+    df = pl.read_parquet(data).to_pandas()
+    for col in df.columns:
+        if df[col].dtype == "category":
+            df[col] = df[col].astype(str)
 
     metadata = SingleTableMetadata()
     metadata.detect_from_dataframe(df)
 
     model_class = model_to_class[model]
-    synthesizer = model_class(metadata, verbose=True, epochs=100)
+    synthesizer = model_class(metadata, epochs=100)
 
     synthesizer.fit(df)
 
