@@ -3,38 +3,270 @@ Ulli Schaechtle <u.schaechtle@gmail.com>
 
 == Overview
 
-This is a quickstart guide to help you use the GenSQL structure-learning project to build your own
-models on tabular data and query them. This guide starts with building a model from an example dataset.
+This is a quickstart guide to help novice users to use the GenSQL structure-learning codebase to build their own
+models on tabular data and show how they can join these models with a large
+population model (LPM). A large population model is new class of foundational
+model aimed to generate data about people.
+
+The first step to get started is installing our software.
 
 include::installation.adoc[]
 
-=== Running structure-learning
-Add a csv file:
-[source,bash]
+== Process
+
+Structure learning for multivariate, heterogeneously-typed data is hard! The
+following describes a supportable process with guardrails. The process enables novice
+users use GenSQL.structure-learning and contribute to the LPM.
+There are a total of 8 steps. After each step, an artifact is shared with the GenSQL team. This ensures any problems that may occur are reproducible by the GenSQL team so that they can be maximally helpful.
+
+
+=== 1. Prepare a CSV file and document it
+
+Add your CSV file as `data/data.csv`.
+
+==== Document your CSV file
+Before we begin the modeling, we create a text file and a CSV file which
+describes our data. These two files are sent to the GenSQL team for review.
+
+This helps the GenSQL team support the users and ensures the data is suitable to be
+joined into the LPM.
+
+This file records answers to the following checklist:
+
 ----
-cp ~/foo/mydat.csv data/data.csv
+Describe the rows. In my CSV file `data/data.csv`, rows correspond to
+    [ ] people
+    [ ] geographic districts
+    [ ] click events
+    [ ] purchase events
+    [ ] transaction events
+    [ ] something else (if so, what?)
+
+List the 10 most important columns below
+    - ...
+    [insert list here - use best guess; skip if your CSV has less than 10 columns]
+
+List the 30 most important columns below
+    - ...
+    [insert list here - use best guess; skip if your CSV has less than 30 columns]
+
+Which column could be described as "outcome" in the experimental sense?
+
+    [insert column name here - use best guess]
+
+Which columns predict this outcome?
+    - ...
+    [insert list here - use best guess]
 ----
-Modify the `params.yaml` file as needed. And build default models:
+
+Add another CSV file recording the schema of your data, i.e. a table with five columns, where each row correpsonds to a column:
+
+. Name of column (without special characters)
+. Short description (one or two sentences)
+. Statistical type of the column: `numerical`, `nominal`, `count`. These types
+are like data types but describe the underlying probability distribution (see
+figure 1 https://papers.nips.cc/paper_files/paper/2016/file/46072631582fc240dd2674a7d063b040-Paper.pdf[here]). For index columns and other columns you want to keep around but don't want to model, write `ignore`.
+. Count of missing values
+. Count of unique values
+
+==== When is this step complete?
+
+Submit the checklist and the CSV file recording your schema to a member of the
+GenSQL team. When they approve, you can move on to the next step.
+
+=== 2. Build the first, small model
+
+==== Create a small subset
+
+First, create a version of your CSV file with ten columns only. Use the ten most important columns as per your answer above.
+
+==== Configure the pipeline
+
+Then open the file `params.yaml`. Ensure the fields specified are set as follows (leave the rest as-is):
+
+[source, yaml]
+----
+sample_count: 10
+sub_sample:
+  N: 1000
+nullify: # IF NEEDED
+  # Entries added here will be treated as null. For example, to treat "NaN" and
+  # "missing" as null uncomment the following two lines:
+  # - NaN
+  # - missing
+schema:
+  # Key/value pairs can be added here to explicitly override the inferred schema
+  # for each column. The available types are as follows: numerical, nominal, and ignore.
+  # For example, to force the "age" column to be treated as a
+  # numerical uncomment the following line:
+  foo: numerical
+  bar: nominal
+  baz: ignore
+loom:
+  extra_passes: 100
+cgpm:
+  minutes: 2
+----
+
+Explicitly write out all columns in the above instead of `foo`, `bar` and `baz`.
+For a detailed explanation of how you can configure `params.yaml`, see the
+section link:structure-learning.html#pipeline-config[Configuring the pipeline]
+in main documentation.
+
+==== Build a model!
+
+Now run the complete structure learning pipeline
 [source,bash]
 ----
 dvc repro
 ----
 
-TIP: Check the automatically generated data schema in `data/schema.edn`. Does it look correct?
-If not, see the section below on editing the schema generation.
+TIP: Check the automatically generated data schema in `data/schema.edn`. Do the
+statistical types match your intuition about the data? If not, is it a bug
+in the configuration of the pipeline or is the raw data different than imagined in
+some way?
 
-Go to `qc/app/qc-dashboard.html` and open it with a web browser to check the quality.
 
-You can improve the default models by further editing the `params.yaml` file.
-See our xref:structure-learning::structure-learning.adoc[section on automated data
-modeling].
+Go to the file `qc/app/qc-dashboard.html` and open it with a web browser to get a first
+sense of model quality. Does the synthetic data generated by the model (orange)
+look similar to the training data (black)?
 
-TIP: Add columns you are particularly interested in to the `columns` section for quality control (see commented out example in the `params.yaml` file). That way, you can ensure that the model captures exactly what you care about.
+==== Now share the model
 
-If not, see the section below on editing the schema generation.
+Go to our link:structure-learning.html#sharing[documentation for sharing models
+and data] and share the result with a member of the GenSQL team.
 
-== Querying the model
-There are different ways to query automatically built models from Python,
-Clojure and JavaScript.
-Checkout the https://github.com/OpenGen/GenSQL.query[GenSQL.query repository]
-about how to query models and data.
+==== When is this step complete?
+
+A member of the GenSQL team will run `dvc pull` and check your result for any errors that are non-trivial to identify for novice users. When they approve, you can move on to the next step.
+
+=== 3. Run baselines
+
+Assessing the quality of heterogeneously-typed multivariate models is an open research problem. In order to quantitatively assess the quality nevertheless, we compare our quality with relevant baselines from the Synthetic Data Vault.
+
+Users need to install the software from the https://pypi.org/project/sdv/[Synthetic Data Vault]. Run the following script
+to produce synthetic data from a copula model and a GAN:
+
+[source, python]
+----
+import pandas as pd
+
+from sdv.metadata import SingleTableMetadata
+from sdv.single_table import GaussianCopulaSynthesizer
+from sdv.single_table import CTGANSynthesizer
+
+df = pd.read_csv("data/ignored.csv")
+
+metadata = SingleTableMetadata()
+metadata.detect_from_dataframe(data=df)
+
+gan = CTGANSynthesizer(metadata)
+gan.fit(df)
+gan_df = gan.sample(len(df))
+gan_df.to_csv("data/synthetic-data-gan.csv", index=False)
+
+copula = GaussianCopulaSynthesizer(metadata)
+copula.fit(df)
+cop_df = copula.sample(len(df))
+cop_df.to_csv("data/synthetic-data-copula.csv", index=False)
+----
+
+==== Assess "fidelity"
+
+Fidelity describes how well the synthetic data produced by a model matches the
+training data.
+
+Use link:https://github.com/InferenceQL/lpm.fidelity[this library] to assess
+how the different GenSQL's synthetic data (saved in `data/synthetic-data-gensql.csv`)
+is from the training data by running
+
+[source, bash]
+----
+nix run github:InferenceQL/lpm.fidelity -- --data-1 data/ignored.csv --data-2 data/synthetic-data-gensql.csv --bivariate >> fidelity-gensql.csv
+----
+
+Repeat this for the baselines you just generated.
+
+[source, bash]
+----
+nix run github:InferenceQL/lpm.fidelity -- --data-1 data/ignored.csv --data-2 data/synthetic-data-gan.csv --bivariate >> fidelity-gan.csv
+----
+
+[source, bash]
+----
+nix run github:InferenceQL/lpm.fidelity -- --data-1 data/ignored.csv --data-2 data/synthetic-data-copula.csv --bivariate >> fidelity-copula.csv
+----
+
+Plot the results you get in the three fidelity-*.csv files in one plot that you save in `data/fidelity.png`
+
+Add the result of this effort with dvc.
+
+[source, bash]
+----
+dvc add data/fidelity.png
+dvc push
+----
+
+NOTE: There is ongoing work to automate this. See
+https://github.com/OpenGen/GenSQL.structure-learning/pull/189[this PR] for an
+example interactive version of this type of plot (only showing GenSQL synthetic data vs real data, no baselines).
+
+==== When is this step complete?
+
+A member from the GenSQL will run `dvc pull` and inspect `data/fidelity.png`.  When we beat the baselines, we can move to the next step.
+
+=== 4. Grow the model
+
+Set
+https://github.com/OpenGen/GenSQL.structure-learning/blob/main/params.yaml#L10[this line] in `params.yaml` to 10000 and https://github.com/OpenGen/GenSQL.structure-learning/blob/main/params.yaml#L32[this line]
+to 10 minutes.
+----
+dvc repro
+----
+
+Checkout `qc/app/qc-dashboard.html`. Does it look good?
+
+Repeat step 3! How does `data/fidelity.png` look like?
+
+Share the model and `data/fidelity.png` with us as described above.
+
+
+==== When is this step complete?
+
+A member from the GenSQL will run `dvc pull` and inspect `data/fidelity.png`.  When we beat the baselines, we can move to the next step.
+
+=== 5. Grow the model again
+
+Change your CSV file to include the 30 most important columns instead of ten.
+Set
+https://github.com/OpenGen/GenSQL.structure-learning/blob/main/params.yaml#L32[this line]
+to 60 minutes.
+----
+dvc repro
+----
+
+As before, checkout `qc/app/qc-dashboard.html`. Does it look good?
+
+Repeat step 3! How does `data/fidelity.png` look like?
+
+Share the model and `data/fidelity.png` with us as described above.
+
+==== When is this step complete?
+
+A member from the GenSQL will run `dvc pull` and inspect `data/fidelity.png`.  When we beat the baselines, we can move to the next step.
+
+=== 6. Model the full dataset
+
+Repeat the process for the full dataset and share the model and `data/fidelity.png` with us as described above.
+
+==== When is this step complete?
+
+A member from the GenSQL will run `dvc pull` and inspect `data/fidelity.png`.  When we beat the baselines, we can move to the next step.
+
+=== 7. Smoke test a generative join
+
+TBD
+
+=== 8. Plot the result a generative join
+
+TBD
