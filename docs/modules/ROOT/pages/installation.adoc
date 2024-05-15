@@ -4,9 +4,9 @@
 
 We rely on the Devenv package manager. Devenv takes care of all our dependencies; currently confirmed to be working on Ubuntu and Mac.
 
-IMPORTANT: Updates to MacOS are known to cause issues with the Nix package manager that powers Devenv.
+- On Ubuntu, follow steps 1 and 2 in https://devenv.sh/getting-started[this guide] to install nix and devenv.
+- On MacOS, install Nix as described https://determinate.systems/posts/determinate-nix-installer[here] and follow step 2 in https://devenv.sh/getting-started[this guide] to install nix and devenv.
 
-- Follow [this guide](https://devenv.sh/getting-started) steps 1 and 2 to install nix and devenv.
 
 The minimum devenv  version is `1.0.0`.
 
@@ -16,10 +16,10 @@ https://docs.docker.com/engine/install/[here].
 
 Then,
 
-* if on linux, run postinstall script: https://docs.docker.com/engine/install/linux-postinstall/
+* if on Linux, run postinstall script: https://docs.docker.com/engine/install/linux-postinstall/
 * login using credentials sufficient for probcomp’s Docker org:
- ** if on linux run `docker login`
- ** if on mac, open the Docker app GUI and log in with credentials
+ ** if on Linux run `docker login`
+ ** if on Mac, open the Docker app GUI and log in with credentials
 * Pull the Loom Docker image:
  ** Confirm you have access to view https://hub.docker.com/r/probcomp/inferenceql.loom
  ** Run `docker pull probcomp/inferenceql.loom`
