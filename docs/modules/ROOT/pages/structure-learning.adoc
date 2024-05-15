@@ -5,54 +5,7 @@ Ulli Schaechtle <u.schaechtle@gmail.com>
 
 This guide will help you use the GenSQL structure-learning project to build your own models on tabular data. Once built, these models can be queried using a variety of interfaces. This guide starts with building a model from an example dataset. It then shows you how to build a model from a dataset you supply. And latter sections go into more detail about different backends for structure-learning and a number of other considerations.
 
-== Installation
-
-=== Dependencies
-
-We rely on the Devenv package manager. Devenv takes care of all our dependencies; currently confirmed to be working on Ubuntu and Mac.
-
-IMPORTANT: Updates to MacOS are known to cause issues with the Nix package manager that powers Devenv.
-
-- Follow [this guide](https://devenv.sh/getting-started) steps 1 and 2 to install nix and devenv.
-
-The minimum devenv  version is `1.0.0`.
-
-Further, we require docker to be installed and to be runnable without `sudo`.
-Installation instructions for Mac or Ubuntu are
-https://docs.docker.com/engine/install/[here].
-
-Then,
-
-* if on linux, run postinstall script: https://docs.docker.com/engine/install/linux-postinstall/
-* login using credentials sufficient for probcomp’s Docker org:
- ** if on linux run `docker login`
- ** if on mac, open the Docker app GUI and log in with credentials
-* Pull the Loom Docker image:
- ** Confirm you have access to view https://hub.docker.com/r/probcomp/inferenceql.loom
- ** Run `docker pull probcomp/inferenceql.loom`
-
-=== Download structure-learning
-
-Install from git
-[source,bash]
-----
-git clone git@github.com:OpenGen/GenSQL.structure-learning.git
-----
-
-=== Start the devenv shell
-
-To install modeling capabilities, go to the structure-learning directory:
-[source,bash]
-----
-cd GenSQL
-----
-and enter a development shell that includes all the dependencies by running:
-[source,bash]
-----
-devenv shell
-----
-WARNING: on macOS, this step can take up to an hour. The reason is that certain dependencies get compiled from scratch. It will only be slow once. The second time you run the `devenv shell` command, it will succeed instantaneously.
-
+include::installation.adoc[]
 
 == Building your first model
 
