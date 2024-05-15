@@ -62,7 +62,8 @@ NOTE: The plots support a number of features including panning, zooming, cross-s
 There are different ways to query automatically built models from Python, Clojure and JavaScript.
 Checkout the https://github.com/OpenGen/GenSQL.query[GenSQL.query repository] about how to query models and data.
 
-== Configuring the pipeline
+
+== Configuring the pipeline [[pipeline-config]]
 
 === Data specifications/settings
 
