@@ -549,43 +549,51 @@ stages:
       - data/db.edn
 
   qc-discretize:
-    cmd: >
-      mkdir -p data/discretized/ &&
-      nix develop github:InferenceQL/lpm.discretize  -c
-      python scripts/discretize.py
-      --real data/ignored.csv
-      --synthetic data/synthetic-data-iql.csv
-      --schema data/loom-schema.json
-      --real-disc data/discretized/ignored.csv
-      --synthetic-disc data/discretized/synthetic-data-iql.csv
-    deps:
-      - scripts/discretize.py
-      - data/ignored.csv
-      - data/synthetic-data-iql.csv
-      - data/loom-schema.json
-    outs:
-      - data/discretized/ignored.csv
-      - data/discretized/synthetic-data-iql.csv
+    foreach: ${synthetic_data_evaluation.datasets}
+    do:
+      cmd: >
+        mkdir -p data/discretized/ &&
+        nix develop github:InferenceQL/lpm.discretize  -c
+        python scripts/discretize.py
+        --real data/ignored.csv
+        --synthetic data/${item}
+        --schema data/loom-schema.json
+        --real-disc data/discretized/ignored.csv
+        --synthetic-disc data/discretized/${item}
+      deps:
+        - scripts/discretize.py
+        - data/ignored.csv
+        - data/${item}
+        - data/loom-schema.json
+      outs:
+        - data/discretized/${item}
 
   qc-fidelity-table:
-    cmd: >
-      nix run github:InferenceQL/lpm.fidelity --
-      --data-1 data/discretized/ignored.csv
-      --data-2 data/discretized/synthetic-data-iql.csv
-      --bivariate
-      > data/fidelity.csv
-    deps:
-      - data/discretized/ignored.csv
-      - data/discretized/synthetic-data-iql.csv
-    outs:
-      - data/fidelity.csv
+    foreach: ${synthetic_data_evaluation.datasets}
+    do:
+      cmd: >
+        mkdir -p data/fidelity/ &&
+        nix run github:InferenceQL/lpm.fidelity --
+        --data-1 data/discretized/ignored.csv
+        --data-2 data/discretized/${item}
+        --bivariate
+        > data/fidelity/${item}
+      deps:
+        - data/discretized/ignored.csv
+        - data/discretized/${item}
+      outs:
+        - data/fidelity/${item}
 
   qc-fidelity-json:
     cmd: >
-      python -c "import pandas as pd; df=pd.read_csv('data/fidelity.csv'); df['index'] = range(len(df)); print(df.to_json(orient='records'))"
-      > data/fidelity.json
+      python scripts/fidelity2json.py
+      --params params.yaml
+      >> data/fidelity.json
+    params:
+      - synthetic_data_evaluation.datasets
     deps:
-      - data/fidelity.csv
+      - scripts/fidelity2json.py
+      - data/fidelity/
     outs:
       - data/fidelity.json
 
