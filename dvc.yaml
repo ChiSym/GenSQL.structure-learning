@@ -548,16 +548,35 @@ stages:
     outs:
       - data/db.edn
 
+  qc-discretize:
+    cmd: >
+      mkdir -p data/discretized/ &&
+      nix develop github:InferenceQL/lpm.discretize  -c
+      python scripts/discretize.py
+      --real data/ignored.csv
+      --synthetic data/synthetic-data-iql.csv
+      --schema data/loom-schema.json
+      --real-disc data/discretized/ignored.csv
+      --synthetic-disc data/discretized/synthetic-data-iql.csv
+    deps:
+      - scripts/discretize.py
+      - data/ignored.csv
+      - data/synthetic-data-iql.csv
+      - data/loom-schema.json
+    outs:
+      - data/discretized/ignored.csv
+      - data/discretized/synthetic-data-iql.csv
+
   qc-fidelity-table:
     cmd: >
       nix run github:InferenceQL/lpm.fidelity --
-      --data-1 data/ignored.csv
-      --data-2 data/synthetic-data-iql.csv
+      --data-1 data/discretized/ignored.csv
+      --data-2 data/discretized/synthetic-data-iql.csv
       --bivariate
       > data/fidelity.csv
     deps:
-      - data/ignored.csv
-      - data/synthetic-data-iql.csv
+      - data/discretized/ignored.csv
+      - data/discretized/synthetic-data-iql.csv
     outs:
       - data/fidelity.csv
 
