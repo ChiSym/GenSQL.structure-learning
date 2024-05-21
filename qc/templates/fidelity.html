@@ -15,11 +15,14 @@
       "data": {
         "values": {{DATA}}
       },
-    "width": 400,
-    "height": 400,
-    "layer": [
+      "width": 400,
+      "height": 400,
+      "layer": [
         {
-          "mark": "line",
+          "mark": {
+            "type": "line",
+            "strokeDash": [5,5]  // Specifies the dash pattern as an array [dash length, gap length]
+          },
           "encoding": {
             "x": {
               "field": "index",
@@ -28,11 +31,11 @@
             "y": {
               "field": "tvd",
               "type": "quantitative"
+            },
+            "color": {
+              "field": "model",
+              "type": "nominal"
             }
-          },
-          "mark": {
-            "type": "line",
-            "strokeDash": [5,5]  // Specifies the dash pattern as an array [dash length, gap length]
           }
         },
         {
@@ -43,7 +46,7 @@
               "type": "ordinal",
               "axis": {
                 "title": "Pairs of columns (ordered from best fit to worst)",
-                "labels": false  // Disables x-axis tick labels
+                "labels": false // Disables x-axis tick labels
               }
             },
             "y": {
@@ -53,10 +56,14 @@
                 "title": "Total variation distance"
               }
             },
-        "tooltip": [
-          {"field": "column-1", "type": "nominal", "title": "Column 1"},
-          {"field": "column-2", "type": "nominal", "title": "Column 2"}
-        ]
+            "color": {
+              "field": "model",
+              "type": "nominal"
+            },
+            "tooltip": [
+              {"field": "column-1", "type": "nominal", "title": "Column 1"},
+              {"field": "column-2", "type": "nominal", "title": "Column 2"}
+            ]
           }
         }
       ]
