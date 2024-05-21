@@ -42,3 +42,4 @@
 /db.edn
 /fidelity.csv
 /fidelity.json
+/synthetic-data-gensql.csv
