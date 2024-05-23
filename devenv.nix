@@ -23,6 +23,10 @@
       libgcc
     ] else [];
     darwin-only-pkgs = if pkgs.stdenv.isDarwin then with pkgs; [
+      pixman
+      cairo
+      pango
+      darwin.apple_sdk.frameworks.CoreText
     ] else [];
   in system-packages ++ python-packages ++ linux-only-pkgs ++ darwin-only-pkgs;
 
