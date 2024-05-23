@@ -10,7 +10,6 @@
       xsv
       duckdb
       giflib
-      libgcc
     ];
     python-packages = with config.languages.python.package.pkgs; [
       setuptools
