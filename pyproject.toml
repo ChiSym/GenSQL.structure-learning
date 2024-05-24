@@ -7,7 +7,7 @@ license = "Apache-2.0"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "3.10.12"
+python = "^3.10.12"
 cgpm = {git = "https://github.com/probcomp/cgpm", branch = "zane/hardcode-version"}
 dvc = "^3.13.3"
 sppl = {git = "https://github.com/probsys/sppl"}

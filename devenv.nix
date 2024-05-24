@@ -1,29 +1,37 @@
 { pkgs, config, ... }:
 
+let
+  inherit (pkgs) lib;
+in
 {
   # https://devenv.sh/packages/
   packages = let
-    system-packages = with pkgs; [
+    system-packages = (with pkgs; [
       awscli2
       clj-kondo
       parallel
       xsv
       duckdb
       giflib
-      libgcc
-    ];
-    python-packages = with config.languages.python.package.pkgs; [
+      cairo
+      pango
+    ]);
+
+    python-packages = (with config.languages.python.package.pkgs; [
       setuptools
       numpy
       pandas
       scipy
       duckdb
-    ];
-    linux-only-pkgs = if pkgs.stdenv.isLinux then with pkgs; [
+    ]);
+
+    linux-only-pkgs = lib.optionals pkgs.stdenv.isLinux (with pkgs; [
       libgcc
-    ] else [];
-    darwin-only-pkgs = if pkgs.stdenv.isDarwin then with pkgs; [
-    ] else [];
+    ]);
+
+    darwin-only-pkgs = lib.optionals pkgs.stdenv.isDarwin (with pkgs; [
+      darwin.apple_sdk.frameworks.CoreText
+    ]);
   in system-packages ++ python-packages ++ linux-only-pkgs ++ darwin-only-pkgs;
 
   enterShell = ''
