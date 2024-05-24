@@ -3,13 +3,16 @@
 
   inputs = {
     nixpkgs.url = "github:cachix/devenv-nixpkgs/rolling";
-    nixpkgs-python.url = "github:cachix/nixpkgs-python";
+    #nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    #nixpkgs-python.url = "github:cachix/nixpkgs-python";
+
     systems.url = "github:nix-systems/default";
+
     devenv.url = "github:cachix/devenv";
-    poetry2nix = {
-      url = "github:nix-community/poetry2nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    devenv.inputs.nixpkgs.follows = "nixpkgs";
+
+    poetry2nix.url = "github:nix-community/poetry2nix";
+    poetry2nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   nixConfig = {

@@ -2,6 +2,12 @@
 
 let
   inherit (pkgs) lib;
+
+  python = pkgs.python310.override {
+    packageOverrides = final: prev: {
+      psycopg2cffi = null;
+    };
+  };
 in
 {
   # https://devenv.sh/packages/
@@ -52,6 +58,7 @@ in
 
   languages.python = {
     enable = true;
+    package = python;
     poetry = {
       enable = true;
       install = {
