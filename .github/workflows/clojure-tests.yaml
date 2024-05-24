@@ -21,15 +21,11 @@ jobs:
         with:
           name: devenv
 
-      - name: Install devenv
-        run: nix profile install tarball+https://install.devenv.sh/latest
-        shell: sh
-
       - name: Build developer environment
-        run: devenv shell -- echo "devenv built"
+        run: env-run echo "Devshell built"
 
       - name: Run Clojure tests
-        run: devenv shell -- clojure -X:test:clj-test
+        run: env-run clojure -X:test:clj-test
 
       - name: Run ClojureScript tests
-        run: devenv shell -- clojure -M:test:cljs-test
+        run: env-run clojure -M:test:cljs-test

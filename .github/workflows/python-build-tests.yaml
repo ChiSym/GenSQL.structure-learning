@@ -4,18 +4,16 @@ on:
   push:
     paths:
       - '.github/workflows/python-build-tests.yaml'
-      - 'devenv.lock'
-      - 'devenv.nix'
-      - 'devenv.yaml'
+      - 'flake.nix'
+      - 'devshell.nix'
       - 'pyproject.toml'
       - 'requirements.txt'
 
   pull_request:
     paths:
       - '.github/workflows/python-build-tests.yaml'
-      - 'devenv.lock'
-      - 'devenv.nix'
-      - 'devenv.yaml'
+      - 'flake.nix'
+      - 'devshell.nix'
       - 'pyproject.toml'
       - 'requirements.txt'
 
@@ -44,16 +42,8 @@ jobs:
         with:
           name: devenv
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.10.12"
-
-      - name: Install devenv
-        run: nix profile install tarball+https://install.devenv.sh/latest
-        shell: sh
-
       - name: Build developer environment
-        run: devenv shell -- echo "devenv built"
+        run: env-run echo "Devshell built"
 
       - name: Run SPPL tests
-        run: devenv shell -- python -m pytest --pyargs sppl
+        run: env-run python -m pytest --pyargs sppl
