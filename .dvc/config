@@ -1,5 +1,6 @@
 [core]
     analytics = false
     remote = default-s3-remote
+    site_cache_dir = .dvc/cache
 ['remote "default-s3-remote"']
     url = s3://lpm-research/default
