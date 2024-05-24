@@ -3,11 +3,7 @@
 let
   inherit (pkgs) lib;
 
-  python = pkgs.python310.override {
-    packageOverrides = final: prev: {
-      psycopg2cffi = null;
-    };
-  };
+  python = pkgs.python310;
 in
 {
   # https://devenv.sh/packages/
@@ -28,7 +24,6 @@ in
       numpy
       pandas
       scipy
-      duckdb
     ]);
 
     linux-only-pkgs = lib.optionals pkgs.stdenv.isLinux (with pkgs; [
