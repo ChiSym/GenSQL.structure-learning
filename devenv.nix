@@ -11,7 +11,9 @@ in
     system-packages = (with pkgs; [
       awscli2
       clj-kondo
-      parallel
+      (writeScriptBin "parallel" ''
+        ${lib.getExe parallel} --will-cite "$@"
+      '')
       xsv
       duckdb
       giflib
