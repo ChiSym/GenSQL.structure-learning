@@ -573,7 +573,9 @@ stages:
     do:
       cmd: >
         mkdir -p data/fidelity/ &&
-        nix run github:InferenceQL/lpm.fidelity --
+        # XXX. this is incredibly ugly but if I don't run `nix develop...` first
+        # then `nix run ...` will not find scipy.
+        nix develop github:InferenceQL/lpm.fidelity -c nix run github:InferenceQL/lpm.fidelity --
         --data-1 data/discretized/ignored.csv
         --data-2 data/discretized/${item}
         --bivariate
