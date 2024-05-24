@@ -20,16 +20,8 @@ jobs:
         with:
           name: devenv
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.10.12"
-
-      - name: Install devenv
-        run: nix profile install tarball+https://install.devenv.sh/latest
-        shell: sh
-
       - name: Build developer environment
-        run: devenv shell -- echo "devenv built"
+        run: env-run echo "Devshell built"
 
       - name: Run Python tests
-        run: devenv shell -- python -m pytest test/scripts
+        run: env-run python -m pytest test/scripts
