@@ -21,10 +21,7 @@ jobs:
   run-tests:
     strategy:
       matrix:
-        # n.b. github actions macos runners are currently
-        # not supporting python 3.10.12. If we upgrade python
-        # we can resume these tests on mac, if we want to.
-        os: [ubuntu-latest]
+        os: [ ubuntu-latest, macos-latest ]
 
     runs-on: ${{ matrix.os }}
 
