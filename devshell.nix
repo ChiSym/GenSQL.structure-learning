@@ -29,6 +29,11 @@
 
       python
       poetry
+
+      cairo
+      pango
+
+      pkg-config
     ]);
 
     linux-only-pkgs = lib.optionals pkgs.stdenv.isLinux (with pkgs; [
