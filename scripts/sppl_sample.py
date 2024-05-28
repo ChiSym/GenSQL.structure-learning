@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import numpy as np
 import scipy.stats as stats
 import sys
 import pandas as pd
@@ -58,6 +59,8 @@ def main():
     args = parser.parse_args()
     spe_dict = json.load(args.model)
     spe = spe_to_dict.spe_from_dict(spe_dict)
+    spe = spe.condition(Identity("age") >= 18)
+    spe = spe.condition(Identity("total_sales") >= 0)
 
     data = pd.read_csv(args.data)
     row_count = len(data)
@@ -65,6 +68,9 @@ def main():
     sample_count = args.sample_count or row_count
     columns = [Identity(c) for c in data.columns]
     samples = generate(spe, sample_count, columns)
+    def toint(v):
+        return int(np.round(v))
+    samples.age = samples.age.apply(toint)
     samples.to_csv(args.output, index=False)
 
 

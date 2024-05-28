@@ -1,5 +1,5 @@
-seed: 0
-sample_count: 3
+seed: 42
+sample_count: 10
 sub_sample:
   #according_to_columns:
   #  Class_of_Orbit:
@@ -7,7 +7,7 @@ sub_sample:
   #    - GEO
   #  Users:
   #    - Commercial
-  N: 1000
+  N: 10000
 parallel:
   # To limit the number of jobs GNU Parallel spawns use add the flag `--jobs n`.
   flags: >-
@@ -22,14 +22,14 @@ schema:
   # for each column. The available types are as follows: numerical, nominal, and ignore.
   # For example, to force the "age" column to be treated as a
   # numerical uncomment the following line:
-  # age: numerical
-  # Apogee_km: numerical
-  # Perigee_km: numerical
+  customer_id: ignore
+  age: numerical
+  total_sales: numerical
 loom:
   extra_passes: 1
 cgpm:
   iterations: 1
-  minutes: 1
+  minutes: 5
   #dependence:
   #  # While the CrossCat implementation in CGPM takes dependence constraints, doing so
   #  # throws a not-implemented-error. Hence, we apply a workaround:

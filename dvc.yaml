@@ -94,74 +94,25 @@ stages:
     outs:
       - data/loom-schema.json
 
-  loom-ingest:
-    cmd: ./bin/loom_task ingest loom data/loom-schema.json data/numericalized.csv
-    deps:
-      - data/loom-schema.json
-      - data/numericalized.csv
-    outs:
-      - loom/ingest
-      - loom/query
-
-  loom-infer-config:
+  cgpm-generate-metadata:
     cmd: >
-      clojure -X gensql.structure-learning.main/infer-config
-      < params.yaml
-      > data/infer-config.json
-    params:
-      - loom.extra_passes
-      - seed
-    outs:
-      - data/infer-config.json
-
-  loom-infer:
-    cmd: ./bin/loom_task infer loom ${sample_count} data/infer-config.json
-    deps:
-      - loom/ingest
-      - loom/query
-      - data/infer-config.json
-    params:
-      - sample_count
-    outs:
-      - loom/samples
-
-  loom-dump-metadata:
-    cmd: >
-      mkdir -p data/cgpm/raw &&
-      find loom/samples -mindepth 1 -maxdepth 1 -type d |
-      parallel ${parallel.flags}
-      ./bin/loom python scripts/loom_dump.py {}
-      --output data/cgpm/raw/{/}.json
-    params:
-      - parallel.flags
-    deps:
-      - loom/samples
-      - scripts/loom_dump.py
-    outs:
-      - data/cgpm/raw
-
-  cgpm-hydrate-metadata:
-    cmd: >
-      find data/cgpm/raw -type f |
-      parallel jsonschema --instance {} schemas/cgpm.json &&
       mkdir -p data/cgpm/hydrated &&
       rm -f data/cgpm/inf.log &&
-      find data/cgpm/raw -type f |
-      sort |
+      seq 0 $((${sample_count} - 1)) |
       parallel ${parallel.flags}
       'python scripts/cgpm_hydrate.py
-      --metadata {}
-      --output data/cgpm/hydrated/{/}
+      --output data/cgpm/hydrated/sample.{}.json
       --data data/numericalized.csv
+      --model DPMM
       --schema data/cgpm-schema.edn
       --mapping-table data/mapping-table.edn
       --seed $((${seed} + {#} - 1))'
     params:
       - parallel.flags
+      - sample_count
       - seed
     deps:
       - data/cgpm-schema.edn
-      - data/cgpm/raw
       - data/mapping-table.edn
       - data/numericalized.csv
       - schemas/cgpm.json
@@ -179,11 +130,9 @@ stages:
       sort |
       parallel ${parallel.flags}
       'python scripts/cgpm_infer.py {}
-      --kernel alpha
       --kernel view_alphas
       --kernel column_hypers
       --kernel rows
-      --kernel columns
       --output data/cgpm/complete/{/}
       --data data/numericalized.csv
       --params params.yaml
@@ -201,6 +150,7 @@ stages:
       - data/numericalized.csv
     outs:
       - data/cgpm/complete
+
 
   save-dependencies:
     cmd: >
@@ -573,8 +523,6 @@ stages:
     do:
       cmd: >
         mkdir -p data/fidelity/ &&
-        # XXX. this is incredibly ugly but if I don't run `nix develop...` first
-        # then `nix run ...` will not find scipy.
         nix develop github:InferenceQL/lpm.fidelity -c nix run github:InferenceQL/lpm.fidelity --
         --data-1 data/discretized/ignored.csv
         --data-2 data/discretized/${item}

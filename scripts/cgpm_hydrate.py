@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+import numpy as np
 import cgpm.utils.general as general
 import edn_format
 import json
@@ -89,6 +90,19 @@ def main():
         state = State.from_metadata(metadata, rng=rng)
     else:
         state = State(**metadata, rng=rng)
+
+    n_clusters = len(set([state.views[0].Zr(i) for i in range(len(df))]))
+    max_number_init_clusters = 50
+    if n_clusters > 10:
+        np.random.seed(args.seed)
+        base_metadata["Zrv"] = {0: np.random.randint(0,max_number_init_clusters,size=len(df)).tolist()}
+        metadata = {**base_metadata, **additional_metadata}
+        rng = general.gen_rng(args.seed)
+
+        if args.metadata is not None:
+            state = State.from_metadata(metadata, rng=rng)
+        else:
+            state = State(**metadata, rng=rng)
 
     json.dump(state.to_metadata(), args.output)
 
