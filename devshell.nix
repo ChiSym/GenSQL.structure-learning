@@ -69,7 +69,9 @@
 
         pnpm install
 
-        poetry config virtualenvs.path $(pwd)/.venv
+        poetry config virtualenvs.path --unset
+        poetry config virtualenvs.in-project true
+
         poetry env use ${python}/bin/python
 
         # We need to set PYTHON_KEYRING_BACKEND to use the null backend as
@@ -78,6 +80,9 @@
         PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring \
         poetry install --no-root
         export PATH="$(poetry env info -p)/bin:$PWD/bin:$PATH"
+
+        venvSitePackages="$(python -c 'import sys; print(sys.path.pop())')"
+        export PYTHONPATH="$venvSitePackages:$PWD/bin:$PYTHONPATH"
         
         mkdir -p .dvc/cache
         dvc cache dir .dvc/cache
