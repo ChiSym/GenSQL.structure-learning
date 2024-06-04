@@ -17,6 +17,8 @@
     '');
 
     system-packages = (with pkgs; [
+      nix
+
       awscli2
       parallel
       xsv
@@ -34,12 +36,16 @@
       pango
 
       pkg-config
+
+      inputs'.lpm-fidelity.packages.default
+      inputs'.lpm-discretize.packages.default
     ]);
 
     linux-only-pkgs = lib.optionals pkgs.stdenv.isLinux (with pkgs; [
-      libgcc
-      libz
+      gcc.cc.libgcc
+      zlib
       stdenv.cc.cc
+      libcxx
     ]);
 
     darwin-only-pkgs = lib.optionals pkgs.stdenv.isDarwin (with pkgs; [
