@@ -25,19 +25,19 @@ jobs:
 
       - name: Install commitlint
         run: |
-          env-run pnpm install --frozen-lockfile
+          ./bin/env-run pnpm install --frozen-lockfile
 
       - name: Print versions
         run: |
-          env-run 'git --version &&
+          ./bin/env-run 'git --version &&
             node --version &&
             pnpm --version &&
             pnpm exec commitlint --version'
 
       - name: Validate current commit (last commit) with commitlint
         if: github.event_name == 'push'
-        run: env-run pnpm exec commitlint --last --verbose
+        run: ./bin/env-run pnpm exec commitlint --last --verbose
 
       - name: Validate PR commits with commitlint
         if: github.event_name == 'pull_request'
-        run: env-run pnpm exec commitlint --from ${{ github.event.pull_request.head.sha }}~${{ github.event.pull_request.commits }} --to ${{ github.event.pull_request.head.sha }} --verbose
+        run: ./bin/env-run pnpm exec commitlint --from ${{ github.event.pull_request.head.sha }}~${{ github.event.pull_request.commits }} --to ${{ github.event.pull_request.head.sha }} --verbose

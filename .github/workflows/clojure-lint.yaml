@@ -22,7 +22,7 @@ jobs:
           name: devenv
 
       - name: Build developer environment
-        run: env-run echo "Devshell built"
+        run: ./bin/env-run echo "Devshell built"
 
       - name: Lint files
-        run: env-run clj-kondo --lint deps.edn src bin test --config '{:output {:pattern "::{{level}} file={{filename}},line={{row}},col={{col}}::{{message}}"}}'
+        run: ./bin/env-run clj-kondo --lint deps.edn src bin test --config '{:output {:pattern "::{{level}} file={{filename}},line={{row}},col={{col}}::{{message}}"}}'
