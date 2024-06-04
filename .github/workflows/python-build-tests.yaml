@@ -40,7 +40,7 @@ jobs:
           name: devenv
 
       - name: Build developer environment
-        run: env-run echo "Devshell built"
+        run: ./bin/env-run echo "Devshell built"
 
       - name: Run SPPL tests
-        run: env-run python -m pytest --pyargs sppl
+        run: ./bin/env-run python -m pytest --pyargs sppl

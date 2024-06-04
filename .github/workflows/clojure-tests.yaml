@@ -22,10 +22,10 @@ jobs:
           name: devenv
 
       - name: Build developer environment
-        run: env-run echo "Devshell built"
+        run: ./bin/env-run echo "Devshell built"
 
       - name: Run Clojure tests
-        run: env-run clojure -X:test:clj-test
+        run: ./bin/env-run clojure -X:test:clj-test
 
       - name: Run ClojureScript tests
-        run: env-run clojure -M:test:cljs-test
+        run: ./bin/env-run clojure -M:test:cljs-test
