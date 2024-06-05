@@ -92,8 +92,8 @@ def main():
         state = State(**metadata, rng=rng)
 
     n_clusters = len(set([state.views[0].Zr(i) for i in range(len(df))]))
-    max_number_init_clusters = 50
-    if n_clusters > 10:
+    max_number_init_clusters = 200
+    if n_clusters > max_number_init_clusters:
         np.random.seed(args.seed)
         base_metadata["Zrv"] = {0: np.random.randint(0,max_number_init_clusters,size=len(df)).tolist()}
         metadata = {**base_metadata, **additional_metadata}
