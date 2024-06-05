@@ -598,7 +598,9 @@ stages:
 
   qc-fidelity-app:
     cmd: >
-      sed "s|{{DATA}}|$(cat data/fidelity.json)|" qc/templates/fidelity.html
+      awk 'BEGIN {data = ARGV[1]; ARGV[1] = ""; while ((getline line < data) > 0) data_str = data_str line "\n"} {gsub("{{DATA}}", data_str)} 1'
+      data/fidelity.json
+      qc/templates/fidelity.html
       > qc/app/fidelity.html
     deps:
       - data/fidelity.json
