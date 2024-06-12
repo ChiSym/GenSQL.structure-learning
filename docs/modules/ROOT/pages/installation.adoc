@@ -7,8 +7,9 @@ We rely on the Devenv package manager. Devenv takes care of all our dependencies
 - On Ubuntu, follow steps 1 and 2 in https://devenv.sh/getting-started[this guide] to install nix and devenv.
 - On MacOS, install Nix as described https://determinate.systems/posts/determinate-nix-installer[here] and follow step 2 in https://devenv.sh/getting-started[this guide] to install nix and devenv.
 
-
 The minimum devenv  version is `1.0.0`.
+
+Users need https://nixos.wiki/wiki/Flakes#Enable_flakes[enable Nix Flakes].
 
 Further, we require docker to be installed and to be runnable without `sudo`.
 Installation instructions for Mac or Ubuntu are
@@ -23,6 +24,7 @@ Then,
 * Pull the Loom Docker image:
  ** Confirm you have access to view https://hub.docker.com/r/probcomp/inferenceql.loom
  ** Run `docker pull probcomp/inferenceql.loom`
+
 
 === Download structure-learning
 
@@ -42,6 +44,6 @@ cd GenSQL.structure-learning.git
 and enter a development shell that includes all the dependencies by running:
 [source,bash]
 ----
-devenv shell
+nix develop
 ----
 WARNING: on macOS, this step can take up to an hour. The reason is that certain dependencies get compiled from scratch. It will only be slow once. The second time you run the `devenv shell` command, it will succeed instantaneously.
