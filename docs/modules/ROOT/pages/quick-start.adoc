@@ -176,40 +176,13 @@ cop_df.to_csv("data/synthetic-data-copula.csv", index=False)
 Fidelity describes how well the synthetic data produced by a model matches the
 training data.
 
-Use link:https://github.com/InferenceQL/lpm.fidelity[this library] to assess
-how the different GenSQL's synthetic data (saved in `data/synthetic-data-gensql.csv`)
-is from the training data by running
+Structure learning uses https://github.com/InferenceQL/lpm.fidelity[this library] to assess
+how accurately GenSQL's synthetic data (saved in `data/synthetic-data-gensql.csv`) matches the training data.
 
-[source, bash]
-----
-nix run github:InferenceQL/lpm.fidelity -- --data-1 data/ignored.csv --data-2 data/synthetic-data-gensql.csv --bivariate >> fidelity-gensql.csv
-----
+Uncomment https://github.com/OpenGen/GenSQL.structure-learning/blob/main/params.yaml#L74-L75[these two lines] and run `dvc repro` to include the newly added baselines.
 
-Repeat this for the baselines you just generated.
-
-[source, bash]
-----
-nix run github:InferenceQL/lpm.fidelity -- --data-1 data/ignored.csv --data-2 data/synthetic-data-gan.csv --bivariate >> fidelity-gan.csv
-----
-
-[source, bash]
-----
-nix run github:InferenceQL/lpm.fidelity -- --data-1 data/ignored.csv --data-2 data/synthetic-data-copula.csv --bivariate >> fidelity-copula.csv
-----
-
-Plot the results you get in the three fidelity-*.csv files in one plot that you save in `data/fidelity.png`
-
-Add the result of this effort with dvc.
-
-[source, bash]
-----
-dvc add data/fidelity.png
-dvc push
-----
-
-NOTE: There is ongoing work to automate this. See
-https://github.com/OpenGen/GenSQL.structure-learning/pull/189[this PR] for an
-example interactive version of this type of plot (only showing GenSQL synthetic data vs real data, no baselines).
+Then, go to the file `qc/app/fidelity.html` and open it with a web browser to
+see how well your model performs compared to your baselines.
 
 ==== When is this step complete?
 
