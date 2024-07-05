@@ -5,8 +5,8 @@ Ulli Schaechtle <u.schaechtle@gmail.com>
 
 This is a quickstart guide to help novice users to use the GenSQL structure-learning codebase to build their own
 models on tabular data and show how they can join these models with a large
-population model (LPM). A large population model is new class of foundational
-model aimed to generate data about people.
+population model (LPM). A large population model is a new class of foundational
+model aimed at generating data about people.
 
 The first step to get started is installing our software.
 
