@@ -11,7 +11,7 @@ TIP: The resolution of the recorded measurements should be adequate. For example
 
 == Data dimensions
 
-GenSQL works best if the data has between 3 and 1000 columns and between 100 and 1 million rows. It's always wise to start with smaller datasets first -- that means fewer rows but especially fewer columns and grow then grow the data. This allows for shorter debugging cycles.
+GenSQL works best if the data has between 3 and 1000 columns and between 100 and 1 million rows. It's always wise to start with smaller datasets first -- that means fewer rows but especially fewer columns and then grow the data. This allows for shorter debugging cycles.
 
 == Data types
 
