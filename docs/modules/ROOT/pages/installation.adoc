@@ -9,18 +9,18 @@ We rely on the Devenv package manager. Devenv takes care of all our dependencies
 
 The minimum devenv  version is `1.0.0`.
 
-Users need https://nixos.wiki/wiki/Flakes#Enable_flakes[enable Nix Flakes].
+Users need to https://nixos.wiki/wiki/Flakes#Enable_flakes[enable Nix Flakes].
 
 Further, we require docker to be installed and to be runnable without `sudo`.
 Installation instructions for Mac or Ubuntu are
 https://docs.docker.com/engine/install/[here].
 
-Then,
+Then:
 
-* if on Linux, run postinstall script: https://docs.docker.com/engine/install/linux-postinstall/
-* login using credentials sufficient for probcomp’s Docker org:
- ** if on Linux run `docker login`
- ** if on Mac, open the Docker app GUI and log in with credentials
+* If on Linux, run postinstall script: https://docs.docker.com/engine/install/linux-postinstall/
+* Log in using credentials sufficient for probcomp’s Docker org:
+ ** If on Linux run `docker login`
+ ** If on Mac, open the Docker app GUI and log in with credentials
 * Pull the Loom Docker image:
  ** Confirm you have access to view https://hub.docker.com/r/probcomp/inferenceql.loom
  ** Run `docker pull probcomp/inferenceql.loom`
@@ -46,4 +46,4 @@ and enter a development shell that includes all the dependencies by running:
 ----
 nix develop
 ----
-WARNING: on macOS, this step can take up to an hour. The reason is that certain dependencies get compiled from scratch. It will only be slow once. The second time you run the `devenv shell` command, it will succeed instantaneously.
+WARNING: On macOS, this step can take up to an hour. The reason is that certain dependencies get compiled from scratch. It will only be slow once. The second time you run the `devenv shell` command, it will succeed instantaneously.
