@@ -1,5 +1,5 @@
 seed: 0
-sample_count: 3
+sample_count: 10
 sub_sample:
   #according_to_columns:
   #  Class_of_Orbit:
@@ -15,18 +15,36 @@ parallel:
 nullify:
   # Entries added here will be treated as null. For example, to treat "NaN" and
   # "missing" as null uncomment the following two lines:
-  # - NaN
-  # - missing
+  - NaN
+  - missing
 schema:
   # Key/value pairs can be added here to explicitly override the inferred schema
   # for each column. The available types are as follows: numerical, nominal, and ignore.
   # For example, to force the "age" column to be treated as a
   # numerical uncomment the following line:
-  # age: numerical
-  # Apogee_km: numerical
-  # Perigee_km: numerical
+
+  # For nominal variables:
+  # (a) less than or equal to 10%
+  # (b) (10%, 20%]
+  # (c) (20%,30%]
+  # (d) (30%, 40%]
+  # (e) (40%, 50%]
+  # (f) (50%, 60%]
+  # (g) (60%, 70%]
+  # (h) (70%, 80%]
+  # (i) (80%, 90%]
+  # (j) (90%, 100%]
+  Municipality: ignore
+  Total_population__Both_sexes_: numerical
+  Taxable_income__million_yen_: numerical
+  Ordinal_Number_of_employed_persons: nominal
+  Number_of_households__Total_: numerical
+  Ordinal_Number_of_physicians: nominal
+  Number_of_dwellings_with_occupying_households: numerical
+  Ordinal_Total_population__65_and_over_: nominal
+  Number_of_elderly_nursing_facilities__Questionnaire_about_basic_matters_: numerical
 loom:
-  extra_passes: 1
+  extra_passes: 100
 cgpm:
   iterations: 1
   minutes: 1
