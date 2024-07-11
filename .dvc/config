@@ -5,4 +5,4 @@
 [cache]
     dir = cache
 ['remote "default-s3-remote"']
-    url = s3://lpm-research/default
+    url = s3://lpm-research/e-stat_japan
