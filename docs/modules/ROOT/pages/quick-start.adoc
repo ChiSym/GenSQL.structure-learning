@@ -16,13 +16,13 @@ include::installation.adoc[]
 
 Structure learning for multivariate, heterogeneously-typed data is hard! The
 following describes a supportable process with guardrails. The process enables novice
-users use GenSQL.structure-learning and contribute to the LPM.
+users to use GenSQL.structure-learning and contribute to the LPM.
 There are a total of 8 steps. After each step, an artifact is shared with the GenSQL team. This ensures any problems that may occur are reproducible by the GenSQL team so that they can be maximally helpful.
 
 
 === 1. Prepare a CSV file and document it
 
-Add your CSV file as `data/data.csv`.
+Copy your CSV files into GenSQL.structure_learning/data and rename it data.csv.
 
 ==== Document your CSV file
 Before we begin the modeling, we create a text file and a CSV file which
@@ -59,7 +59,7 @@ Which columns predict this outcome?
     [insert list here - use best guess]
 ----
 
-Add another CSV file recording the schema of your data, i.e. a table with five columns, where each row correpsonds to a column:
+Add another CSV file recording the schema of your data, i.e. a table with five columns, where each row corresponds to a column:
 
 . Name of column (without special characters)
 . Short description (one or two sentences)
@@ -74,7 +74,7 @@ figure 1 https://papers.nips.cc/paper_files/paper/2016/file/46072631582fc240dd26
 Submit the checklist and the CSV file recording your schema to a member of the
 GenSQL team. When they approve, you can move on to the next step.
 
-=== 2. Build the first, small model
+=== 2. Build the first small model
 
 ==== Create a small subset
 
@@ -82,7 +82,7 @@ First, create a version of your CSV file with ten columns only. Use the ten most
 
 ==== Configure the pipeline
 
-Then open the file `params.yaml`. Ensure the fields specified are set as follows (leave the rest as-is):
+Open the file `params.yaml`. Ensure the fields specified are set as follows (leave the rest as-is):
 
 [source, yaml]
 ----
@@ -99,29 +99,31 @@ schema:
   # for each column. The available types are as follows: numerical, nominal, and ignore.
   # For example, to force the "age" column to be treated as a
   # numerical uncomment the following line:
-  foo: numerical
-  bar: nominal
-  baz: ignore
+  # age: numerical
+  # Apogee_km: numerical
+  # Perigee_km: ignore
 loom:
   extra_passes: 100
 cgpm:
   minutes: 2
 ----
 
-Explicitly write out all columns in the above instead of `foo`, `bar` and `baz`.
+Explicitly write out all columns in the schema section instead of `age`, `Apogee_km` and `Perigee_km`.
 For a detailed explanation of how you can configure `params.yaml`, see the
 section link:structure-learning.html#pipeline-config[Configuring the pipeline]
-in main documentation.
+in the main documentation.
 
 ==== Build a model!
 
-Now run the complete structure learning pipeline
+Now run the complete structure learning pipeline:
 [source,bash]
 ----
 dvc repro
 ----
 
-TIP: Check the automatically generated data schema in `data/schema.edn`. Do the
+The output will be saved in `data/synthetic-data-gensql.csv`.
+
+TIP: Check the automatically generated data schema in `data/cgpm-schema.edn`. Do the
 statistical types match your intuition about the data? If not, is it a bug
 in the configuration of the pipeline or is the raw data different than imagined in
 some way?
@@ -142,33 +144,62 @@ A member of the GenSQL team will run `dvc pull` and check your result for any er
 
 === 3. Run baselines
 
-Assessing the quality of heterogeneously-typed multivariate models is an open research problem. In order to quantitatively assess the quality nevertheless, we compare our quality with relevant baselines from the Synthetic Data Vault.
+In order to quantitatively assess the quality, we compare our results with relevant baselines from the Synthetic Data Vault.
 
-Users need to install the software from the https://pypi.org/project/sdv/[Synthetic Data Vault]. Run the following script
-to produce synthetic data from a copula model and a GAN:
+Users need to install the software from the https://pypi.org/project/sdv/[Synthetic Data Vault]. 
+
+First, exit your nix environment by running 
+[source,bash]
+----
+exit
+----
+
+Copy the following script into a file named `sdv_generate.py` in the `GenSQL.structure_learning` directory. 
+
 
 [source, python]
 ----
 import pandas as pd
-
 from sdv.metadata import SingleTableMetadata
-from sdv.single_table import GaussianCopulaSynthesizer
-from sdv.single_table import CTGANSynthesizer
+from sdv.single_table import GaussianCopulaSynthesizer, CTGANSynthesizer
 
+# Read the data
 df = pd.read_csv("data/ignored.csv")
 
+# Detect metadata from the dataframe
 metadata = SingleTableMetadata()
 metadata.detect_from_dataframe(data=df)
 
+# Save metadata to JSON
+metadata.save_to_json("data/metadata.json")
+
+# Load metadata from JSON
+metadata = SingleTableMetadata.load_from_json("data/metadata.json")
+
+# Initialize and fit the CTGAN synthesizer
 gan = CTGANSynthesizer(metadata)
 gan.fit(df)
 gan_df = gan.sample(len(df))
 gan_df.to_csv("data/synthetic-data-gan.csv", index=False)
 
+# Initialize and fit the Gaussian Copula synthesizer
 copula = GaussianCopulaSynthesizer(metadata)
 copula.fit(df)
 cop_df = copula.sample(len(df))
 cop_df.to_csv("data/synthetic-data-copula.csv", index=False)
+----
+
+Execute it by running:
+----
+python sdv_generate.py
+----
+This will produce synthetic data from a copula model and a GAN 
+and put the output into `data/synthetic-data-gan.csv` and `data/synthetic-data-copula.csv`.
+
+When your data has been generated re-enter your nix environment by running
+[source,bash]
+----
+nix develop
 ----
 
 ==== Assess "fidelity"
@@ -176,7 +207,7 @@ cop_df.to_csv("data/synthetic-data-copula.csv", index=False)
 Fidelity describes how well the synthetic data produced by a model matches the
 training data.
 
-Structure learning uses https://github.com/InferenceQL/lpm.fidelity[this library] to assess
+Structure learning uses https://github.com/InferenceQL/lpm.fidelity[the lpm.fidelity library] to assess
 how accurately GenSQL's synthetic data (saved in `data/synthetic-data-gensql.csv`) matches the training data.
 
 Uncomment https://github.com/OpenGen/GenSQL.structure-learning/blob/main/params.yaml#L74-L75[these two lines] and run `dvc repro` to include the newly added baselines.
