@@ -1,0 +1,18 @@
+= This is a GenSQL-publish-file
+
+[gensql]
+----
+SELECT * FROM data LIMIT 10
+----
+
+== Synthetic data
+
+
+[gensql]
+----
+SELECT * FROM
+  GENERATE
+    *
+  UNDER baseline_model
+LIMIT 10
+----
