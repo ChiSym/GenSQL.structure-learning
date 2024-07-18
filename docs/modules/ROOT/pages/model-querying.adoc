@@ -1,0 +1,4 @@
+=== Model Querying
+There are different ways to query automatically built models from Python, Clojure and JavaScript.
+
+Checkout the https://github.com/OpenGen/GenSQL.query[GenSQL.query repository] to learn how to query models and data.

@@ -1,0 +1,71 @@
+=== Generate Baseline Data
+In order to quantitatively assess the quality, we compare our results with relevant baselines from the Synthetic Data Vault.
+
+Users need to install the software from the https://pypi.org/project/sdv/[Synthetic Data Vault]. 
+
+First, exit your nix environment by running 
+[source,bash]
+----
+exit
+----
+
+Copy the following script into a file named `sdv_generate.py` in the `GenSQL.structure_learning` directory. 
+
+
+[source, python]
+----
+import pandas as pd
+from sdv.metadata import SingleTableMetadata
+from sdv.single_table import GaussianCopulaSynthesizer, CTGANSynthesizer
+
+# Read the data
+df = pd.read_csv("data/ignored.csv")
+
+# Detect metadata from the dataframe
+metadata = SingleTableMetadata()
+metadata.detect_from_dataframe(data=df)
+
+# Save metadata to JSON
+metadata.save_to_json("data/metadata.json")
+
+# Load metadata from JSON
+metadata = SingleTableMetadata.load_from_json("data/metadata.json")
+
+# Initialize and fit the CTGAN synthesizer
+gan = CTGANSynthesizer(metadata)
+gan.fit(df)
+gan_df = gan.sample(len(df))
+gan_df.to_csv("data/synthetic-data-gan.csv", index=False)
+
+# Initialize and fit the Gaussian Copula synthesizer
+copula = GaussianCopulaSynthesizer(metadata)
+copula.fit(df)
+cop_df = copula.sample(len(df))
+cop_df.to_csv("data/synthetic-data-copula.csv", index=False)
+----
+
+Execute it by running:
+----
+python sdv_generate.py
+----
+This will produce synthetic data from a copula model and a GAN 
+and put the output into `data/synthetic-data-gan.csv` and `data/synthetic-data-copula.csv`.
+
+When your data has been generated re-enter your nix environment by running
+[source,bash]
+----
+nix develop
+----
+
+=== Assess "Fidelity"
+
+Fidelity describes how well the synthetic data produced by a model matches the
+training data.
+
+Structure learning uses https://github.com/InferenceQL/lpm.fidelity[the lpm.fidelity library] to assess
+how accurately GenSQL's synthetic data (saved in `data/synthetic-data-gensql.csv`) matches the training data.
+
+Uncomment https://github.com/OpenGen/GenSQL.structure-learning/blob/main/params.yaml#L74-L75[these two lines] and run `dvc repro` to include the newly added baselines.
+
+Then, go to the file `qc/app/fidelity.html` and open it with a web browser to
+see how well your model performs compared to your baselines.

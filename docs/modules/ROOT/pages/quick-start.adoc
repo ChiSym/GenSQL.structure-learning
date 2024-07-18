@@ -1,9 +1,9 @@
-= Quickstart
+= Quick Start Guide
 Ulli Schaechtle <u.schaechtle@gmail.com>
 
 == Overview
 
-This is a quickstart guide to help novice users to use the GenSQL structure-learning codebase to build their own
+This is a quickstart guide to help novice users use the GenSQL structure-learning codebase to build their own
 models on tabular data and show how they can join these models with a large
 population model (LPM). A large population model is a new class of foundational
 model aimed at generating data about people.
@@ -12,26 +12,34 @@ The first step to get started is installing our software.
 
 include::installation.adoc[]
 
-== Process
+== Build, Validation, and Submission Process
 
-Structure learning for multivariate, heterogeneously-typed data is hard! The
-following describes a supportable process with guardrails. The process enables novice
-users to use GenSQL.structure-learning and contribute to the LPM.
-There are a total of 8 steps. After each step, an artifact is shared with the GenSQL team. This ensures any problems that may occur are reproducible by the GenSQL team so that they can be maximally helpful.
+Structure learning for multivariate, heterogeneously-typed data is hard! 
+The following describes how to build your project in a way that is supportable by the GenSQL team.
+The process enables novice users to use GenSQL.structure-learning and contribute to the LPM. 
+We ask that you iteratively test your model, increasing in size and complexity only after validating a smaller subset works. 
+After each iteration we recommend sharing an artifact with the GenSQL team for validation and assistance. 
+This ensures any problems that may occur are reproducible by the GenSQL team so that we can be maximally helpful.
 
+=== Bug Reporting
 
-=== 1. Prepare a CSV file and document it
+If you run into something that you believe to be a bug while working your way through the tutorial, please 
+follow the link:bug-reporting.adoc[instructions for triaging and reporting bugs]. 
 
-Copy your CSV files into GenSQL.structure_learning/data and rename it data.csv.
+== 1. Prepare and Document your Data File 
 
-==== Document your CSV file
-Before we begin the modeling, we create a text file and a CSV file which
-describes our data. These two files are sent to the GenSQL team for review.
+Copy your CSV file into GenSQL.structure_learning/data and rename it data.csv.
 
-This helps the GenSQL team support the users and ensures the data is suitable to be
+For more details on how to prepare your data see the link:data-preparation.adoc[Data Preparation] page.
+
+=== Document your Data File
+Before we begin modeling, we create a text file and an additional CSV file which will
+describe your data. These two files are sent to the GenSQL team for review.
+
+This helps the GenSQL team support users and ensures the data is suitable to be
 joined into the LPM.
 
-This file records answers to the following checklist:
+The text file records answers to the following checklist:
 
 ----
 Describe the rows. In my CSV file `data/data.csv`, rows correspond to
@@ -59,7 +67,7 @@ Which columns predict this outcome?
     [insert list here - use best guess]
 ----
 
-Add another CSV file recording the schema of your data, i.e. a table with five columns, where each row corresponds to a column:
+The additional CSV file records the schema of your data, i.e. a table with five columns, where each row corresponds to a column:
 
 . Name of column (without special characters)
 . Short description (one or two sentences)
@@ -69,18 +77,16 @@ figure 1 https://papers.nips.cc/paper_files/paper/2016/file/46072631582fc240dd26
 . Count of missing values
 . Count of unique values
 
-==== When is this step complete?
+=== When is this step complete?
 
 Submit the checklist and the CSV file recording your schema to a member of the
 GenSQL team. When they approve, you can move on to the next step.
 
-=== 2. Build the first small model
-
-==== Create a small subset
+== 2. Create a Small Test Data Set
 
 First, create a version of your CSV file with ten columns only. Use the ten most important columns as per your answer above.
 
-==== Configure the pipeline
+=== Configure the Pipeline
 
 Open the file `params.yaml`. Ensure the fields specified are set as follows (leave the rest as-is):
 
@@ -109,117 +115,33 @@ cgpm:
 ----
 
 Explicitly write out all columns in the schema section instead of `age`, `Apogee_km` and `Perigee_km`.
-For a detailed explanation of how you can configure `params.yaml`, see the
-section link:structure-learning.html#pipeline-config[Configuring the pipeline]
-in the main documentation.
+See the link:pipeline-configuration.adoc[Pipeline Configuration] page for a detailed explanation of how to configure `params.yaml`.
 
-==== Build a model!
+== 3. Build the First Small Model
+include::model-building.adoc[]
 
-Now run the complete structure learning pipeline:
-[source,bash]
-----
-dvc repro
-----
+== 4. Validate the Small Model
+include::quality-control.adoc[]
 
-The output will be saved in `data/synthetic-data-gensql.csv`.
+Does the synthetic data generated by the model (orange) look similar to the training data (black)?
 
-TIP: Check the automatically generated data schema in `data/cgpm-schema.edn`. Do the
-statistical types match your intuition about the data? If not, is it a bug
-in the configuration of the pipeline or is the raw data different than imagined in
-some way?
+== 5. Share the Model
+include::model-sharing.adoc[]
 
+=== When is this step complete?
 
-Go to the file `qc/app/qc-dashboard.html` and open it with a web browser to get a first
-sense of model quality. Does the synthetic data generated by the model (orange)
-look similar to the training data (black)?
+A member of the GenSQL team will run `dvc pull` and check your result for any errors that are non-trivial to identify for 
+novice users. When they approve, you can move on to the next step.
 
-==== Now share the model
+== 6. Run Baselines
 
-Go to our link:structure-learning.html#sharing[documentation for sharing models
-and data] and share the result with a member of the GenSQL team.
+include::baseline-comparison.adoc[]
 
-==== When is this step complete?
-
-A member of the GenSQL team will run `dvc pull` and check your result for any errors that are non-trivial to identify for novice users. When they approve, you can move on to the next step.
-
-=== 3. Run baselines
-
-In order to quantitatively assess the quality, we compare our results with relevant baselines from the Synthetic Data Vault.
-
-Users need to install the software from the https://pypi.org/project/sdv/[Synthetic Data Vault]. 
-
-First, exit your nix environment by running 
-[source,bash]
-----
-exit
-----
-
-Copy the following script into a file named `sdv_generate.py` in the `GenSQL.structure_learning` directory. 
-
-
-[source, python]
-----
-import pandas as pd
-from sdv.metadata import SingleTableMetadata
-from sdv.single_table import GaussianCopulaSynthesizer, CTGANSynthesizer
-
-# Read the data
-df = pd.read_csv("data/ignored.csv")
-
-# Detect metadata from the dataframe
-metadata = SingleTableMetadata()
-metadata.detect_from_dataframe(data=df)
-
-# Save metadata to JSON
-metadata.save_to_json("data/metadata.json")
-
-# Load metadata from JSON
-metadata = SingleTableMetadata.load_from_json("data/metadata.json")
-
-# Initialize and fit the CTGAN synthesizer
-gan = CTGANSynthesizer(metadata)
-gan.fit(df)
-gan_df = gan.sample(len(df))
-gan_df.to_csv("data/synthetic-data-gan.csv", index=False)
-
-# Initialize and fit the Gaussian Copula synthesizer
-copula = GaussianCopulaSynthesizer(metadata)
-copula.fit(df)
-cop_df = copula.sample(len(df))
-cop_df.to_csv("data/synthetic-data-copula.csv", index=False)
-----
-
-Execute it by running:
-----
-python sdv_generate.py
-----
-This will produce synthetic data from a copula model and a GAN 
-and put the output into `data/synthetic-data-gan.csv` and `data/synthetic-data-copula.csv`.
-
-When your data has been generated re-enter your nix environment by running
-[source,bash]
-----
-nix develop
-----
-
-==== Assess "fidelity"
-
-Fidelity describes how well the synthetic data produced by a model matches the
-training data.
-
-Structure learning uses https://github.com/InferenceQL/lpm.fidelity[the lpm.fidelity library] to assess
-how accurately GenSQL's synthetic data (saved in `data/synthetic-data-gensql.csv`) matches the training data.
-
-Uncomment https://github.com/OpenGen/GenSQL.structure-learning/blob/main/params.yaml#L74-L75[these two lines] and run `dvc repro` to include the newly added baselines.
-
-Then, go to the file `qc/app/fidelity.html` and open it with a web browser to
-see how well your model performs compared to your baselines.
-
-==== When is this step complete?
+=== When is this step complete?
 
 A member from the GenSQL will run `dvc pull` and inspect `data/fidelity.png`.  When we beat the baselines, we can move to the next step.
 
-=== 4. Grow the model
+== 7. Grow the Model
 
 Set
 https://github.com/OpenGen/GenSQL.structure-learning/blob/main/params.yaml#L10[this line] in `params.yaml` to 10000 and https://github.com/OpenGen/GenSQL.structure-learning/blob/main/params.yaml#L32[this line]
@@ -234,12 +156,11 @@ Repeat step 3! How does `data/fidelity.png` look like?
 
 Share the model and `data/fidelity.png` with us as described above.
 
-
-==== When is this step complete?
+=== When is this step complete?
 
 A member from the GenSQL will run `dvc pull` and inspect `data/fidelity.png`.  When we beat the baselines, we can move to the next step.
 
-=== 5. Grow the model again
+== 8. Grow the Model Again
 
 Change your CSV file to include the 30 most important columns instead of ten.
 Set
@@ -255,22 +176,22 @@ Repeat step 3! How does `data/fidelity.png` look like?
 
 Share the model and `data/fidelity.png` with us as described above.
 
-==== When is this step complete?
+=== When is this step complete?
 
 A member from the GenSQL will run `dvc pull` and inspect `data/fidelity.png`.  When we beat the baselines, we can move to the next step.
 
-=== 6. Model the full dataset
+== 9. Model the Full Dataset
 
 Repeat the process for the full dataset and share the model and `data/fidelity.png` with us as described above.
 
-==== When is this step complete?
+=== When is this step complete?
 
 A member from the GenSQL will run `dvc pull` and inspect `data/fidelity.png`.  When we beat the baselines, we can move to the next step.
 
-=== 7. Smoke test a generative join
+== 10. Smoke Test a Generative Join
 
 TBD
 
-=== 8. Plot the result a generative join
+== 11. Plot the Result a Generative Join
 
 TBD

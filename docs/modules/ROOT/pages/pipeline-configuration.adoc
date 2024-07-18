@@ -1,0 +1,74 @@
+
+=== Pipeline Configuration
+
+==== Data Settings
+
+There are a variety of settings in the `params.yaml` file in the structure-learning root dir. 
+The following might need to be changed depending on your dataset.
+
+==== Schema
+
+GenSQL focuses on two types of columns: `numerical` (recording real numbers) and `nominal` columns (recording categories). 
+GenSQL handles ordinal columns by expressing them as nominal. Columns that should be ignored during analysis can be set to `ignore`.
+
+Structure-learning tries to guess the statistical data types in your CSV. You can see
+which statistical types are guessed by running `dvc repro -f guess-schema` and then opening `data/schema.edn`.
+
+TIP: If a statistical type cannot be guessed with confidence, structure-learning chooses to ignore this column. 
+You can add `default-stat-type: numerical` or `default-stat-type: nominal` if you prefer to define the stattypes 
+of all columns that can't be guessed. This can save you some time when a lot of columns are ignored.
+
+If you want to manually set the data types for one or more columns you can do that in `schema` section in `params.yaml`.
+
+The key section in `params.yaml` is:
+[source,bash]
+----
+Key/value pairs can be added here to explicitly override the inferred schema
+  # for each column. The available types are as follows: numerical, nominal, and ignore.
+  # For example, to force the "age" column to be treated as a
+  # numerical uncomment the following line:
+  # age: numerical
+  # Apogee_km: numerical
+  # Perigee_km: ignore
+----
+
+==== Nullify
+
+This setting allows you to specify which string values will be considered as
+null values in your CSV. For example, if you have the string `NaN` encoding
+missing data then you have to let the structure-learning system know.
+
+NOTE: The system will treat strings as categories in a categorical variable.
+
+The key section in `params.yaml` is:
+[source,bash]
+----
+nullify:
+  # Entries added here will be treated as null. For example, to treat "NaN" and
+  # "missing" as null uncomment the following two lines:
+  # - NaN
+  # - missing
+----
+
+==== Inference-Related Settings
+
+There are a number of settings in `params.yaml` file that allow you to control the inference process. 
+See the link:model-backends.adoc[model backends] section on CGPM for more details on these settings.
+
+==== QC Options
+
+See the comments in the `qc` section of the `params.yaml` file for details on the various settings available for QC plots.
+
+[source,bash]
+----
+qc:
+  # Set this to the number of synthetic samples desired in QC plots.
+  sample_count: 1000
+  # Set this to specify the columns visualized in QC plots.
+  # When not set, up to 8 columns--taken from the schema--will be visualized.
+  # e.g. columns: ["foo", "bar", "baz"]
+  columns: null
+  # This limits the number of categories shown for categorical variables in
+  # 2-dimensional QC plots. Set this to null for no limit.
+  category_limit: 10
+----
