@@ -1,0 +1,30 @@
+=== Build a Model!
+
+GenSQL structure-learning is built around DVC (https://dvc.org/), a project that helps with 
+version control of machine learning pipelines.
+
+The steps for building a model are encoded as dvc pipelines (see `dvc.yaml`) All we have to do is 
+run the pipeline and dvc takes care of the rest.
+
+From the root structure-learning directory (`GenSQL`), we can run the following command to get a 
+list of the pipeline stages and which files they will produce giving us an overview of the work 
+that will be done to build the model.
+
+[source,bash]
+----
+dvc stage list
+----
+
+Now run all of the pipelines by executing:
+[source,bash]
+----
+dvc repro
+----
+Run `dvc repro --help` to see different options of running the pipeline.
+
+
+The output will be saved in `data/synthetic-data-gensql.csv`.
+
+TIP: Check the automatically generated data schema in `data/cgpm-schema.edn`. Do the
+statistical types match your intuition about the data? If not, should they be hardcoded in the 
+link:pipeline-configuration.adoc[pipeline configuration], or is the raw data different than imagined?

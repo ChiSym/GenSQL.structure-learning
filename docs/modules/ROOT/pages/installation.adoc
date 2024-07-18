@@ -39,7 +39,7 @@ git clone git@github.com:OpenGen/GenSQL.structure-learning.git
 To install modeling capabilities, go to the structure-learning directory:
 [source,bash]
 ----
-cd GenSQL.structure-learning.git
+cd GenSQL.structure-learning
 ----
 and enter a development shell that includes all the dependencies by running:
 [source,bash]

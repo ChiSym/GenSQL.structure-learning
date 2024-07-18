@@ -1,0 +1,22 @@
+=== Quality Control Plots
+
+Before we use our model, how do we know if it's any good?
+
+Structure-learning produces two quality control apps for comparing simulated data produced by the model 
+and the original observed data.
+
+You can find them in `qc/app` folder.
+
+`qc-dashboard.html` shows comparisons between all combinations of columns, while `qc-splom.html` shows a 
+scatter plot matrix of just numerical columns -- the latter is not so interesting here as none of the 
+numerical columns are inferred automatically (though there are several numerical columns in the data, 
+which one can add manually as in `test/satellites/params.yaml`).
+
+These apps are fully contained in their respective html files, so they can be easily moved around or shared.
+
+The premise of the qc-plots is following: if our model has truly learned the multi-variate distribution of 
+the data then the marginal and pairwise-marginal distributions of simulations from the model should match 
+those of the observed data. These qc-plots allow one to visually confirm this.
+
+NOTE: The plots support a number of features including panning, zooming, cross-selection, and details on hover. 
+There are also other options in the options menu. You can find more details in the QC section of this guide.

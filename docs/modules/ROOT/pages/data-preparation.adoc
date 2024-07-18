@@ -1,0 +1,49 @@
+=== Data preparation
+
+TIP: Structure leaning expects your data file to be named data.csv and placed in GenSQL.structure_learning/data.
+
+Most CSV files can be used for GenSQL! GenSQL consumes tabular data, where columns denote variables of interest 
+and rows denote observations on these variables, like in a typical Excel file, but in 
+https://en.wikipedia.org/wiki/Comma-separated_values[CSV format]. 
+Example files can be found https://github.com/InferenceQL/inferenceql.analyses/blob/public/analyses/Satellites/data.csv[here], 
+https://github.com/InferenceQL/inferenceql.analyses/blob/public/analyses/Stackoverflow/data.csv[here], and 
+https://github.com/InferenceQL/inferenceql.analyses/blob/public/analyses/Gapminder/data.csv[here]. 
+The CSV table can have empty cells; missing data is not an issue for GenSQL.
+
+TIP: When testing with smaller sub-sets of your data, always be sure to include your primary "of interest" columns in 
+order to have a valuable testable unit. 
+
+==== Requirements
+* Every column that is modeled should have more than one unique value.
+* Column names/headers cannot contain special characters or spaces.
+* The number of unique categories in every nominal column should be less than the number of rows in the table.
+* Deterministic relationships should be avoided for analysis. For example, if a person's height is recorded in 
+both centimeters and feet, users should link:pipeline-configuration.adoc[ignore] one column during analysis or remove it from the data altogether.
+* Columns recording time-stamps or concrete dates should be avoided.  Often their presence implies that the table 
+somehow encodes a kind of time series which requires a non-trivial transformation of the data to ensure columns represent 
+self-contained variables and rows record observations on them.
+
+WARNING: The resolution of the recorded measurements should be adequate. For example, assume a user wants to understand the 
+relationship between public health funding and demographics using Census data.  Assume columns are variables that record 
+health funding and demographics and each row is a State. This CSV table may not provide data fine-grained enough to discern 
+a signal in the data showing the relationships of interest. Instead, a user may decide to look at county-level data 
+(i.e. each row is a county) instead to find the effects they are looking for.
+
+==== Data dimensions
+
+GenSQL works best if the data has between 3 and 1000 columns and between 100 and 1 million rows. It's always wise to start 
+with smaller datasets first -- that means fewer rows but especially fewer columns and then grow the data. This allows for 
+shorter debugging cycles.
+
+==== Data types
+
+GenSQL focuses on two types of columns: numerical (recording real numbers) and nominal columns (recording categories). 
+GenSQL handles ordinal columns by expressing them as nominal. Columns that are important for the interpretation of analysis 
+results, but that can’t be analyzed themselves (such as index columns) can be kept, but should be explicitly link:pipeline-configuration.adoc[ignored] during analysis.
+
+The system implements modeling of other data types as well, but most users should not 
+work with them. They are experimental and not yet stress-tested.
+
+TIP: GenSQL data differs from many traditional machine learning data sets in that users don't have to decide a priori 
+on a split of columns into a target to be predicted and a set of features. Instead, GenSQL defaults to modeling all 
+columns and rows in the data jointly.
