@@ -2,15 +2,17 @@
 === Reporting a Bug or Problem
 
 Bugs can be reported via our https://github.com/OpenGen/GenSQL.structure-learning/issues[issue tracker].
-With Bayesian structure learning, bugs and problems can occur only when working with a specific model, schema, or dataset.
-To ensure the GenSQL team can help you, please share a minimal version of your data and pipeline with us.
+In order to reproduce your bug we must be able to reproduce your environment. Many bugs and problems 
+only occur with a specific model, schema, or dataset. To ensure we can help you, please 
+link:model-sharing.adoc[share a minimal version of your data and pipeline] with us.
 
-==== Report problems with models when the DVC pipeline runs end-to-end
+==== Model Quality or Model Behavior Bugs
 
-If your DVC pipeline runs end-to-end but you are unhappy with model quality or
-model behavior, please refer to the section about link:model-sharing.adoc[sharing]. Add a short description of the problem in the most recent commit message.
+If your DVC pipeline successfully runs end-to-end but you are unhappy with model quality or
+model behavior, please refer to the section about link:model-sharing.adoc[sharing]. 
+Add a short description of the problem in the most recent commit message.
 
-==== Report a crash of your DVC pipeline
+==== Report a Crash in the DVC Pipeline
 
 If the DVC pipeline crashes when you run `dvc repro`, follow a four-step procedure.
 
