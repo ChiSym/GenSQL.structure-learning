@@ -1,0 +1,29 @@
+=== Sharing your Models
+
+Sharing models works via https://dvc.org/doc/command-reference/remote#description[DVC remotes].
+Remotes can be configured by editing the
+https://github.com/OpenGen/GenSQL.structure-learning/blob/main/.dvc/config[.dvc/config file].
+
+Users need to change the s3 bucket and sub-address in https://github.com/OpenGen/GenSQL.structure-learning/blob/main/.dvc/config#L5[this line]
+to a bucket and directory that they have access to. Reach out to the team to get access to the buckets managed by the GenSQL team.
+
+Once this is done, the process consists of pushing changes to GitHub and the remote:
+
+1. Check out a new git branch by running `git checkout -b [branchname]`.
+2. Ensure your pipeline is up-to-date by running `dvc repro`.
+3. Check all raw data used in with DVC. For example, if the raw data consists of a single CSV and no pre-processing was added, you can run `dvc add data.csv` and follow the instructions in the terminal.
+4. Commit local changes to the code, pipeline, and parameters. Ensure to always run `git add dvc.lock params.yaml dvc.yaml`.
+5. Run `git commit` and add a message about what you changed.
+6. Run `git push` (specifying upstream branch if needed).
+7. Run `dvc push`.
+
+NOTE: `dvc push` and `dvc pull` only work reliably when stages never get deleted manually from `dvc.yaml`. They *must* be deleted with `dvc remove [stage]`.
+
+WARNING: Never push to the main branch on GitHub.
+
+
+=== Downloading a model shared by someone else
+
+1. Update your remote branches on Github by running `git fetch`. Then, check out an existing git branch by running `git checkout [branchname]`.
+2. Confirm that you have access to the S3 bucket that serves as a DVC remote in `.dvc/config`.
+3. Run `dvc pull`. The data and QC directories are now populated with what was checked into this branch.
