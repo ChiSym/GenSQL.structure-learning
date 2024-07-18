@@ -1,12 +1,19 @@
-= Structure learning
+= Structure Learning
 Ulli Schaechtle <u.schaechtle@gmail.com>
 
 == Overview
 
-Ulli TODO: Write an overview of what structure learning is and why people would want to use it. Note that model querying and 
-model backends are not addressed in the quick start, so those would be good topics to introduce here.
+This documentation will help you use the GenSQL structure-learning project to build your own models on tabular data. 
+Once built, these models can be queried using a link:model-querying.adoc[variety of interfaces]. 
 
-We recommend that you start with the Quickstart, then use the individual documents for remembering how to do steps later.
+We recommend that you start with the link:quick-start.adoc[Quick Start Guide], then use the individual documents for 
+remembering how to do steps later. The link:quick-start.adoc[Quick Start Guide] shows you how to start building a 
+small model from a dataset you supply and incrementally increase the size and fidelity of the model, then share your 
+results with the GenSQL team.
+
+After following the Quick Start Guide you can review more advanced information about 
+link:model-backends.adoc[different backends] for structure-learning.
+
 
 == Documentation
 link:quick-start.adoc[Quick Start Guide]
