@@ -11,9 +11,9 @@ We recommend that you start with the Quickstart, then use the individual documen
 == Documentation
 link:quick-start.adoc[Quick Start Guide]
 
-link:data-preparation.adoc[Data Preparation]
-
 link:installation.adoc[Installation]
+
+link:data-preparation.adoc[Data Preparation]
 
 link:pipeline-configuration.adoc[Pipeline Configuration]
 
