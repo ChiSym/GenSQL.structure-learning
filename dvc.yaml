@@ -431,15 +431,15 @@ stages:
     outs:
       - data/xcat/complete/
 
-  xcat-merge:
-    cmd: >
-      clj -X gensql.structure-learning.clojurecat/merge
-      :models data/xcat/complete
-      :out data/xcat/xcat.merged.edn
-    deps:
-      - data/xcat/complete
-    outs:
-      - data/xcat/xcat.merged.edn
+#  xcat-merge:
+#    cmd: >
+#      clj -X gensql.structure-learning.clojurecat/merge
+#      :models data/xcat/complete
+#      :out data/xcat/xcat.merged.edn
+#    deps:
+#      - data/xcat/complete
+#    outs:
+#      - data/xcat/xcat.merged.edn
 
   qc-dashboard-spec:
     cmd: >
@@ -528,32 +528,32 @@ stages:
       outs:
         - data/predictions.csv
 
-  assemble-database:
-    cmd: >
-      clojure -M:exec gensql.structure-learning.main assemble-database
-      --table-name ${database.table_name}
-      --table-path ${database.table_path}
-      --model-name ${database.model_name}
-      --model-path ${database.model_path}
-      > data/db.edn
-    params:
-      - database.table_name
-      - database.table_path
-      - database.model_name
-      - database.model_path
-    deps:
-      - data/nullified.csv
-      - data/cgpm
-      - data/xcat
-    outs:
-      - data/db.edn
+#  assemble-database:
+#    cmd: >
+#      clojure -M:exec gensql.structure-learning.main assemble-database
+#      --table-name ${database.table_name}
+#      --table-path ${database.table_path}
+#      --model-name ${database.model_name}
+#      --model-path ${database.model_path}
+#      > data/db.edn
+#    params:
+#      - database.table_name
+#      - database.table_path
+#      - database.model_name
+#      - database.model_path
+#    deps:
+#      - data/nullified.csv
+#      - data/cgpm
+#      - data/xcat
+#    outs:
+#      - data/db.edn
 
   qc-discretize:
     foreach: ${synthetic_data_evaluation.datasets}
     do:
       cmd: >
         mkdir -p data/discretized/ &&
-        python scripts/discretize.py
+        nix develop github:InferenceQL/lpm.discretize -c python scripts/discretize.py
         --real data/ignored.csv
         --synthetic data/${item}
         --schema data/loom-schema.json
@@ -572,7 +572,7 @@ stages:
     do:
       cmd: >
         mkdir -p data/fidelity/ &&
-        assess-distance
+        nix develop github:InferenceQL/lpm.fidelity -c assess-distance
         --data-1 data/discretized/ignored.csv
         --data-2 data/discretized/${item}
         --bivariate
