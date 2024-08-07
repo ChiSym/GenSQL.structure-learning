@@ -63,6 +63,19 @@ def main():
     spe = spe_sum if n_children > 1 else spe_sum.children[0]
     spe.child = id_children
 
+    #  2024-07-13: (Tim) Special for istream modeling
+    spe = spe.condition(Identity("created_at") > 0)
+    spe = spe.condition(Identity("max_visit_month") >= 0)
+    spe = spe.condition(Identity("seat_capacity") > 0)
+    spe = spe.condition(Identity("total_score") >= 0)
+    spe = spe.condition(Identity("review_count") >= 0)
+    spe = spe.condition(Identity("hozon_count") >= 0)
+    spe = spe.condition(Identity("all_photo_count") >= 0)
+    spe = spe.condition(Identity("photo_food_count") >= 0)
+    spe = spe.condition(Identity("photo_drink_count") >= 0)
+    spe = spe.condition(Identity("photo_interior_count") >= 0)
+    spe = spe.condition(Identity("photo_exterior_count") >= 0)
+
     json.dump(spe_to_dict.spe_to_dict(spe), args.output)
 
 
