@@ -1,8 +1,11 @@
 [core]
     analytics = false
-    remote = default-s3-remote
+    remote = pm-dg-s3-remote
     site_cache_dir = ./.dvc/cache
+    autostage = true
 [cache]
     dir = cache
 ['remote "default-s3-remote"']
     url = s3://lpm-research/default
+['remote "pm-dg-s3-remote"']
+    url = s3://prob-comp.data-sharing/point-up-mall/iql/
