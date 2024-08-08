@@ -21,7 +21,7 @@
 (defn guess-stattype
   "Guess the statistical type of a collection of values."
   [default-type coll]
-  (let [max-categories 50
+  (let [max-categories 255
         dv (distinct coll) ; Distinct vals.
         num-dv (count dv)
         ratio-dv (/ num-dv (count coll)) ; Ratio of distinct vals to all vals.
