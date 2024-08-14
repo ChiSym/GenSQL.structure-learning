@@ -1,5 +1,5 @@
 seed: 0
-sample_count: 10
+sample_count: 1
 sub_sample:
   #according_to_columns:
   #  Class_of_Orbit:
@@ -35,19 +35,20 @@ schema:
   # (i) (80%, 90%]
   # (j) (90%, 100%]
   Municipality: ignore
-  Total_population__Both_sexes_: numerical
-  Taxable_income__million_yen_: numerical
+  Total_population__Both_sexes_: nominal
+  Taxable_income__million_yen_: nominal
   Ordinal_Number_of_employed_persons: nominal
-  Number_of_households__Total_: numerical
+  Number_of_households__Total_: nominal
   Ordinal_Number_of_physicians: nominal
-  Number_of_dwellings_with_occupying_households: numerical
+  Number_of_dwellings_with_occupying_households: nominal
   Ordinal_Total_population__65_and_over_: nominal
-  Number_of_elderly_nursing_facilities__Questionnaire_about_basic_matters_: numerical
+  Number_of_elderly_nursing_facilities__Questionnaire_about_basic_matters_: nominal
+  Number_of_lower_secondary_school_students: nominal
 loom:
   extra_passes: 100
 cgpm:
   iterations: 1
-  minutes: 60
+  minutes: 450
   #dependence:
   #  # While the CrossCat implementation in CGPM takes dependence constraints, doing so
   #  # throws a not-implemented-error. Hence, we apply a workaround:
