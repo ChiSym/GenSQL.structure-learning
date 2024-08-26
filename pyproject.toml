@@ -16,7 +16,7 @@ jsonschema = "^4.19.0"
 catboost = "^1.2"
 scikit-learn = "^1.3.0"
 pytest = "^6.2"
-dvc-s3= "^2.23"
+dvc-s3= "^3.2.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"
