@@ -71,6 +71,7 @@ def main():
     base_metadata = dict(
         X=df.values, cctypes=cctypes, distargs=distargs, outputs=range(df.shape[1])
     )
+    base_metadata["Zv"] = {i: 0 for i in range(len(cctypes))}
     if args.model == "CrossCat":
         pass  # don't constrain the model space further.
     elif args.model == "DPMM":

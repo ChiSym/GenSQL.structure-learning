@@ -8,15 +8,14 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "~3.10.12"
-cgpm = {git = "https://github.com/probcomp/cgpm.git", branch = "zane/hardcode-version"}
+cgpm = {git = "https://github.com/probcomp/cgpm.git", rev = "schaechtle/loom-compatible-parametrization"}
 dvc = "^3.13.3"
 sppl = {git = "https://github.com/probsys/sppl.git"}
 edn-format = "^0.7.5"
 jsonschema = "^4.19.0"
 catboost = "^1.2"
 scikit-learn = "^1.3.0"
-pytest = "^6.2"
-dvc-s3= "^2.23"
+pytest = "^6.2.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"

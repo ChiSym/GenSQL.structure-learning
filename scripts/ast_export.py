@@ -20,7 +20,7 @@ def read_metadata(f):
     # as lists of pairs. When deserializing them we need to do the conversion
     # in the other direciton.
 
-    for k in ["view_alphas", "Zv", "Zrv"]:
+    for k in ["view_structure_hypers", "Zv", "Zrv"]:
         if k in metadata:
             metadata[k] = dict(metadata[k])
 
@@ -86,11 +86,11 @@ def export_primitive(output, cctype, hypers, suffstats, distargs, categorical_ma
 
     elif cctype == "categorical":
         k = distargs["k"]
-        alpha = hypers["alpha"]
+        alphas = [hypers[f"alpha_{i}"] for i in range(len(hypers))]
         N = suffstats["N"]
         counts = suffstats["counts"]
         # Compute the distribution.
-        weights = [alpha + counts[i] for i in range(k)]
+        weights = [alphas[i] + counts[i] for i in range(k)]
         norm = sum(weights)
         if categorical_mapping is None:
             keys = map(str, range(k))
@@ -107,20 +107,29 @@ def export_primitive(output, cctype, hypers, suffstats, distargs, categorical_ma
 
     elif cctype == "crp":
         alpha = hypers["alpha"]
+        discount = hypers["discount"]
         N = suffstats["N"]
         counts = dict(suffstats["counts"])
         assert 1 <= len(counts)
         # Compute the distribution.
         tables = sorted(counts)
-        weights = [counts[t] for t in tables] + [alpha]
-        norm = sum(weights)
+
+        total_count = counts.values()
+        logdenom = math.log(total_count + alpha)
+        new_table_prob = math.log(len(counts) * discount + alpha) - logdenom
+        probs = [new_table_prob - math.log(m) if count==0 else
+                log(count - self.discount) - logdenom
+                for count in counts.values()
+        ]
+        weight = probs + [new_table_prob]
+
         keys = map(str, range(len(weights)))
         dist = {
             edn_format.Keyword("distribution/type"): edn_format.Keyword(
                 "distribution.type/categorical"
             ),
             edn_format.Keyword("categorical/category->weight"): {
-                key: weight / norm for key, weight in zip(keys, weights)
+                key: math.exp(weight) for key, weight in zip(keys, weights)
             },
         }
 
@@ -247,7 +256,7 @@ def export_cluster(
 def export_view(metadata, categorical_mapping, variable_mapping):
     # Compute the CRP cluster weights using Zr and alpha.
     Zr = metadata["Zr"]
-    alpha = metadata["alpha"]
+    alpha = metadata["structure_hypers"]["alpha"]
     counts = Counter(Zr)
     tables_existing = sorted(set(Zr))
     table_aux = max(tables_existing) + 1 if (len(tables_existing) > 0) else 0
@@ -324,7 +333,7 @@ def main():
             "distargs": metadata["distargs"],
             "suffstats": metadata["suffstats"],
             "Zr": metadata["Zrv"][view_idx],
-            "alpha": metadata["view_alphas"][view_idx],
+            "structure_hypers": metadata["view_structure_hypers"][view_idx],
         }
         view = export_view(metadata_view, category_mapping, variable_mapping)
         views.append({edn_format.Keyword("view/clusters"): view})
