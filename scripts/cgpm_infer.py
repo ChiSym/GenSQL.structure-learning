@@ -45,7 +45,7 @@ def main():
         action="append",
         type=str,
         help="Inference kernel.",
-        default=["alpha", "view_alphas", "column_hypers"],
+        default=["structure_hypers", "view_structure_hypers", "column_hypers"],
         metavar="KERNEL",
         dest="kernels",
     )

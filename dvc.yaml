@@ -125,6 +125,14 @@ stages:
     outs:
       - loom/samples
 
+
+  loom-featur-encoding:
+    cmd: ./bin/loom python -m loom cat loom/ingest/encoding.json.gz > data/loom-feature-encoding.json
+    deps:
+      - loom/ingest
+    outs:
+      - data/loom-feature-encoding.json
+
   loom-dump-metadata:
     cmd: >
       mkdir -p data/cgpm/raw &&
@@ -132,11 +140,13 @@ stages:
       parallel ${parallel.flags}
       ./bin/loom python scripts/loom_dump.py {}
       --output data/cgpm/raw/{/}.json
+      --data data/numericalized.csv
     params:
       - parallel.flags
     deps:
       - loom/samples
       - scripts/loom_dump.py
+      - data/loom-feature-encoding.json
     outs:
       - data/cgpm/raw
 
@@ -179,8 +189,8 @@ stages:
       sort |
       parallel ${parallel.flags}
       'python scripts/cgpm_infer.py {}
-      --kernel alpha
-      --kernel view_alphas
+      --kernel structure_hypers
+      --kernel view_structure_hypers
       --kernel column_hypers
       --kernel rows
       --kernel columns
@@ -553,7 +563,7 @@ stages:
     do:
       cmd: >
         mkdir -p data/discretized/ &&
-        python scripts/discretize.py
+        nix develop github:InferenceQL/lpm.discretize -c python scripts/discretize.py
         --real data/ignored.csv
         --synthetic data/${item}
         --schema data/loom-schema.json
@@ -572,7 +582,7 @@ stages:
     do:
       cmd: >
         mkdir -p data/fidelity/ &&
-        assess-distance
+        nix develop github:InferenceQL/lpm.fidelity -c assess-distance
         --data-1 data/discretized/ignored.csv
         --data-2 data/discretized/${item}
         --bivariate
