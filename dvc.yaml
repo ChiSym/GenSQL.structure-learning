@@ -563,7 +563,7 @@ stages:
     do:
       cmd: >
         mkdir -p data/discretized/ &&
-        python scripts/discretize.py
+        nix develop github:InferenceQL/lpm.discretize -c python scripts/discretize.py
         --real data/ignored.csv
         --synthetic data/${item}
         --schema data/loom-schema.json
@@ -582,7 +582,7 @@ stages:
     do:
       cmd: >
         mkdir -p data/fidelity/ &&
-        assess-distance
+        nix develop github:InferenceQL/lpm.fidelity -c assess-distance
         --data-1 data/discretized/ignored.csv
         --data-2 data/discretized/${item}
         --bivariate
